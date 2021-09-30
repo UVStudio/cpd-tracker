@@ -10,6 +10,17 @@ dotenv.config({ path: '.env' });
 connectDB();
 
 const app = express();
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+app.use(cookieParser());
+
+//Routes
+const cert = require('./routes/cert');
+
+//Mount routes
+app.use('/api/cert', cert);
+
+//Start Server
 const PORT = process.env.PORT || 5000;
 
 app.get('/', (req, res) => {
