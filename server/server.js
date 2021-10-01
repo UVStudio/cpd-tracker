@@ -17,9 +17,11 @@ app.use(cookieParser());
 
 //Routes
 const cert = require('./routes/cert');
+const pdf = require('./routes/pdf');
 
 //Mount routes
 app.use('/api/cert', cert);
+app.use('/api/pdf', pdf);
 
 //Error Handling
 app.use(errorHandler);

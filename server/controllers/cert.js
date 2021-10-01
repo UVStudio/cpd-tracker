@@ -2,7 +2,6 @@ const fs = require('fs');
 const Cert = require('../models/Cert');
 const aws = require('aws-sdk');
 const { fromPath } = require('pdf2pic');
-//import { fromPath } from 'pdf2pic';
 const ErrorResponse = require('../utils/errorResponse');
 const asyncHandler = require('../middleware/async');
 
@@ -180,6 +179,7 @@ exports.deleteAllCerts = asyncHandler(async (req, res, next) => {
     .promise();
 
   await Cert.deleteMany();
+
   res.status(200).json({
     success: 'true',
     data: { 'certificates deleted: ': certs.length },
