@@ -15,27 +15,45 @@ exports.postCert = asyncHandler(async (req, res, next) => {
 
   let certFileUrl;
   let certObj;
+  let convertSwitch = true;
 
-  console.log('certfile: ', certFile);
+  // console.log('certfile: ', certFile);
+  // console.log('certfile original name: ', certFile.originalname);
 
-  const options = {
-    density: 100,
-    quality: 80,
-    saveFilename: `${certFile.originalname}`,
-    savePath: './uploads',
-    format: 'jpg',
-  };
+  const certFileOrigName = certFile.originalname;
+  const certFileConvertedName = certFileOrigName.replace(/ /g, '-');
 
-  const storeAsImage = fromPath(certFile.path, options);
-  const pageToConvertAsImage = 1;
+  //console.log('new converted name: ', certFileConvertedName);
 
-  await storeAsImage(pageToConvertAsImage)
-    .then((resolve) => {
-      convertedCertFile = resolve;
-      console.log('convertedCertFile: ', convertedCertFile);
-      return convertedCertFile;
-    })
-    .catch(console.log('not working'));
+  const fileExtLength = certFileConvertedName.split('.').length;
+  const fileExt = certFileConvertedName.split('.')[fileExtLength - 1];
+
+  //console.log('fileExt: ', fileExt);
+
+  if (fileExt !== 'pdf') {
+    convertSwitch === false;
+  }
+
+  if (convertSwitch) {
+    const options = {
+      density: 100,
+      quality: 80,
+      saveFilename: `${certFileConvertedName}`,
+      savePath: './uploads',
+      format: 'jpg',
+    };
+
+    const storeAsImage = fromPath(certFile.path, options);
+    const pageToConvertAsImage = 1;
+
+    await storeAsImage(pageToConvertAsImage)
+      .then((resolve) => {
+        convertedCertFile = resolve;
+        console.log('convertedCertFile: ', convertedCertFile);
+        return convertedCertFile;
+      })
+      .catch(console.log('not working'));
+  }
 
   aws.config.setPromisesDependency();
   aws.config.update({
@@ -46,12 +64,12 @@ exports.postCert = asyncHandler(async (req, res, next) => {
 
   const s3 = new aws.S3();
 
-  const upload = (pic) => {
+  const upload = (cert) => {
     const params = {
       ACL: 'public-read',
       Bucket: process.env.BUCKET_NAME,
-      Body: fs.createReadStream(pic.path),
-      Key: `cert/${pic.name}`,
+      Body: fs.createReadStream(cert.path),
+      Key: `cert/${cert.name}`,
     };
 
     s3.upload(params, async (err, data) => {
@@ -59,9 +77,8 @@ exports.postCert = asyncHandler(async (req, res, next) => {
         res.json({ msg: err });
       }
 
-      fs.unlinkSync(pic.path);
+      fs.unlinkSync(cert.path);
       fs.unlinkSync(certFile.path);
-      //console.log('pic.path: ', pic.path);
 
       if (data) {
         certFileUrl = data.Location;
@@ -77,14 +94,94 @@ exports.postCert = asyncHandler(async (req, res, next) => {
       }
     });
   };
-  //upload(certFile);
-  upload(convertedCertFile);
+  if (convertSwitch) {
+    upload(convertedCertFile);
+  } else {
+    upload(certFile);
+  }
 });
 
 //desc    GET Cert by ID
 //route   GET /api/cert/:id
 //access  public
+exports.getCertById = asyncHandler(async (req, res, next) => {
+  const cert = await Cert.findById(req.params.id);
+
+  if (!cert) {
+    return next(new ErrorResponse('This certificate does not exist.', 400));
+  }
+
+  res.status(200).json({ success: true, data: cert });
+});
 
 //desc    DELETE Cert by ID
 //route   DELETE /api/cert/:id
 //access  public
+exports.deleteCertById = asyncHandler(async (req, res, next) => {
+  const cert = await Cert.findById(req.params.id);
+
+  if (!cert) {
+    return next(new ErrorResponse('This certificate does not exist.', 400));
+  }
+
+  const certPic = 'cert/' + cert.imgUrl.split('/').pop();
+
+  const deleteParam = {
+    Bucket: process.env.BUCKET_NAME,
+    Key: certPic,
+  };
+
+  const s3 = new aws.S3({
+    accessKeyId: process.env.ACCESSKEYID,
+    secretAccessKey: process.env.SECRETACCESSKEY,
+    Bucket: process.env.BUCKET_NAME,
+    region: process.env.REGION,
+  });
+
+  await s3
+    .deleteObject(deleteParam, (err, data) => {
+      if (err) console.error('err: ', err);
+      if (data) console.log('data:', data);
+    })
+    .promise();
+
+  await Cert.deleteOne({ _id: req.params.id });
+
+  res.status(200).json({ success: 'true', data: 'Certificate deleted.' });
+});
+
+//desc    DELETE all Certs img on S3
+//route   DELETE /api/cert/
+//access  public
+exports.deleteAllCerts = asyncHandler(async (req, res, next) => {
+  const certs = await Cert.find();
+
+  const objects = certs.map((cert) => ({
+    Key: 'cert/' + cert.imgUrl.split('/').pop(),
+  }));
+
+  const deleteParam = {
+    Bucket: process.env.BUCKET_NAME,
+    Delete: { Objects: objects },
+  };
+
+  const s3 = new aws.S3({
+    accessKeyId: process.env.ACCESSKEYID,
+    secretAccessKey: process.env.SECRETACCESSKEY,
+    Bucket: process.env.BUCKET_NAME,
+    region: process.env.REGION,
+  });
+
+  await s3
+    .deleteObjects(deleteParam, (err, data) => {
+      if (err) console.error('err: ', err);
+      if (data) console.log('data:', data);
+    })
+    .promise();
+
+  await Cert.deleteMany();
+  res.status(200).json({
+    success: 'true',
+    data: { 'certificates deleted: ': certs.length },
+  });
+});

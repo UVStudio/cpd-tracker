@@ -2,6 +2,7 @@ const express = require('express');
 const dotenv = require('dotenv');
 const cookieParser = require('cookie-parser');
 const connectDB = require('./db/db');
+const errorHandler = require('./middleware/error');
 
 //.env setup
 dotenv.config({ path: '.env' });
@@ -19,6 +20,9 @@ const cert = require('./routes/cert');
 
 //Mount routes
 app.use('/api/cert', cert);
+
+//Error Handling
+app.use(errorHandler);
 
 //Start Server
 const PORT = process.env.PORT || 5000;
