@@ -1,7 +1,4 @@
-const fs = require('fs');
 const PDFDocument = require('pdfkit');
-const Cert = require('../models/Cert');
-const aws = require('aws-sdk');
 const axios = require('axios');
 const ErrorResponse = require('../utils/errorResponse');
 

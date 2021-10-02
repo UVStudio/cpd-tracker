@@ -1,6 +1,5 @@
 const express = require('express');
 const multer = require('multer');
-
 const {
   postCert,
   getCertById,
@@ -10,14 +9,15 @@ const {
 
 const router = express.Router();
 
+const { protect } = require('../middleware/auth');
+
 const multerSingle = multer({
   dest: 'uploads/',
-  //limits: { fieldSize: 300 * 300 },
 }).single('cert');
 
 router.get('/:id', getCertById);
 router.delete('/:id', deleteCertById);
 router.delete('/', deleteAllCerts);
-router.post('/', multerSingle, postCert);
+router.post('/', protect, multerSingle, postCert);
 
 module.exports = router;

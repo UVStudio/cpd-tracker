@@ -1,5 +1,6 @@
 const fs = require('fs');
 const Cert = require('../models/Cert');
+const User = require('../models/User');
 const aws = require('aws-sdk');
 const { fromPath } = require('pdf2pic');
 const ErrorResponse = require('../utils/errorResponse');
@@ -7,15 +8,18 @@ const asyncHandler = require('../middleware/async');
 
 //desc    POST Cert
 //route   POST /api/cert/
-//access  public
+//access  private
 exports.postCert = asyncHandler(async (req, res, next) => {
+  const userId = req.user.id;
   const certFile = req.file;
+  const year = req.body.year;
   let convertedCertFile;
 
   let certFileUrl;
   let certObj;
   let convertSwitch = true;
 
+  // console.log('userId: ', userId);
   // console.log('certfile: ', certFile);
   // console.log('certfile original name: ', certFile.originalname);
 
@@ -86,8 +90,15 @@ exports.postCert = asyncHandler(async (req, res, next) => {
         );
 
         certObj = await Cert.create({
+          user: userId,
           imgUrl: certFileUrl,
-        });
+          year,
+        }).catch(
+          res
+            .status(400)
+            .json({ success: false, data: 'Certificate not uploaded' })
+        );
+
         res.status(200).json({ success: true, data: certObj });
         return;
       }
