@@ -7,7 +7,6 @@ const asyncHandler = require('../middleware/async');
 exports.uploadImage = asyncHandler(async (req, res, next) => {
   try {
     res.json({ file: req.file });
-    //console.log('req.file: ', req.file);
     // const profile = await Profile.findById(req.profile.id);
     // profile.avatarId = avatarId;
     // //console.log(profile);
