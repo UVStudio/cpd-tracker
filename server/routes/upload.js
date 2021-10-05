@@ -52,21 +52,3 @@ const upload = multer({ storage, limits: { fileSize: 300000 } });
 router.post('/', upload.single('cert'), uploadImage);
 
 module.exports = router;
-
-// //@route   POST /api/upload
-// //@desc    Uploads file to DB
-// //@access  Private
-// router.post('/', upload.single('cert'), async (req, res) => {
-//   try {
-//     res.json({ file: req.file });
-//     console.log('req.file: ', req.file);
-//     // const profile = await Profile.findById(req.profile.id);
-//     // profile.avatarId = avatarId;
-//     // //console.log(profile);
-//     // await profile.save();
-//   } catch (err) {
-//     // res.render('index', { msg: err });
-//     console.error(err.message);
-//     res.status(500).send('Server Error');
-//   }
-// });
