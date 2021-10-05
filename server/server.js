@@ -8,9 +8,11 @@ const errorHandler = require('./middleware/error');
 dotenv.config({ path: '.env' });
 
 //connect DB
+let gfs;
 connectDB();
 
 const app = express();
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
@@ -19,11 +21,13 @@ app.use(cookieParser());
 const cert = require('./routes/cert');
 const pdf = require('./routes/pdf');
 const auth = require('./routes/auth');
+const upload = require('./routes/upload');
 
 //Mount routes
 app.use('/api/cert', cert);
 app.use('/api/pdf', pdf);
 app.use('/api/auth', auth);
+app.use('/api/upload', upload);
 
 //Error Handling
 app.use(errorHandler);

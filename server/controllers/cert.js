@@ -6,11 +6,14 @@ const { fromPath } = require('pdf2pic');
 const ErrorResponse = require('../utils/errorResponse');
 const asyncHandler = require('../middleware/async');
 
+//Avoid uploading duplicates onto MongoDB
+
 //desc    POST Cert
 //route   POST /api/cert/
 //access  private
 exports.postCert = asyncHandler(async (req, res, next) => {
   const userId = req.user.id;
+
   const certFile = req.file;
   const year = req.body.year;
   let convertedCertFile;
@@ -37,10 +40,11 @@ exports.postCert = asyncHandler(async (req, res, next) => {
     convertSwitch === false;
   }
 
+  //if cert is PDF, convert to jpg
   if (convertSwitch) {
     const options = {
       density: 100,
-      quality: 80,
+      quality: 60,
       saveFilename: `${certFileConvertedName}`,
       savePath: './uploads',
       format: 'jpg',
@@ -58,52 +62,51 @@ exports.postCert = asyncHandler(async (req, res, next) => {
       .catch(console.log('not working'));
   }
 
-  aws.config.setPromisesDependency();
-  aws.config.update({
-    accessKeyId: process.env.ACCESSKEYID,
-    secretAccessKey: process.env.SECRETACCESSKEY,
-    region: process.env.REGION,
-  });
+  //AWS S3 upload begins
+  // aws.config.setPromisesDependency();
+  // aws.config.update({
+  //   accessKeyId: process.env.ACCESSKEYID,
+  //   secretAccessKey: process.env.SECRETACCESSKEY,
+  //   region: process.env.REGION,
+  // });
 
-  const s3 = new aws.S3();
+  // const s3 = new aws.S3();
 
-  const upload = (cert) => {
-    const params = {
-      ACL: 'public-read',
-      Bucket: process.env.BUCKET_NAME,
-      Body: fs.createReadStream(cert.path),
-      Key: `cert/${cert.name}`,
-    };
+  // const upload = (cert) => {
+  //   const params = {
+  //     ACL: 'public-read',
+  //     Bucket: process.env.BUCKET_NAME,
+  //     Body: fs.createReadStream(cert.path),
+  //     Key: `cert/${cert.name}`,
+  //   };
 
-    s3.upload(params, async (err, data) => {
-      if (err) {
-        res.json({ msg: err });
-      }
+  //   s3.upload(params, async (err, data) => {
+  //     if (err) {
+  //       res.json({ msg: err });
+  //     }
 
-      fs.unlinkSync(cert.path);
-      fs.unlinkSync(certFile.path);
+  //     fs.unlinkSync(cert.path);
+  //     fs.unlinkSync(certFile.path);
 
-      if (data) {
-        certFileUrl = data.Location;
-        console.log(
-          'Certificate has been uploaded to S3 and URL created successfully'
-        );
+  //     if (data) {
+  //       certFileUrl = data.Location;
+  //       console.log(
+  //         'Certificate has been uploaded to S3 and URL created successfully'
+  //       );
 
-        certObj = await Cert.create({
-          user: userId,
-          imgUrl: certFileUrl,
-          year,
-        }).catch(
-          res
-            .status(400)
-            .json({ success: false, data: 'Certificate not uploaded' })
-        );
+  //       certObj = await Cert.create({
+  //         user: userId,
+  //         imgUrl: certFileUrl,
+  //         year,
+  //       });
 
-        res.status(200).json({ success: true, data: certObj });
-        return;
-      }
-    });
-  };
+  //       res.status(200).json({ success: true, data: certObj });
+  //       return;
+  //     }
+  //   });
+  // };
+
+  //code to decide whether to upload .pdf or .jpg
   if (convertSwitch) {
     upload(convertedCertFile);
   } else {

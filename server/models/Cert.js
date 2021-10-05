@@ -8,7 +8,10 @@ const CertSchema = new mongoose.Schema({
   },
   imgUrl: {
     type: String,
-    required: true,
+  },
+  img: {
+    data: Buffer,
+    contentType: String,
   },
   year: {
     type: String,

@@ -64,6 +64,7 @@ exports.login = asyncHandler(async (req, res, next) => {
 //access  private
 exports.getCurrentUser = asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.user.id);
+  //console.log('current route user: ', req.user);
 
   if (!user) {
     return next(new ErrorResponse('No user is logged in at the moment', 400));

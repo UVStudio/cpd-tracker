@@ -1,5 +1,6 @@
 const PDFDocument = require('pdfkit');
 const axios = require('axios');
+const fs = require('fs');
 const ErrorResponse = require('../utils/errorResponse');
 
 const fetchImage = async (src) => {
@@ -44,4 +45,4 @@ const buildPDF = async (imgUrls, dataCallback, endCallback) => {
   doc.end();
 };
 
-module.exports = { buildPDF };
+module.exports = { buildPDF, fetchImage };
