@@ -4,14 +4,12 @@ const CertSchema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.ObjectId,
     ref: 'User',
-    required: true,
   },
   imgUrl: {
     type: String,
   },
   img: {
-    data: Buffer,
-    contentType: String,
+    type: mongoose.Schema.ObjectId,
   },
   year: {
     type: String,

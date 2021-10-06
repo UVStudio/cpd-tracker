@@ -1,8 +1,9 @@
 const express = require('express');
 const multer = require('multer');
 const {
-  postCert,
+  //postCert,
   getCertById,
+  getCertsByUser,
   deleteCertById,
   deleteAllCerts,
 } = require('../controllers/cert');
@@ -15,9 +16,10 @@ const multerSingle = multer({
   dest: 'uploads/',
 }).single('cert');
 
+router.get('/user', protect, getCertsByUser);
 router.get('/:id', getCertById);
 router.delete('/:id', deleteCertById);
 router.delete('/', deleteAllCerts);
-router.post('/', protect, multerSingle, postCert);
+//router.post('/', protect, multerSingle, postCert);
 
 module.exports = router;

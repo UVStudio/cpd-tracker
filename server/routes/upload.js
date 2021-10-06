@@ -3,8 +3,9 @@ const path = require('path');
 const crypto = require('crypto');
 const mongoose = require('mongoose');
 const multer = require('multer');
-const { GridFsStorage } = require('multer-gridfs-storage');
 const Grid = require('gridfs-stream');
+const { fromPath } = require('pdf2pic');
+const upload = multer({ dest: 'uploads/', limits: { fileSize: 300000 } });
 const { uploadImage } = require('../controllers/upload');
 
 const router = express.Router();
@@ -24,31 +25,6 @@ conn.once('open', (req, res) => {
   gfs.collection('Upload');
 });
 
-// Create storage engine
-const storage = new GridFsStorage({
-  url: process.env.MONGO_URI,
-  file: (req, file) => {
-    return new Promise((res, rej) => {
-      crypto.randomBytes(16, (err, buf) => {
-        if (err) {
-          return reject(err);
-        }
-
-        const midName = file.originalname.split('.').shift();
-        const filename =
-          buf.toString('hex') + '-' + midName + path.extname(file.originalname);
-        const fileInfo = {
-          filename: filename,
-          //the bucketName needs to match the collection name
-          bucketName: 'Upload',
-        };
-        res(fileInfo);
-      });
-    });
-  },
-});
-const upload = multer({ storage, limits: { fileSize: 300000 } });
-
-router.post('/', upload.single('cert'), uploadImage);
+router.post('/', protect, upload.single('cert'), uploadImage);
 
 module.exports = router;
