@@ -13,7 +13,6 @@ exports.uploadImage = asyncHandler(async (req, res, next) => {
   const file = req.file;
   const userId = req.user.id;
   const year = req.body.year;
-  //console.log('file: ', file);
 
   if (!file || !year) {
     return next(new ErrorResponse('Complete the form.', 400));
@@ -31,14 +30,14 @@ exports.uploadImage = asyncHandler(async (req, res, next) => {
     midName +
     '-' +
     Date.now() +
-    '-' +
     path.extname(cleanFileName);
 
   const storage = new GridFsStorage({
     url: process.env.MONGO_URI,
     file: () => {
       return {
-        filename: userId + '-' + year + '-' + midName + '-' + Date.now(),
+        filename: userId + '-' + year + '.jpg',
+        bucketName: 'uploads',
       };
     },
   });
@@ -49,7 +48,7 @@ exports.uploadImage = asyncHandler(async (req, res, next) => {
     density: 100,
     quality: 60,
     saveFilename: `${newFileName}`,
-    savePath: './uploads',
+    savePath: `./uploads`,
     format: 'jpg',
   };
 
@@ -60,16 +59,13 @@ exports.uploadImage = asyncHandler(async (req, res, next) => {
     await storeAsImage(pageToConvertAsImage)
       .then((resolve) => {
         uploadFile = resolve;
-        //console.log('uploadfile: ', uploadFile);
         return uploadFile;
       })
       .catch(console.log('not working'));
   }
 
   const stream = fs.createReadStream(uploadFile.path);
-
   const response = await storage.fromStream(stream, req, uploadFile);
-  // console.log('response: ', response);
 
   fs.unlinkSync(file.path);
   fs.unlinkSync(uploadFile.path);

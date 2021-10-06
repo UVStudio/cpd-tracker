@@ -5,6 +5,6 @@ const router = express.Router();
 
 const { protect } = require('../middleware/auth');
 
-router.get('/', protect, getPDF);
+router.post('/', protect, getPDF);
 
 module.exports = router;

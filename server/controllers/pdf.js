@@ -20,63 +20,149 @@ let gfs;
 
 conn.once('open', (req, res) => {
   //Init stream
-  gfs = Grid(conn.db, mongoose.mongo);
-  //gfs.collection();
+  gfs = new Grid(conn.db, mongoose.mongo);
+  gfs.collection('uploads');
 });
 
-//desc    GET pdf
-//route   GET /api/pdf/
-//access  private
-exports.getPDF = asyncHandler(async (req, res, next) => {
-  const certs = await Cert.find({ user: req.user.id });
-  const imgIDs = certs.map((cert) => cert.img);
-
-  gfs.files.find().toArray(function (err, files) {
-    console.log('files found: ', files);
-    console.log('file type: ', typeof files[0]);
-    // files.forEach((file) => {
-    //   //gfs.createReadStream(file.filename).pipe(res);
-    //   console.log(file);
-    // });
-    // const readStream = gfs.createReadStream(files[0].filename);
-    // readStream.pipe(res);
-
-    gfs.files.findOne({ _id: files[0]._id }, function (err, file) {
-      console.log('file found: ', file);
+function downloadFile(file_id) {
+  return new Promise((resolve, reject) => {
+    const read_stream = gfs.createReadStream({ _id: file_id });
+    let file = [];
+    read_stream.on('data', function (chunk) {
+      file.push(chunk);
+    });
+    read_stream.on('error', (e) => {
+      console.log(e);
+      reject(e);
+    });
+    return read_stream.on('end', function () {
+      file = Buffer.concat(file);
+      const img = `data:image/png;base64,${Buffer(file).toString('base64')}`;
+      resolve(img);
     });
   });
+}
 
-  res.status(200).json({ success: 'true', data: imgIDs });
+//desc    POST pdf
+//route   POST /api/pdf/
+//access  private
+exports.getPDF = asyncHandler(async (req, res, next) => {
+  //const certs = await Cert.find({ user: req.user.id });
+  const userId = req.user.id;
+  const year = req.body.year;
+  const searchTerm = `${userId}-${year}.jpg`;
+  const regex = new RegExp('searchTerm');
 
-  // const doc = new PDFDocument();
+  console.log('search: ', searchTerm);
 
-  // doc.pipe(fs.createWriteStream('./uploads/report.pdf')); // write to PDF
-  // //doc.pipe(res); //HTTP res
+  //const imgIDs = certs.map((cert) => cert.img);
+  //console.log('imgIDs: ', imgIDs);
 
-  // doc
-  //   .image('./assets/accounting-icon.png', {
-  //     fit: [50, 50],
-  //   })
-  //   .moveDown(1);
+  let filesArr = [];
 
-  // doc.fontSize(18).text('CPD Tracker').moveDown(0);
-  // doc.fontSize(10).text('By Sheriff Consulting').moveDown(2);
+  //certs.forEach((cert) => filesArr.push(cert.img));
+  //console.log('filesArr: ', filesArr);
 
-  // for (let i = 0; i < imgUrls.length; i++) {
-  //   doc.fontSize(14).text(`Certificate #${i + 1}`);
+  const doc = new PDFDocument();
 
-  //   let tempUrl = await fetchImage(`${imgUrls[i]}`);
+  doc.pipe(fs.createWriteStream('./uploads/report.pdf')); // write to PDF
+  //doc.pipe(res); //HTTP res
 
-  //   doc
-  //     .image(tempUrl, {
+  doc
+    .image('./assets/accounting-icon.png', {
+      fit: [50, 50],
+    })
+    .moveDown(1);
+
+  doc.fontSize(18).text('CPD Tracker').moveDown(0);
+  doc.fontSize(10).text('By Sheriff Consulting').moveDown(2);
+
+  // const printingCert = async (tempImgFile) => {
+  //   return doc
+  //     .image(tempImgFile, {
   //       fit: [384, 256],
   //       align: 'center',
   //     })
   //     .moveDown(2);
+  // };
+
+  // for (let i = 0; i < filesArr.length; i++) {
+  //   gfs.files.findOne({ _id: filesArr[i] }, async (err, file) => {
+  //     console.log('file found: ', file);
+  //     doc.fontSize(14).text(`Certificate #${i + 1}`);
+  //     let tempImgFile = await downloadFile(file._id);
+  //     await printingCert(tempImgFile);
+  //     doc.end();
+  //   });
   // }
 
-  // doc.end();
+  gfs.files
+    .find({
+      filename: searchTerm,
+    })
+    .toArray(async (err, files) => {
+      //console.log('files found: ', files);
+      for (let i = 0; i < files.length; i++) {
+        doc.fontSize(14).text(`Certificate #${i + 1}`);
+        let tempImgFile = await downloadFile(files[i]._id);
+
+        doc
+          .image(tempImgFile, {
+            fit: [384, 256],
+            align: 'center',
+          })
+          .moveDown(2);
+      }
+
+      doc.end();
+    });
+
+  res.status(200).json({ success: 'true', data: filesArr });
 });
+
+// files.forEach((file) => {
+//   gfs.createReadStream({ _id: files[0]._id }).pipe(res);
+//   console.log(file);
+// });
+// gfs.createReadStream({ _id: files[0]._id }).pipe(res);
+
+// gfs.files.findOne({ _id: fileId }, function (err, file) {
+//   console.log('file found: ', file);
+//   //console.log('res: ', res);
+//   const readStream = gfs.createReadStream(file.filename);
+//   readStream.pipe(res);
+// });
+
+//res.status(200).json({ success: 'true', data: imgIDs });
+
+// const doc = new PDFDocument();
+
+// doc.pipe(fs.createWriteStream('./uploads/report.pdf')); // write to PDF
+// //doc.pipe(res); //HTTP res
+
+// doc
+//   .image('./assets/accounting-icon.png', {
+//     fit: [50, 50],
+//   })
+//   .moveDown(1);
+
+// doc.fontSize(18).text('CPD Tracker').moveDown(0);
+// doc.fontSize(10).text('By Sheriff Consulting').moveDown(2);
+
+// for (let i = 0; i < imgUrls.length; i++) {
+//   doc.fontSize(14).text(`Certificate #${i + 1}`);
+
+//   let tempUrl = await fetchImage(`${imgUrls[i]}`);
+
+//   doc
+//     .image(tempUrl, {
+//       fit: [384, 256],
+//       align: 'center',
+//     })
+//     .moveDown(2);
+// }
+
+// doc.end();
 
 //desc    GET pdf
 //route   GET /api/pdf/

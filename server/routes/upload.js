@@ -4,7 +4,6 @@ const crypto = require('crypto');
 const mongoose = require('mongoose');
 const multer = require('multer');
 const Grid = require('gridfs-stream');
-const { fromPath } = require('pdf2pic');
 const upload = multer({ dest: 'uploads/', limits: { fileSize: 300000 } });
 const { uploadImage } = require('../controllers/upload');
 
