@@ -8,7 +8,6 @@ const axios = require('axios');
 const ErrorResponse = require('../utils/errorResponse');
 const asyncHandler = require('../middleware/async');
 const { buildPDF, fetchImage } = require('../utils/pdfBuilder');
-const ObjectID = require('mongodb').ObjectID;
 
 //create mongo connection
 const conn = mongoose.createConnection(process.env.MONGO_URI, {
@@ -20,24 +19,28 @@ let gfs;
 
 conn.once('open', (req, res) => {
   //Init stream
-  gfs = new Grid(conn.db, mongoose.mongo);
-  gfs.collection('uploads');
+  //"mongoose": "^5.13.7",
+  gfs = new mongoose.mongo.GridFSBucket(conn.db, {
+    bucketName: 'uploads',
+  });
 });
 
 function downloadFile(file_id) {
   return new Promise((resolve, reject) => {
-    const read_stream = gfs.createReadStream({ _id: file_id });
+    const read_stream = gfs.openDownloadStream(file_id);
     let file = [];
-    read_stream.on('data', function (chunk) {
+    read_stream.on('data', (chunk) => {
       file.push(chunk);
     });
     read_stream.on('error', (e) => {
       console.log(e);
       reject(e);
     });
-    return read_stream.on('end', function () {
+    return read_stream.on('end', () => {
       file = Buffer.concat(file);
-      const img = `data:image/png;base64,${Buffer(file).toString('base64')}`;
+      const img = `data:image/png;base64,${Buffer.from(file).toString(
+        'base64'
+      )}`;
       resolve(img);
     });
   });
@@ -47,25 +50,17 @@ function downloadFile(file_id) {
 //route   POST /api/pdf/
 //access  private
 exports.getPDF = asyncHandler(async (req, res, next) => {
-  //const certs = await Cert.find({ user: req.user.id });
   const userId = req.user.id;
   const year = req.body.year;
   const searchTerm = `${userId}-${year}.jpg`;
-  const regex = new RegExp('searchTerm');
 
-  console.log('search: ', searchTerm);
-
-  //const imgIDs = certs.map((cert) => cert.img);
-  //console.log('imgIDs: ', imgIDs);
+  const user = await User.findById(userId);
 
   let filesArr = [];
 
-  //certs.forEach((cert) => filesArr.push(cert.img));
-  //console.log('filesArr: ', filesArr);
-
   const doc = new PDFDocument();
 
-  doc.pipe(fs.createWriteStream('./uploads/report.pdf')); // write to PDF
+  doc.pipe(fs.createWriteStream(`./uploads/${userId}-${year}.pdf`)); // write to PDF
   //doc.pipe(res); //HTTP res
 
   doc
@@ -76,34 +71,16 @@ exports.getPDF = asyncHandler(async (req, res, next) => {
 
   doc.fontSize(18).text('CPD Tracker').moveDown(0);
   doc.fontSize(10).text('By Sheriff Consulting').moveDown(2);
+  doc.fontSize(12).text(`Student Name: ${user.name}`).moveDown(1);
 
-  // const printingCert = async (tempImgFile) => {
-  //   return doc
-  //     .image(tempImgFile, {
-  //       fit: [384, 256],
-  //       align: 'center',
-  //     })
-  //     .moveDown(2);
-  // };
-
-  // for (let i = 0; i < filesArr.length; i++) {
-  //   gfs.files.findOne({ _id: filesArr[i] }, async (err, file) => {
-  //     console.log('file found: ', file);
-  //     doc.fontSize(14).text(`Certificate #${i + 1}`);
-  //     let tempImgFile = await downloadFile(file._id);
-  //     await printingCert(tempImgFile);
-  //     doc.end();
-  //   });
-  // }
-
-  gfs.files
+  conn.db
+    .collection('uploads.files')
     .find({
       filename: searchTerm,
     })
     .toArray(async (err, files) => {
-      //console.log('files found: ', files);
       for (let i = 0; i < files.length; i++) {
-        doc.fontSize(14).text(`Certificate #${i + 1}`);
+        doc.fontSize(10).text(`Certificate #${i + 1}`);
         let tempImgFile = await downloadFile(files[i]._id);
 
         doc
@@ -148,6 +125,25 @@ exports.getPDF = asyncHandler(async (req, res, next) => {
 
 // doc.fontSize(18).text('CPD Tracker').moveDown(0);
 // doc.fontSize(10).text('By Sheriff Consulting').moveDown(2);
+
+// const printingCert = async (tempImgFile) => {
+//   return doc
+//     .image(tempImgFile, {
+//       fit: [384, 256],
+//       align: 'center',
+//     })
+//     .moveDown(2);
+// };
+
+// for (let i = 0; i < filesArr.length; i++) {
+//   gfs.files.findOne({ _id: filesArr[i] }, async (err, file) => {
+//     console.log('file found: ', file);
+//     doc.fontSize(14).text(`Certificate #${i + 1}`);
+//     let tempImgFile = await downloadFile(file._id);
+//     await printingCert(tempImgFile);
+//     doc.end();
+//   });
+// }
 
 // for (let i = 0; i < imgUrls.length; i++) {
 //   doc.fontSize(14).text(`Certificate #${i + 1}`);

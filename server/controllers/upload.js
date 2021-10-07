@@ -64,6 +64,10 @@ exports.uploadImage = asyncHandler(async (req, res, next) => {
       .catch(console.log('not working'));
   }
 
+  //https://www.npmjs.com/package/sharp
+  //https://www.npmjs.com/package/png-to-jpeg
+  //https://www.npmjs.com/package/jimp
+
   const stream = fs.createReadStream(uploadFile.path);
   const response = await storage.fromStream(stream, req, uploadFile);
 
