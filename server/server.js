@@ -8,7 +8,6 @@ const errorHandler = require('./middleware/error');
 dotenv.config({ path: '.env' });
 
 //connect DB
-let gfs;
 connectDB();
 
 const app = express();

@@ -1,11 +1,11 @@
 const mongoose = require('mongoose');
 
-const CertSchema = new mongoose.Schema({
+const ReportSchema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.ObjectId,
     ref: 'User',
   },
-  img: {
+  report: {
     type: mongoose.Schema.ObjectId,
   },
   year: {
@@ -18,4 +18,4 @@ const CertSchema = new mongoose.Schema({
   },
 });
 
-module.exports = Cert = mongoose.model('Cert', CertSchema);
+module.exports = Report = mongoose.model('Report', ReportSchema);
