@@ -1,6 +1,7 @@
 const PDFDocument = require('pdfkit');
 const fs = require('fs');
 const mongoose = require('mongoose');
+const aws = require('aws-sdk');
 const { GridFsStorage } = require('multer-gridfs-storage');
 const ErrorResponse = require('../utils/errorResponse');
 
@@ -10,13 +11,22 @@ const conn = mongoose.createConnection(process.env.MONGO_URI, {
   useUnifiedTopology: true,
 });
 
-let gfs;
+let gfsCerts;
+let gfsReports;
 
 conn.once('open', (req, res) => {
   //Init stream
   //"mongoose": "^5.13.7",
-  gfs = new mongoose.mongo.GridFSBucket(conn.db, {
+  gfsReports = new mongoose.mongo.GridFSBucket(conn.db, {
     bucketName: 'reports',
+  });
+});
+
+conn.once('open', (req, res) => {
+  //Init stream
+  //"mongoose": "^5.13.7",
+  gfsCerts = new mongoose.mongo.GridFSBucket(conn.db, {
+    bucketName: 'uploads',
   });
 });
 
@@ -31,9 +41,11 @@ const buildPDF = async (
 ) => {
   const doc = new PDFDocument();
 
-  doc.pipe(fs.createWriteStream(`./uploads/${CPDFileName}`));
+  let writeStream = fs.createWriteStream(`./uploads/${CPDFileName}`);
+  doc.pipe(writeStream);
+
   const pdfObj = doc.pipe(
-    gfs.openUploadStream(`${userId}-${year}-CPD-report.pdf`)
+    gfsReports.openUploadStream(`${userId}-${year}-CPD-report.pdf`)
   );
 
   doc
@@ -54,7 +66,7 @@ const buildPDF = async (
     .toArray(async (err, files) => {
       for (let i = 0; i < files.length; i++) {
         doc.fontSize(10).text(`Certificate #${i + 1}`);
-        let tempCertFile = await downloadFile(files[i]._id);
+        let tempCertFile = await downloadFile(files[i]._id, gfsCerts);
 
         doc
           .image(tempCertFile, {
@@ -70,7 +82,50 @@ const buildPDF = async (
 
       doc.end();
     });
-  return pdfObj.id;
+
+  //Stream to S3 and create the URL
+  let reportFileUrl;
+
+  aws.config.setPromisesDependency();
+  aws.config.update({
+    accessKeyId: process.env.ACCESSKEYID,
+    secretAccessKey: process.env.SECRETACCESSKEY,
+    region: process.env.REGION,
+  });
+
+  const s3 = new aws.S3();
+
+  writeStream.on('finish', () => {
+    const pdfFile = fs.readFileSync(`./uploads/${CPDFileName}`);
+    const params = {
+      ACL: 'public-read',
+      Bucket: process.env.BUCKET_NAME,
+      Body: pdfFile,
+      Key: `reports/${CPDFileName}`,
+      contentType: 'application/pdf',
+    };
+    s3.upload(params, async (err, data) => {
+      if (err) {
+        res.json({ msg: err });
+      }
+
+      if (data) {
+        reportFileUrl = data.Location;
+        console.log(
+          'Report has been uploaded to S3 and URL created successfully'
+        );
+
+        //create Report document on mongo after PDF is created and saved on mongo
+        const reportObj = await Report.create({
+          user: userId,
+          report: pdfObj.id,
+          url: reportFileUrl,
+          year,
+        });
+      }
+    });
+  });
+  return pdfObj;
 };
 
 module.exports = { buildPDF };

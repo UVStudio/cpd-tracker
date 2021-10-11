@@ -5,9 +5,11 @@ const User = require('../models/User');
 const PDFDocument = require('pdfkit');
 const { GridFsStorage } = require('multer-gridfs-storage');
 const Grid = require('gridfs-stream');
+const aws = require('aws-sdk');
 const ErrorResponse = require('../utils/errorResponse');
 const asyncHandler = require('../middleware/async');
 const { buildPDF } = require('../utils/pdfBuilder');
+const ObjectId = require('mongodb').ObjectId;
 
 //create mongo connection
 const conn = mongoose.createConnection(process.env.MONGO_URI, {
@@ -15,17 +17,26 @@ const conn = mongoose.createConnection(process.env.MONGO_URI, {
   useUnifiedTopology: true,
 });
 
-let gfs;
+let gfsCerts;
+let gfsReports;
 
 conn.once('open', (req, res) => {
   //Init stream
   //"mongoose": "^5.13.7",
-  gfs = new mongoose.mongo.GridFSBucket(conn.db, {
+  gfsCerts = new mongoose.mongo.GridFSBucket(conn.db, {
     bucketName: 'uploads',
   });
 });
 
-function downloadFile(file_id) {
+conn.once('open', (req, res) => {
+  //Init stream
+  //"mongoose": "^5.13.7",
+  gfsReports = new mongoose.mongo.GridFSBucket(conn.db, {
+    bucketName: 'reports',
+  });
+});
+
+const downloadFile = (file_id, gfs) => {
   return new Promise((resolve, reject) => {
     const read_stream = gfs.openDownloadStream(file_id);
     let file = [];
@@ -44,12 +55,12 @@ function downloadFile(file_id) {
       resolve(img);
     });
   });
-}
+};
 
 //desc    POST pdf
 //route   POST /api/pdf/
 //access  private
-exports.getPDF = asyncHandler(async (req, res, next) => {
+exports.producePDF = asyncHandler(async (req, res, next) => {
   const userId = req.user.id;
   const year = req.body.year;
   const searchTerm = `${userId}-${year}.jpg`;
@@ -68,22 +79,23 @@ exports.getPDF = asyncHandler(async (req, res, next) => {
     downloadFile
   );
 
-  const reportObj = await Report.create({
-    user: userId,
-    report: response.id,
-    year,
-  });
-
-  res.status(200).json({ success: 'true', response: reportObj });
+  res.status(200).json({ success: 'true' });
 });
 
-// const stream = res.writeHead(200, {
-//   'Content-Type': 'application/pdf',
-//   'Content-Disposition': 'attachment;filename=report.pdf',
-// });
+//desc    GET pdf Object by PDF ID
+//route   GET /api/pdf/:id
+//access  public
+exports.getPDFByPDFId = asyncHandler(async (req, res, next) => {
+  //const clientId = req.params.id;
+  const pdfId = req.params.id;
 
-// buildPDF(
-//   imgUrls,
-//   (chunk) => stream.write(chunk),
-//   () => stream.end()
-// );
+  conn.db
+    .collection('reports.files')
+    .find({
+      //filename: `${clientId}-2021-CPD-report.pdf`,
+      _id: ObjectId(pdfId),
+    })
+    .toArray(async (err, files) => {
+      res.status(200).json({ success: true, data: files });
+    });
+});

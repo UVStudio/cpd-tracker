@@ -1,10 +1,11 @@
 const express = require('express');
-const { getPDF } = require('../controllers/pdf');
+const { producePDF, getPDFByPDFId } = require('../controllers/pdf');
 
 const router = express.Router();
 
 const { protect } = require('../middleware/auth');
 
-router.post('/', protect, getPDF);
+router.post('/', protect, producePDF);
+router.get('/:id', getPDFByPDFId);
 
 module.exports = router;

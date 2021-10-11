@@ -105,7 +105,7 @@ exports.deleteAllCerts = asyncHandler(async (req, res, next) => {
   });
 });
 
-//desc    POST Cert
+// //desc    POST Cert
 // //route   POST /api/cert/
 // //access  private
 // exports.postCert = asyncHandler(async (req, res, next) => {

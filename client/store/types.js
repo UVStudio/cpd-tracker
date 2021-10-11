@@ -5,3 +5,8 @@ export const GET_USER = 'GET_USER';
 export const AUTHENTICATE = 'AUTHENTICATE';
 export const LOGOUT = 'LOGOUT';
 export const SET_DID_TRY_AL = 'SET_DID_TRY_AL';
+export const FORM_INPUT_UPDATE = 'FORM_INPUT_UPDATE';
+
+//INPUT
+export const INPUT_CHANGE = 'INPUT_CHANGE';
+export const INPUT_BLUR = 'INPUT_BLUR';

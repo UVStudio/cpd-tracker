@@ -1,5 +1,4 @@
 import React from 'react';
-import { Platform } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
@@ -7,6 +6,7 @@ import { MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
 import Auth from '../screens/auth/Auth';
 import Profile from '../screens/auth/Profile';
 import Timer from '../screens/timer/Timer';
+import UploadSession from '../screens/timer/UploadSession';
 import Rules from '../screens/rules/Rules';
 import Records from '../screens/records/Records';
 import Colors from '../constants/Colors';
@@ -17,17 +17,16 @@ const defaultNavOptions = {
   },
   headerTitleStyle: {
     fontFamily: 'sans-serif-light',
-    fontSize: 28,
+    fontSize: 24,
   },
   headerBackTitleStyle: {
-    fontSize: 28,
+    fontSize: 24,
   },
   headerBackTitle: '',
   headerTintColor: 'white',
 };
 
 const AuthStackNavigator = createStackNavigator();
-
 export const AuthNavigator = () => {
   return (
     <AuthStackNavigator.Navigator screenOptions={defaultNavOptions}>
@@ -42,46 +41,75 @@ export const AuthNavigator = () => {
 };
 
 const TimerStackNavigator = createStackNavigator();
-
-export const TimerNavigator = () => {
+const TimerNavigator = () => {
   return (
     <TimerStackNavigator.Navigator screenOptions={defaultNavOptions}>
-      <TimerStackNavigator.Screen name="Timer" component={Timer} />
+      <TimerStackNavigator.Screen
+        name="Non-Verifiable Hours"
+        component={Timer}
+      />
+      <TimerStackNavigator.Screen
+        name="UploadSession"
+        component={UploadSession}
+      />
     </TimerStackNavigator.Navigator>
   );
 };
-
 const RecordsStackNavigator = createStackNavigator();
-
-export const RecordsNavigator = () => {
+const RecordsNavigator = () => {
   return (
     <RecordsStackNavigator.Navigator screenOptions={defaultNavOptions}>
-      <RecordsStackNavigator.Screen name="Records" component={Records} />
+      <RecordsStackNavigator.Screen
+        name="Certificate Records"
+        component={Records}
+      />
     </RecordsStackNavigator.Navigator>
   );
 };
-
 const RulesStackNavigator = createStackNavigator();
-
-export const RulesNavigator = () => {
+const RulesNavigator = () => {
   return (
     <RulesStackNavigator.Navigator screenOptions={defaultNavOptions}>
-      <RulesStackNavigator.Screen name="Rules" component={Rules} />
+      <RulesStackNavigator.Screen name="CPD Rules" component={Rules} />
     </RulesStackNavigator.Navigator>
   );
 };
-
 const ProfileStackNavigator = createStackNavigator();
-
-export const ProfileNavigator = () => {
+const ProfileNavigator = () => {
   return (
     <ProfileStackNavigator.Navigator screenOptions={defaultNavOptions}>
-      <ProfileStackNavigator.Screen name="Profile" component={Profile} />
+      <ProfileStackNavigator.Screen name="Your Profile" component={Profile} />
     </ProfileStackNavigator.Navigator>
   );
 };
 
 const TrackerBottomTabNavigator = createBottomTabNavigator();
+export const BottomTabNavigator = () => {
+  return (
+    <TrackerBottomTabNavigator.Navigator screenOptions={bottomTabOptions}>
+      <TrackerBottomTabNavigator.Screen
+        name="Timer"
+        component={TimerNavigator}
+        options={{ headerShown: false }}
+      />
+      <TrackerBottomTabNavigator.Screen
+        name="Records"
+        component={RecordsNavigator}
+        options={{ headerShown: false }}
+      />
+      <TrackerBottomTabNavigator.Screen
+        name="Rules"
+        component={RulesNavigator}
+        options={{ headerShown: false }}
+      />
+      <TrackerBottomTabNavigator.Screen
+        name="Profile"
+        component={ProfileNavigator}
+        options={{ headerShown: false }}
+      />
+    </TrackerBottomTabNavigator.Navigator>
+  );
+};
 
 const bottomTabOptions = ({ route }) => ({
   tabBarIcon: ({ focused, color }) => {
@@ -101,38 +129,25 @@ const bottomTabOptions = ({ route }) => ({
       return <MaterialCommunityIcons name={iconName} size={32} color={color} />;
     }
   },
+  tabBarActiveTintColor: Colors.primary,
+  tabBarInactiveTintColor: 'gray',
+  tabBarLabelPosition: 'below-icon',
+  tabBarStyle: [
+    {
+      display: 'flex',
+    },
+    null,
+  ],
+  headerStyle: {
+    backgroundColor: Colors.primary,
+  },
+  headerTitleStyle: {
+    fontFamily: 'sans-serif-light',
+    fontSize: 24,
+  },
+  headerBackTitleStyle: {
+    fontSize: 24,
+  },
+  headerBackTitle: '',
+  headerTintColor: 'white',
 });
-
-export const BottomTabNavigator = () => {
-  return (
-    <TrackerBottomTabNavigator.Navigator
-      screenOptions={bottomTabOptions}
-      tabBarOptions={{
-        activeTintColor: Colors.primary,
-        inactiveTintColor: 'gray',
-        labelPosition: 'below-icon',
-        style:
-          Platform.OS === 'android'
-            ? { paddingBottom: 4, paddingTop: 3 }
-            : { paddingTop: 6 },
-      }}
-    >
-      <TrackerBottomTabNavigator.Screen
-        name="Timer"
-        component={TimerNavigator}
-      />
-      <TrackerBottomTabNavigator.Screen
-        name="Records"
-        component={RecordsNavigator}
-      />
-      <TrackerBottomTabNavigator.Screen
-        name="Rules"
-        component={RulesNavigator}
-      />
-      <TrackerBottomTabNavigator.Screen
-        name="Profile"
-        component={ProfileNavigator}
-      />
-    </TrackerBottomTabNavigator.Navigator>
-  );
-};

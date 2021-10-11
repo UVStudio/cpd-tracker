@@ -1,14 +1,10 @@
 import React, { useState } from 'react';
 import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
-import CustomButton from '../../components/CustomButton';
 
-const Timer = (props) => {
+const UploadSession = () => {
   return (
     <View style={styles.container}>
-      <Text>Timer Screen</Text>
-      <CustomButton onSelect={() => props.navigation.navigate('UploadSession')}>
-        Upload Session
-      </CustomButton>
+      <Text>Upload Session Screen</Text>
     </View>
   );
 };
@@ -22,4 +18,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Timer;
+export default UploadSession;
