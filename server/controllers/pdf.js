@@ -61,6 +61,7 @@ const downloadFile = (file_id, gfs) => {
 //route   POST /api/pdf/
 //access  private
 exports.producePDF = asyncHandler(async (req, res, next) => {
+  //console.log('req.body: ', req.body);
   const userId = req.user.id;
   const year = req.body.year;
   const searchTerm = `${userId}-${year}.jpg`;
@@ -70,6 +71,7 @@ exports.producePDF = asyncHandler(async (req, res, next) => {
   // write report to PDF
   const CPDFileName = `${userId}-${year}-CPD-report.pdf`;
   const response = await buildPDF(
+    res,
     conn,
     userId,
     year,
@@ -78,8 +80,38 @@ exports.producePDF = asyncHandler(async (req, res, next) => {
     CPDFileName,
     downloadFile
   );
+});
 
-  res.status(200).json({ success: 'true' });
+//desc    DELETE pdf
+//route   DELETE /api/pdf/
+//access  private
+exports.deletePDF = asyncHandler(async (req, res, next) => {
+  const pdf = req.body.pdf;
+
+  const pdfUrl = 'reports/' + pdf;
+
+  console.log('pdfUrl: ', pdfUrl);
+
+  const deleteParam = {
+    Bucket: process.env.BUCKET_NAME,
+    Key: pdfUrl,
+  };
+
+  const s3 = new aws.S3({
+    accessKeyId: process.env.ACCESSKEYID,
+    secretAccessKey: process.env.SECRETACCESSKEY,
+    Bucket: process.env.BUCKET_NAME,
+    region: process.env.REGION,
+  });
+
+  await s3
+    .deleteObject(deleteParam, (err, data) => {
+      if (err) console.error('err: ', err);
+      if (data) console.log('data:', data);
+    })
+    .promise();
+
+  res.status(200).json({ success: 'true', data: 'Report deleted.' });
 });
 
 //desc    GET pdf Object by PDF ID

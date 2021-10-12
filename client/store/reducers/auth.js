@@ -2,9 +2,9 @@ import { AUTHENTICATE, LOGOUT, SET_USER, SET_DID_TRY_AL } from '../types';
 
 const initialState = {
   token: null,
-  //userId: null,
-  user: {},
+  userId: null,
   didTryAutoLogin: false,
+  user: {},
   //veriCode: null,
 };
 
@@ -13,9 +13,9 @@ export default (state = initialState, action) => {
     case AUTHENTICATE:
       return {
         token: action.token,
-        // userId: action.userId,
-        user: action.user,
+        userId: action.userId,
         didTryAutoLogin: true,
+        user: action.user,
       };
     case SET_DID_TRY_AL:
       return {

@@ -6,12 +6,11 @@ import { CURRENT_IP } from '../../serverConfig';
 let timer;
 const oneMonth = 30 * 24 * 60 * 60 * 1000;
 
-export const authenticate = (token, expiryTime, user) => {
+export const authenticate = (token, userId, expiryTime, user) => {
   return (dispatch) => {
     dispatch(setLogoutTimer(expiryTime));
-    dispatch({ type: AUTHENTICATE, token, user });
-    //dispatch({ type: AUTHENTICATE, token, userId });
-    // dispatch({ type: SET_USER, user: user });
+    dispatch({ type: AUTHENTICATE, token, userId });
+    dispatch({ type: SET_USER, user: user });
   };
 };
 
@@ -36,9 +35,16 @@ export const register = (name, email, password) => {
       );
 
       const resData = response.data;
-      await dispatch(authenticate(resData.token, oneMonth, resData.user));
+      await dispatch(
+        authenticate(resData.token, resData.user._id, oneMonth, resData.user)
+      );
       const expirationDate = resData.options.expires;
-      await saveDataToStorage(resData.token, resData.user._id, expirationDate);
+      await saveDataToStorage(
+        resData.token,
+        resData.user._id,
+        expirationDate,
+        resData.user
+      );
       await dispatch(setAuthUser(resData.user));
     } catch (err) {
       throw new Error(err.response.data.error);
@@ -62,10 +68,18 @@ export const login = (email, password) => {
       );
 
       const resData = response.data;
-      console.log('resData: ', resData);
-      await dispatch(authenticate(resData.token, oneMonth, resData.user));
+      console.log('auth resData: ', resData);
+
+      await dispatch(
+        authenticate(resData.token, resData.user._id, oneMonth, resData.user)
+      );
       const expirationDate = resData.options.expires;
-      await saveDataToStorage(resData.token, resData.user._id, expirationDate);
+      await saveDataToStorage(
+        resData.token,
+        resData.user._id,
+        expirationDate,
+        resData.user
+      );
       await dispatch(setAuthUser(resData.user));
     } catch (err) {
       throw new Error(err.response.data.error);
@@ -103,13 +117,14 @@ const setLogoutTimer = (expirationTime) => {
   };
 };
 
-const saveDataToStorage = (token, userId, expirationDate) => {
+const saveDataToStorage = (token, userId, expirationDate, resData) => {
   AsyncStorage.setItem(
     'userData',
     JSON.stringify({
       token: token,
       userId: userId,
       expiryDate: expirationDate,
+      user: resData,
     })
   );
 };

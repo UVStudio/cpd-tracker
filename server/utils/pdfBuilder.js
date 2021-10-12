@@ -31,6 +31,7 @@ conn.once('open', (req, res) => {
 });
 
 const buildPDF = async (
+  res,
   conn,
   userId,
   year,
@@ -44,9 +45,10 @@ const buildPDF = async (
   let writeStream = fs.createWriteStream(`./uploads/${CPDFileName}`);
   doc.pipe(writeStream);
 
-  const pdfObj = doc.pipe(
-    gfsReports.openUploadStream(`${userId}-${year}-CPD-report.pdf`)
-  );
+  //pipe to Mongo - no longer needed
+  // const pdfObj = doc.pipe(
+  //   gfsReports.openUploadStream(`${userId}-${year}-CPD-report.pdf`)
+  // );
 
   doc
     .image('./assets/accounting-icon.png', {
@@ -115,17 +117,18 @@ const buildPDF = async (
           'Report has been uploaded to S3 and URL created successfully'
         );
 
-        //create Report document on mongo after PDF is created and saved on mongo
-        const reportObj = await Report.create({
-          user: userId,
-          report: pdfObj.id,
-          url: reportFileUrl,
-          year,
-        });
+        res.status(200).send({ success: true });
       }
     });
   });
-  return pdfObj;
 };
 
 module.exports = { buildPDF };
+
+//create Report document on mongo after PDF is created and saved on mongo
+// await Report.create({
+//   user: userId,
+//   report: pdfObj.id,
+//   url: reportFileUrl,
+//   year,
+// });

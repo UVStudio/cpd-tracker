@@ -101,9 +101,9 @@ const sendTokenResponse = (user, statusCode, res) => {
     //httpOnly: true,
   };
 
-  if (process.env.NODE_ENV === 'production') {
-    options.secure = true;
-  }
+  // if (process.env.NODE_ENV === 'production') {
+  //   options.secure = true;
+  // }
 
   //where we save token to cookie, with options
   res

@@ -47,8 +47,6 @@ const Auth = () => {
   const [isLogging, setIsLogging] = useState(false);
   const [isRegistering, setIsRegistering] = useState(false);
 
-  const authState = useSelector((state) => state.auth);
-
   const dispatch = useDispatch();
 
   const [formState, dispatchFormState] = useReducer(formReducer, {

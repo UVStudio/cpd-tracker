@@ -1,9 +1,13 @@
 import React, { useState } from 'react';
 import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
+import { useSelector } from 'react-redux';
 
 const Rules = () => {
+  const user = useSelector((state) => state.auth.user);
+
   return (
     <View style={styles.container}>
+      {/* <Text>Hello {user.name}!</Text> */}
       <Text>Rules Screen</Text>
     </View>
   );

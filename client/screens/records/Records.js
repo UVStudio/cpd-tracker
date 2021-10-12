@@ -3,6 +3,10 @@ import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 import * as Notifications from 'expo-notifications';
 import * as MediaLibrary from 'expo-media-library';
+import * as reportActions from '../../store/actions/report';
+import { downloadToFolder } from 'expo-file-dl';
+import CustomButton from '../../components/CustomButton';
+
 import {
   AndroidImportance,
   AndroidNotificationVisibility,
@@ -10,8 +14,6 @@ import {
   NotificationChannelInput,
   NotificationContentInput,
 } from 'expo-notifications';
-import { downloadToFolder } from 'expo-file-dl';
-import CustomButton from '../../components/CustomButton';
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -25,11 +27,15 @@ const channelId = 'DownloadInfo';
 
 const Records = () => {
   const user = useSelector((state) => state.auth.user);
-  console.log('user: ', user);
+  const reportReady = useSelector((state) => state.report.report);
+
+  console.log('report state: ', reportReady);
+
+  const dispatch = useDispatch();
 
   const [downloadProgress, setDownloadProgress] = useState('0%');
 
-  async function setNotificationChannel() {
+  const setNotificationChannel = async () => {
     const loadingChannel = await Notifications.getNotificationChannelAsync(
       channelId
     );
@@ -49,7 +55,7 @@ const Records = () => {
         channelOptions
       );
     }
-  }
+  };
 
   useEffect(() => {
     setNotificationChannel();
@@ -71,10 +77,24 @@ const Records = () => {
     setDownloadProgress(`${pctg.toFixed(0)}%`);
   };
 
+  const generatePDFHandler = async (year) => {
+    try {
+      await dispatch(reportActions.buildReport(year));
+    } catch (err) {
+      console.log(err.message);
+    }
+  };
+
   const downloadPDFHandler = async () => {
-    await downloadToFolder(pdfUri, fileName, 'Download', channelId, {
-      downloadProgressCallback: downloadProgressUpdater,
-    });
+    const AWSFileName = `${user._id}-2021-CPD-report.pdf`;
+    try {
+      await downloadToFolder(pdfUri, fileName, 'Download', channelId, {
+        downloadProgressCallback: downloadProgressUpdater,
+      });
+      await dispatch(reportActions.deleteReport(AWSFileName));
+    } catch (err) {
+      console.log(err.message);
+    }
   };
 
   useEffect(() => {
@@ -85,19 +105,25 @@ const Records = () => {
     getNotificationPermissions();
   });
 
-  const pdfUri =
-    'https://cpdtracker.s3.us-east-2.amazonaws.com/reports/615ec3a7e949ec0444b8d233-2021-CPD-report.pdf';
+  const pdfUri = `https://cpdtracker.s3.us-east-2.amazonaws.com/reports/${user._id}-2021-CPD-report.pdf`;
 
-  const fileName = 'CPD-report.pdf';
+  const fileName = `${user.name}-CPD-report.pdf`;
 
   return (
     <View style={styles.container}>
-      <Text>Records Screen</Text>
       <Text>Hello {user.name}!</Text>
-      <CustomButton onSelect={downloadPDFHandler}>
-        Download PDF Report
+      <CustomButton onSelect={() => generatePDFHandler(2021)}>
+        Generate PDF Report
       </CustomButton>
-      <Text>{downloadProgress}</Text>
+      <Text>Records Screen</Text>
+      {reportReady ? (
+        <View>
+          <CustomButton onSelect={downloadPDFHandler}>
+            Download PDF Report
+          </CustomButton>
+          <Text>{downloadProgress}</Text>
+        </View>
+      ) : null}
     </View>
   );
 };
