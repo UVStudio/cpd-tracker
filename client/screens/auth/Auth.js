@@ -2,12 +2,13 @@ import React, { useReducer, useEffect, useCallback, useState } from 'react';
 import {
   View,
   Text,
+  Alert,
   ActivityIndicator,
   StyleSheet,
   ScrollView,
   ImageBackground,
 } from 'react-native';
-import { useDispatch } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 
 import CustomFormCard from '../../components/CustomFormCard';
 import CustomInput from '../../components/CustomInput';
@@ -45,6 +46,8 @@ const Auth = () => {
   const [isSignup, setIsSignup] = useState(false);
   const [isLogging, setIsLogging] = useState(false);
   const [isRegistering, setIsRegistering] = useState(false);
+
+  const authState = useSelector((state) => state.auth);
 
   const dispatch = useDispatch();
 

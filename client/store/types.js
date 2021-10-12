@@ -6,6 +6,7 @@ export const AUTHENTICATE = 'AUTHENTICATE';
 export const LOGOUT = 'LOGOUT';
 export const SET_DID_TRY_AL = 'SET_DID_TRY_AL';
 export const FORM_INPUT_UPDATE = 'FORM_INPUT_UPDATE';
+export const SET_USER = 'SET_USER';
 
 //INPUT
 export const INPUT_CHANGE = 'INPUT_CHANGE';
