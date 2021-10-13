@@ -1,4 +1,5 @@
 const User = require('../models/User');
+//const Cert = require('../models/Cert');
 const ErrorResponse = require('../utils/errorResponse');
 const asyncHandler = require('../middleware/async');
 
@@ -37,9 +38,6 @@ exports.createUser = asyncHandler(async (req, res, next) => {
 exports.login = asyncHandler(async (req, res, next) => {
   const { email, password } = req.body;
 
-  console.log('email:', email);
-  console.log('password:', password);
-
   if (!email || !password) {
     return next(new ErrorResponse('Please provide an email and password', 400));
   }
@@ -74,6 +72,88 @@ exports.getCurrentUser = asyncHandler(async (req, res, next) => {
     success: true,
     data: user,
   });
+});
+
+//desc    POST add verifiable hours to current User
+//route   POST /api/auth/current/verifiable
+//access  private
+exports.addVerifiableHours = asyncHandler(async (req, res, next) => {
+  const user = await User.findById(req.user.id);
+
+  if (!user) {
+    return next(new ErrorResponse('No user is logged in at the moment', 400));
+  }
+
+  const { year, hours } = req.body;
+
+  const userHours = user.verifiable;
+  const findYear = userHours.findIndex((e) => e.year === year);
+
+  if (userHours.length === 0) {
+    userHours.push({
+      year: year,
+      hours: hours,
+    });
+  } else if (userHours.length > 0 && findYear !== -1) {
+    const query = { _id: user._id, 'verifiable.year': year };
+    const update = {
+      $inc: {
+        'verifiable.$.hours': +hours,
+      },
+    };
+    await User.updateOne(query, update);
+  } else {
+    userHours.push({
+      year: year,
+      hours: hours,
+    });
+  }
+
+  await user.save();
+
+  //the user data returned is one cycle out of date when updating via Mongo syntax
+  res.status(200).json({ success: 'true', data: user });
+});
+
+//desc    POST add non-verifiable hours to current User
+//route   POST /api/auth/current/nonverifiable
+//access  private
+exports.addNonVerifiableHours = asyncHandler(async (req, res, next) => {
+  const user = await User.findById(req.user.id);
+
+  if (!user) {
+    return next(new ErrorResponse('No user is logged in at the moment', 400));
+  }
+
+  const { year, hours } = req.body;
+
+  const userHours = user.nonVerifiable;
+  const findYear = userHours.findIndex((e) => e.year === year);
+
+  if (userHours.length === 0) {
+    userHours.push({
+      year: year,
+      hours: hours,
+    });
+  } else if (userHours.length > 0 && findYear !== -1) {
+    const query = { _id: user._id, 'nonVerifiable.year': year };
+    const update = {
+      $inc: {
+        'nonVerifiable.$.hours': +hours,
+      },
+    };
+    await User.updateOne(query, update);
+  } else {
+    userHours.push({
+      year: year,
+      hours: hours,
+    });
+  }
+
+  await user.save();
+
+  //the user data returned is one cycle out of date when updating via Mongo syntax
+  res.status(200).json({ success: 'true', data: user });
 });
 
 //desc    LOGOUT user / clear cookie
