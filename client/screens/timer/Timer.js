@@ -5,7 +5,9 @@ import CustomButton from '../../components/CustomButton';
 
 const Timer = (props) => {
   const user = useSelector((state) => state.auth.user);
-  console.log('user: ', user);
+  const authState = useSelector((state) => state.auth);
+  //console.log('user: ', user);
+  console.log('authState: ', authState);
 
   return (
     <View style={styles.container}>

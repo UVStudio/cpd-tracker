@@ -3,7 +3,11 @@ import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 import * as Notifications from 'expo-notifications';
 import * as MediaLibrary from 'expo-media-library';
+import * as DocumentPicker from 'expo-document-picker';
+
 import * as reportActions from '../../store/actions/report';
+import * as certActions from '../../store/actions/cert';
+
 import { downloadToFolder } from 'expo-file-dl';
 import CustomButton from '../../components/CustomButton';
 
@@ -77,6 +81,21 @@ const Records = () => {
     setDownloadProgress(`${pctg.toFixed(0)}%`);
   };
 
+  const addCertHandler = async (year) => {
+    try {
+      const file = await DocumentPicker.getDocumentAsync({
+        type: '*/*',
+        copyToCacheDirectory: false,
+      });
+
+      if (file.type === 'success') {
+        await dispatch(certActions.addCert(file, year));
+      }
+    } catch (err) {
+      console.log(err.message);
+    }
+  };
+
   const generatePDFHandler = async (year) => {
     try {
       await dispatch(reportActions.buildReport(year));
@@ -112,9 +131,15 @@ const Records = () => {
   return (
     <View style={styles.container}>
       <Text>Hello {user.name}!</Text>
+
+      <CustomButton onSelect={() => addCertHandler(2021)}>
+        Add Verifiable Hours
+      </CustomButton>
+
       <CustomButton onSelect={() => generatePDFHandler(2021)}>
         Generate PDF Report
       </CustomButton>
+
       <Text>Records Screen</Text>
       {reportReady ? (
         <View>

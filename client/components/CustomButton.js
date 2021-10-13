@@ -5,18 +5,23 @@ import Colors from '../constants/Colors';
 
 const CustomButton = (props) => {
   return (
-    <View style={styles.shadow}>
-      <Pressable
-        style={{ ...styles.button, ...props.style }}
-        onPress={props.onSelect}
-      >
-        <Text style={styles.buttonText}>{props.children}</Text>
-      </Pressable>
+    <View style={styles.buttonContainer}>
+      <View style={styles.shadow}>
+        <Pressable
+          style={{ ...styles.button, ...props.style }}
+          onPress={props.onSelect}
+        >
+          <Text style={styles.buttonText}>{props.children}</Text>
+        </Pressable>
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
+  buttonContainer: {
+    marginVertical: 5,
+  },
   button: {
     backgroundColor: Colors.primary,
   },

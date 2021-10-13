@@ -282,7 +282,7 @@ const styles = StyleSheet.create({
     marginTop: 15,
   },
   buttonContainer: {
-    marginVertical: 3,
+    marginVertical: 0,
   },
 });
 

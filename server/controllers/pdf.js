@@ -90,8 +90,6 @@ exports.deletePDF = asyncHandler(async (req, res, next) => {
 
   const pdfUrl = 'reports/' + pdf;
 
-  console.log('pdfUrl: ', pdfUrl);
-
   const deleteParam = {
     Bucket: process.env.BUCKET_NAME,
     Key: pdfUrl,
