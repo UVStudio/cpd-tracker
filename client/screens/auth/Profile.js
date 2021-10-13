@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
 import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
 import { useDispatch } from 'react-redux';
-import CustomButton from '../../components/CustomButton';
+
 import * as authActions from '../../store/actions/auth';
+
+import CustomButton from '../../components/CustomButton';
+import CustomScreenContainer from '../../components/CustomScreenContainer';
 
 const Profile = () => {
   const dispatch = useDispatch();
@@ -12,20 +15,13 @@ const Profile = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <CustomScreenContainer>
       <Text>Profile Screen</Text>
       <CustomButton onSelect={logoutHandler}>Logout</CustomButton>
-    </View>
+    </CustomScreenContainer>
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+const styles = StyleSheet.create({});
 
 export default Profile;

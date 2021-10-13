@@ -10,6 +10,7 @@ import * as certActions from '../../store/actions/cert';
 
 import { downloadToFolder } from 'expo-file-dl';
 import CustomButton from '../../components/CustomButton';
+import CustomScreenContainer from '../../components/CustomScreenContainer';
 
 import {
   AndroidImportance,
@@ -89,7 +90,8 @@ const Records = () => {
       });
 
       if (file.type === 'success') {
-        await dispatch(certActions.addCert(file, year));
+        console.log('success');
+        //await dispatch(certActions.addCert(file, year));
       }
     } catch (err) {
       console.log(err.message);
@@ -129,11 +131,11 @@ const Records = () => {
   const fileName = `${user.name}-CPD-report.pdf`;
 
   return (
-    <View style={styles.container}>
+    <CustomScreenContainer>
       <Text>Hello {user.name}!</Text>
 
       <CustomButton onSelect={() => addCertHandler(2021)}>
-        Add Verifiable Hours
+        Add Course Certificate
       </CustomButton>
 
       <CustomButton onSelect={() => generatePDFHandler(2021)}>
@@ -149,17 +151,10 @@ const Records = () => {
           <Text>{downloadProgress}</Text>
         </View>
       ) : null}
-    </View>
+    </CustomScreenContainer>
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+const styles = StyleSheet.create({});
 
 export default Records;

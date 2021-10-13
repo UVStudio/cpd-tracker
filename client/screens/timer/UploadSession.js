@@ -1,21 +1,15 @@
 import React, { useState } from 'react';
 import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
+import CustomScreenContainer from '../../components/CustomScreenContainer';
 
 const UploadSession = () => {
   return (
-    <View style={styles.container}>
+    <CustomScreenContainer>
       <Text>Upload Session Screen</Text>
-    </View>
+    </CustomScreenContainer>
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+const styles = StyleSheet.create({});
 
 export default UploadSession;

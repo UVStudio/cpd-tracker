@@ -5,6 +5,7 @@ import { MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
 
 import Auth from '../screens/auth/Auth';
 import Profile from '../screens/auth/Profile';
+import Stats from '../screens/stats/Stats';
 import Timer from '../screens/timer/Timer';
 import UploadSession from '../screens/timer/UploadSession';
 import Rules from '../screens/rules/Rules';
@@ -40,6 +41,14 @@ export const AuthNavigator = () => {
   );
 };
 
+const CPDStackNavigator = createStackNavigator();
+const CPDNavigator = () => {
+  return (
+    <CPDStackNavigator.Navigator screenOptions={defaultNavOptions}>
+      <CPDStackNavigator.Screen name="Your CPD Statistics" component={Stats} />
+    </CPDStackNavigator.Navigator>
+  );
+};
 const TimerStackNavigator = createStackNavigator();
 const TimerNavigator = () => {
   return (
@@ -88,6 +97,11 @@ export const BottomTabNavigator = () => {
   return (
     <TrackerBottomTabNavigator.Navigator screenOptions={bottomTabOptions}>
       <TrackerBottomTabNavigator.Screen
+        name="CPD Stats"
+        component={CPDNavigator}
+        options={{ headerShown: false }}
+      />
+      <TrackerBottomTabNavigator.Screen
         name="Timer"
         component={TimerNavigator}
         options={{ headerShown: false }}
@@ -127,6 +141,9 @@ const bottomTabOptions = ({ route }) => ({
     } else if (route.name === 'Profile') {
       iconName = focused ? 'account' : 'account-outline';
       return <MaterialCommunityIcons name={iconName} size={32} color={color} />;
+    } else if (route.name === 'CPD Stats') {
+      iconName = focused ? 'stats-chart' : 'stats-chart-outline';
+      return <Ionicons name={iconName} size={32} color={color} />;
     }
   },
   tabBarActiveTintColor: Colors.primary,

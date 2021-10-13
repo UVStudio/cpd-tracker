@@ -2,14 +2,16 @@ import React, { useState } from 'react';
 import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
 import { useSelector } from 'react-redux';
 
+import CustomScreenContainer from '../../components/CustomScreenContainer';
+
 const Rules = () => {
   const user = useSelector((state) => state.auth.user);
 
   return (
-    <View style={styles.container}>
-      {/* <Text>Hello {user.name}!</Text> */}
+    <CustomScreenContainer>
+      <Text>Hello {user.name}!</Text>
       <Text>Rules Screen</Text>
-    </View>
+    </CustomScreenContainer>
   );
 };
 

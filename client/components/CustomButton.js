@@ -1,5 +1,11 @@
 import React from 'react';
-import { Text, View, Pressable, StyleSheet } from 'react-native';
+import {
+  Text,
+  View,
+  TouchableHighlight,
+  Pressable,
+  StyleSheet,
+} from 'react-native';
 
 import Colors from '../constants/Colors';
 
@@ -7,12 +13,13 @@ const CustomButton = (props) => {
   return (
     <View style={styles.buttonContainer}>
       <View style={styles.shadow}>
-        <Pressable
+        <TouchableHighlight
           style={{ ...styles.button, ...props.style }}
           onPress={props.onSelect}
+          underlayColor={Colors.light}
         >
           <Text style={styles.buttonText}>{props.children}</Text>
-        </Pressable>
+        </TouchableHighlight>
       </View>
     </View>
   );
@@ -20,6 +27,7 @@ const CustomButton = (props) => {
 
 const styles = StyleSheet.create({
   buttonContainer: {
+    width: '80%',
     marginVertical: 5,
   },
   button: {

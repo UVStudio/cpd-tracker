@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
 import { useSelector } from 'react-redux';
 import CustomButton from '../../components/CustomButton';
+import CustomScreenContainer from '../../components/CustomScreenContainer';
 
 const Timer = (props) => {
   const user = useSelector((state) => state.auth.user);
@@ -10,13 +11,13 @@ const Timer = (props) => {
   console.log('authState: ', authState);
 
   return (
-    <View style={styles.container}>
+    <CustomScreenContainer>
       {/* <Text>Hello {user.name}!</Text> */}
       <Text>Timer Screen</Text>
       <CustomButton onSelect={() => props.navigation.navigate('UploadSession')}>
         Upload Session
       </CustomButton>
-    </View>
+    </CustomScreenContainer>
   );
 };
 
