@@ -34,6 +34,9 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Please state your provincial jurisdiction'],
   },
+  hours: {
+    type: Array,
+  },
   verifiable: {
     type: Array,
   },

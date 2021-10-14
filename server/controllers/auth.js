@@ -2,6 +2,7 @@ const User = require('../models/User');
 //const Cert = require('../models/Cert');
 const ErrorResponse = require('../utils/errorResponse');
 const asyncHandler = require('../middleware/async');
+const { currentYear } = require('../utils/currentYear');
 
 //desc    CREATE user
 //route   POST /api/auth/
@@ -21,11 +22,33 @@ exports.createUser = asyncHandler(async (req, res, next) => {
     );
   }
 
+  const hours = [
+    {
+      year: currentYear + 1,
+      verifiable: 0,
+      nonVerifiable: 0,
+      ethics: 0,
+    },
+    {
+      year: currentYear,
+      verifiable: 0,
+      nonVerifiable: 0,
+      ethics: 0,
+    },
+    {
+      year: currentYear - 1,
+      verifiable: 0,
+      nonVerifiable: 0,
+      ethics: 0,
+    },
+  ];
+
   user = await User.create({
     name,
     email,
     password,
     province,
+    hours,
     role,
   });
 
@@ -54,15 +77,30 @@ exports.login = asyncHandler(async (req, res, next) => {
     return next(new ErrorResponse('Invalid password', 401));
   }
 
+  //create hours objects in case user has skipped logging on for years
+  const fakeCurrentYear = 2024;
+  const userHours = user.hours;
+  const lastYearDB = userHours[0].year;
+  const catchUpYears = fakeCurrentYear - lastYearDB;
+
+  for (let i = catchUpYears - 1; i > -1; i--) {
+    userHours.unshift({
+      year: fakeCurrentYear - i,
+      verifiable: 0,
+      nonVerifiable: 0,
+      ethics: 0,
+    });
+  }
+
+  await user.save();
+
   sendTokenResponse(user, 200, res);
 });
-
 //desc    GET current logged in user
 //route   GET /api/auth/current
 //access  private
 exports.getCurrentUser = asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.user.id);
-  //console.log('current route user: ', req.user);
 
   if (!user) {
     return next(new ErrorResponse('No user is logged in at the moment', 400));
@@ -74,9 +112,77 @@ exports.getCurrentUser = asyncHandler(async (req, res, next) => {
   });
 });
 
+//desc    POST add hours to current User
+//route   POST /api/auth/current/hours
+//access  private
+exports.addCPDHours = asyncHandler(async (req, res, next) => {
+  const user = await User.findById(req.user.id);
+
+  if (!user) {
+    return next(new ErrorResponse('No user is logged in at the moment', 400));
+  }
+
+  const { year, verifiable, nonVerifiable, ethics } = req.body;
+  const index = user.hours.findIndex((e) => e.year === year);
+
+  if (index === -1) {
+    return next(new ErrorResponse('Requested year is not found', 400));
+  }
+
+  if (ethics > verifiable) {
+    return next(
+      new ErrorResponse(
+        'Ethics hours cannot be greater than Verifiable hours',
+        400
+      )
+    );
+  }
+
+  if (verifiable > 0 && nonVerifiable > 0) {
+    return next(
+      new ErrorResponse(
+        'A course can only be either Verifiable or non-Verifiable. Cannot be both.',
+        400
+      )
+    );
+  }
+
+  const query = { _id: user._id, 'hours.year': year };
+
+  if (verifiable > 0) {
+    const update = {
+      $inc: {
+        'hours.$.verifiable': +verifiable,
+      },
+    };
+    await User.updateOne(query, update);
+  }
+
+  if (nonVerifiable > 0) {
+    const update = {
+      $inc: {
+        'hours.$.nonVerifiable': +nonVerifiable,
+      },
+    };
+    await User.updateOne(query, update);
+  }
+
+  if (ethics > 0) {
+    const update = {
+      $inc: {
+        'hours.$.ethics': +ethics,
+      },
+    };
+    await User.updateOne(query, update);
+  }
+
+  res.status(200).json({ success: 'true' });
+});
+
 //desc    POST add verifiable hours to current User
 //route   POST /api/auth/current/verifiable
 //access  private
+/* CURRENT NOT USING */
 exports.addVerifiableHours = asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.user.id);
 
@@ -118,6 +224,7 @@ exports.addVerifiableHours = asyncHandler(async (req, res, next) => {
 //desc    POST add non-verifiable hours to current User
 //route   POST /api/auth/current/nonverifiable
 //access  private
+/* CURRENT NOT USING */
 exports.addNonVerifiableHours = asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.user.id);
 
