@@ -25,11 +25,6 @@ const Stats = () => {
   const [showYear, setShowYear] = useState(false);
   console.log('showYear: ', showYear);
 
-  // const showHandler = (index) => {
-  //   setShowYear(userHours[index].year);
-  //   console.log('showYear: ', showYear);
-  // };
-
   return (
     <CustomScreenContainer>
       <CustomTitle>Statistics Overview</CustomTitle>

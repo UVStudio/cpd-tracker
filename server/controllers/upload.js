@@ -5,7 +5,22 @@ const { fromPath } = require('pdf2pic');
 const Jimp = require('jimp');
 const ErrorResponse = require('../utils/errorResponse');
 const asyncHandler = require('../middleware/async');
+const mongoose = require('mongoose');
 const { GridFsStorage } = require('multer-gridfs-storage');
+const Grid = require('gridfs-stream');
+const ObjectId = require('mongodb').ObjectId;
+
+const conn = mongoose.createConnection(process.env.MONGO_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
+
+//Init gfs
+// conn.once('open', (req, res) => {
+//   //Init stream
+//   gfs = Grid(conn.db, mongoose.mongo);
+//   gfs.collection('uploads');
+// });
 
 //@route   POST /api/upload
 //@desc    Uploads Cert to DB
@@ -105,6 +120,41 @@ exports.uploadCert = asyncHandler(async (req, res, next) => {
     .json({ success: 'true', fileData: response, certData: certObj });
 });
 
-//** https://www.npmjs.com/package/jimp **//
-//https://www.npmjs.com/package/sharp
-//https://www.npmjs.com/package/png-to-jpeg
+//@route   DELETE /api/upload/:id
+//@desc    DELETE Upload FILE and CHUNKS by FILE mongo ID
+//@access  Private
+exports.deleteUploadById = asyncHandler(async (req, res, next) => {
+  const fileId = req.params.id;
+
+  const file = await conn.db
+    .collection('uploads.files')
+    .findOne({ _id: ObjectId(fileId) });
+  const chunks = await conn.db
+    .collection('uploads.chunks')
+    .find({ files_id: ObjectId(fileId) })
+    .toArray();
+
+  if (!file || chunks.length == 0) {
+    return next(new ErrorResponse('File not found', 400));
+  }
+
+  const fileResult = await conn.db
+    .collection('uploads.files')
+    .deleteOne({ _id: ObjectId(fileId) });
+
+  const chunksResult = await conn.db
+    .collection('uploads.chunks')
+    .deleteMany({ files_id: ObjectId(fileId) });
+
+  if (fileResult.deletedCount === 0 || chunksResult.deletedCount === 0) {
+    return next(new ErrorResponse('File did not get deleted', 400));
+  }
+
+  res.status(200).json({
+    success: 'true',
+    data: {
+      file: fileResult.deletedCount,
+      chunks: chunksResult.deletedCount,
+    },
+  });
+});
