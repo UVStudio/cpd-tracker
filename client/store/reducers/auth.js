@@ -12,6 +12,7 @@ export default (state = initialState, action) => {
   switch (action.type) {
     case AUTHENTICATE:
       return {
+        ...state,
         token: action.token,
         userId: action.userId,
         didTryAutoLogin: true,
@@ -21,6 +22,7 @@ export default (state = initialState, action) => {
       return {
         ...state,
         didTryAutoLogin: true,
+        user: action.user,
       };
     case SET_USER:
       return {

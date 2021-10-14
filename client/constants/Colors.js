@@ -4,5 +4,6 @@ export default {
   dark: '#173D47',
   secondary: '#472B10',
   lightSecondary: '#94683E',
-  grey: '#ccc',
+  grey: '#bbb',
+  darkGrey: '#888',
 };

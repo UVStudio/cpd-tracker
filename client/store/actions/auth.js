@@ -9,7 +9,7 @@ const oneMonth = 30 * 24 * 60 * 60 * 1000;
 export const authenticate = (token, userId, expiryTime, user) => {
   return (dispatch) => {
     dispatch(setLogoutTimer(expiryTime));
-    dispatch({ type: AUTHENTICATE, token, userId });
+    dispatch({ type: AUTHENTICATE, token, userId, user });
     dispatch({ type: SET_USER, user: user });
   };
 };
@@ -68,7 +68,6 @@ export const login = (email, password) => {
       );
 
       const resData = response.data;
-      console.log('auth resData: ', resData);
 
       await dispatch(
         authenticate(resData.token, resData.user._id, oneMonth, resData.user)

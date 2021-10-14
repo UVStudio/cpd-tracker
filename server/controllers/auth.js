@@ -1,5 +1,4 @@
 const User = require('../models/User');
-//const Cert = require('../models/Cert');
 const ErrorResponse = require('../utils/errorResponse');
 const asyncHandler = require('../middleware/async');
 const { currentYear } = require('../utils/currentYear');
@@ -78,14 +77,14 @@ exports.login = asyncHandler(async (req, res, next) => {
   }
 
   //create hours objects in case user has skipped logging on for years
-  const fakeCurrentYear = 2024;
+  //const fakeCurrentYear = 2024;
   const userHours = user.hours;
   const lastYearDB = userHours[0].year;
-  const catchUpYears = fakeCurrentYear - lastYearDB;
+  const catchUpYears = currentYear - lastYearDB;
 
   for (let i = catchUpYears - 1; i > -1; i--) {
     userHours.unshift({
-      year: fakeCurrentYear - i,
+      year: currentYear - i,
       verifiable: 0,
       nonVerifiable: 0,
       ethics: 0,
@@ -179,10 +178,24 @@ exports.addCPDHours = asyncHandler(async (req, res, next) => {
   res.status(200).json({ success: 'true' });
 });
 
+//desc    LOGOUT user / clear cookie
+//route   GET /api/auth/logout
+//access  private
+exports.logOut = asyncHandler(async (req, res, next) => {
+  res.cookie('token', 'none', {
+    expires: new Date(Date.now() + 5 * 1000),
+  });
+
+  res.status(200).json({
+    success: true,
+    data: 'You have logged out',
+  });
+});
+
 //desc    POST add verifiable hours to current User
 //route   POST /api/auth/current/verifiable
 //access  private
-/* CURRENT NOT USING */
+/* CURRENTLY NOT USING */
 exports.addVerifiableHours = asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.user.id);
 
@@ -224,7 +237,7 @@ exports.addVerifiableHours = asyncHandler(async (req, res, next) => {
 //desc    POST add non-verifiable hours to current User
 //route   POST /api/auth/current/nonverifiable
 //access  private
-/* CURRENT NOT USING */
+/* CURRENTLY NOT USING */
 exports.addNonVerifiableHours = asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.user.id);
 
@@ -261,20 +274,6 @@ exports.addNonVerifiableHours = asyncHandler(async (req, res, next) => {
 
   //the user data returned is one cycle out of date when updating via Mongo syntax
   res.status(200).json({ success: 'true', data: user });
-});
-
-//desc    LOGOUT user / clear cookie
-//route   GET /api/auth/logout
-//access  private
-exports.logOut = asyncHandler(async (req, res, next) => {
-  res.cookie('token', 'none', {
-    expires: new Date(Date.now() + 5 * 1000),
-  });
-
-  res.status(200).json({
-    success: true,
-    data: 'You have logged out',
-  });
 });
 
 /*** HELPER ***/

@@ -217,32 +217,26 @@ const Auth = () => {
               />
             ) : null}
             <View style={styles.buttonGroupContainer}>
-              <View style={styles.buttonContainer}>
-                <CustomButton onSelect={authHandler}>
-                  {isSignup
-                    ? isRegistering
-                      ? 'Registering...'
-                      : 'Register'
-                    : isLogging
-                    ? 'Logging in..'
-                    : 'Login'}
-                </CustomButton>
-              </View>
-              <View style={styles.buttonContainer}>
-                <CustomButton
-                  onSelect={() => setIsSignup((prevState) => !prevState)}
-                >
-                  {`Switch to ${isSignup ? 'Login' : 'Register'}`}
-                </CustomButton>
-              </View>
-              <View style={styles.buttonContainer}>
-                <CustomButton
-                  title="Forgot Password"
-                  onSelect={() => props.navigation.navigate('ForgotPassword')}
-                >
-                  Forgot Password
-                </CustomButton>
-              </View>
+              <CustomButton onSelect={authHandler}>
+                {isSignup
+                  ? isRegistering
+                    ? 'Registering...'
+                    : 'Register'
+                  : isLogging
+                  ? 'Logging in..'
+                  : 'Login'}
+              </CustomButton>
+              <CustomButton
+                onSelect={() => setIsSignup((prevState) => !prevState)}
+              >
+                {`Switch to ${isSignup ? 'Login' : 'Register'}`}
+              </CustomButton>
+              <CustomButton
+                title="Forgot Password"
+                onSelect={() => props.navigation.navigate('ForgotPassword')}
+              >
+                Forgot Password
+              </CustomButton>
             </View>
           </ScrollView>
         </CustomFormCard>
@@ -280,9 +274,7 @@ const styles = StyleSheet.create({
   },
   buttonGroupContainer: {
     marginTop: 15,
-  },
-  buttonContainer: {
-    marginVertical: 0,
+    alignItems: 'center',
   },
 });
 

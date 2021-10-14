@@ -6,13 +6,10 @@ import CustomScreenContainer from '../../components/CustomScreenContainer';
 
 const Timer = (props) => {
   const user = useSelector((state) => state.auth.user);
-  const authState = useSelector((state) => state.auth);
-  //console.log('user: ', user);
-  console.log('authState: ', authState);
 
   return (
     <CustomScreenContainer>
-      {/* <Text>Hello {user.name}!</Text> */}
+      <Text>Hello {user.name}!</Text>
       <Text>Timer Screen</Text>
       <CustomButton onSelect={() => props.navigation.navigate('UploadSession')}>
         Upload Session

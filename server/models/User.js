@@ -37,12 +37,12 @@ const UserSchema = new mongoose.Schema({
   hours: {
     type: Array,
   },
-  verifiable: {
-    type: Array,
-  },
-  nonVerifiable: {
-    type: Array,
-  },
+  // verifiable: {
+  //   type: Array,
+  // },
+  // nonVerifiable: {
+  //   type: Array,
+  // },
   createdAt: {
     type: Date,
     default: Date.now,

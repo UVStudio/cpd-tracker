@@ -10,6 +10,7 @@ const Startup = () => {
   useEffect(() => {
     const tryLogin = async () => {
       const userData = await AsyncStorage.getItem('userData');
+      //console.log('startup: ', userData);
       if (!userData) {
         dispatch(authActions.setDidTryAL());
         return;
