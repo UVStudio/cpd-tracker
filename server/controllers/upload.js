@@ -15,13 +15,6 @@ const conn = mongoose.createConnection(process.env.MONGO_URI, {
   useUnifiedTopology: true,
 });
 
-//Init gfs
-// conn.once('open', (req, res) => {
-//   //Init stream
-//   gfs = Grid(conn.db, mongoose.mongo);
-//   gfs.collection('uploads');
-// });
-
 //@route   POST /api/upload
 //@desc    Uploads Cert to DB
 //@access  Private

@@ -12,8 +12,11 @@ import CustomText from '../../components/CustomText';
 import CustomTitle from '../../components/CustomTitle';
 import CustomSubtitle from '../../components/CustomSubtitle';
 import CustomAccordionUnit from '../../components/CustomAccordionUnit';
+import CustomStatsDivider from '../../components/CustomStatsDivider';
+import CustomStatsInfoBox from '../../components/CustomStatsInfoBox';
 import CustomGreyLine from '../../components/CustomGreyLine';
 import CustomThinGreyLine from '../../components/CustomThinGreyLine';
+import CustomProgressBar from '../../components/CustomProgressBar';
 import CustomScreenContainer from '../../components/CustomScreenContainer';
 
 const Stats = () => {
@@ -22,8 +25,7 @@ const Stats = () => {
   // console.log('authState: ', authState);
   const userHours = user.hours;
 
-  const [showYear, setShowYear] = useState(false);
-  console.log('showYear: ', showYear);
+  const [showYear, setShowYear] = useState(2021);
 
   return (
     <CustomScreenContainer>
@@ -36,13 +38,27 @@ const Stats = () => {
           </Pressable>
           <CustomThinGreyLine />
           {showYear === elem.year ? (
-            <View>
-              <CustomText>Verifiable Hours: {elem.verifiable}</CustomText>
-              <CustomText>
-                Non-Verifiable Hours: {elem.nonVerifiable}
-              </CustomText>
-              <CustomText>Ethics Hours: {elem.ethics}</CustomText>
-            </View>
+            <CustomStatsInfoBox>
+              <CustomStatsDivider>
+                <CustomText>Verifiable Hours: {elem.verifiable}</CustomText>
+                <CustomProgressBar
+                  progress={elem.verifiable}
+                  type="verifiable"
+                />
+              </CustomStatsDivider>
+              <CustomStatsDivider>
+                <CustomText>
+                  Non-Verifiable Hours: {elem.nonVerifiable}
+                </CustomText>
+                <CustomProgressBar
+                  progress={elem.nonVerifiable}
+                  type="nonVerifiable"
+                />
+              </CustomStatsDivider>
+              <CustomStatsDivider>
+                <CustomText>Ethics Hours: {elem.ethics}</CustomText>
+              </CustomStatsDivider>
+            </CustomStatsInfoBox>
           ) : null}
         </CustomAccordionUnit>
       ))}
