@@ -2,8 +2,8 @@ import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import Colors from '../constants/Colors';
 
-const CustomThinGreyLine = () => {
-  return <View style={styles.greyline}></View>;
+const CustomThinGreyLine = (props) => {
+  return <View style={{ ...styles.greyline, ...props.style }}></View>;
 };
 
 const styles = StyleSheet.create({

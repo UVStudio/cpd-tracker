@@ -1,18 +1,16 @@
 const express = require('express');
 const {
-  getCertById,
-  getCertsByUser,
-  deleteCertById,
-  deleteAllCerts,
+  getCertObjById,
+  getAllCertObjsByUser,
+  addCPDHours,
 } = require('../controllers/cert');
 
 const router = express.Router();
 
 const { protect } = require('../middleware/auth');
 
-router.get('/user', protect, getCertsByUser);
-router.get('/:id', getCertById);
-router.delete('/:id', deleteCertById);
-router.delete('/', deleteAllCerts);
+router.post('/hours', protect, addCPDHours);
+router.get('/user', protect, getAllCertObjsByUser);
+router.get('/:id', getCertObjById);
 
 module.exports = router;

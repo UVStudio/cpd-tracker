@@ -13,6 +13,7 @@ const styles = StyleSheet.create({
     fontSize: 26,
     fontFamily: 'sans-serif-condensed',
     alignSelf: 'flex-start',
+    marginTop: 10,
     color: Colors.primary,
   },
 });

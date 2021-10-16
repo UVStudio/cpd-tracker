@@ -7,6 +7,7 @@ import {
   StyleSheet,
   Pressable,
 } from 'react-native';
+import currentYear from '../../utils/currentYear';
 
 import CustomText from '../../components/CustomText';
 import CustomTitle from '../../components/CustomTitle';
@@ -25,7 +26,7 @@ const Stats = () => {
   // console.log('authState: ', authState);
   const userHours = user.hours;
 
-  const [showYear, setShowYear] = useState(2021);
+  const [showYear, setShowYear] = useState(currentYear);
 
   return (
     <CustomScreenContainer>

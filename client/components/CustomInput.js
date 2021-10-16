@@ -92,13 +92,13 @@ const styles = StyleSheet.create({
     marginTop: 3,
   },
   label: {
-    fontFamily: 'sans-serif',
+    fontFamily: 'sans-serif-condensed',
     marginVertical: 2,
     marginTop: 4,
   },
   input: {
     fontSize: 16,
-    fontFamily: 'sans-serif-light',
+    fontFamily: 'sans-serif-condensed',
     paddingHorizontal: 4,
     paddingVertical: 2,
     borderColor: '#ccc',
@@ -109,7 +109,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   errorText: {
-    fontFamily: 'sans-serif-light',
+    fontFamily: 'sans-serif-condensed',
     color: 'red',
     fontSize: 13,
   },

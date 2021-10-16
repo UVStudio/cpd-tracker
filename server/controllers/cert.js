@@ -9,7 +9,7 @@ const asyncHandler = require('../middleware/async');
 //desc    GET Cert by ID
 //route   GET /api/cert/:id
 //access  public
-exports.getCertById = asyncHandler(async (req, res, next) => {
+exports.getCertObjById = asyncHandler(async (req, res, next) => {
   const cert = await Cert.findById(req.params.id);
 
   if (!cert) {
@@ -22,7 +22,7 @@ exports.getCertById = asyncHandler(async (req, res, next) => {
 //desc    GET Certs by current user
 //route   GET /api/cert/user
 //access  private
-exports.getCertsByUser = asyncHandler(async (req, res, next) => {
+exports.getAllCertObjsByUser = asyncHandler(async (req, res, next) => {
   const certs = await Cert.find({ user: req.user.id });
 
   if (!certs) {
@@ -32,78 +32,165 @@ exports.getCertsByUser = asyncHandler(async (req, res, next) => {
   res.status(200).json({ success: true, data: certs });
 });
 
+//desc    POST add hours to current User
+//route   POST /api/cert/hours
+//access  private
+exports.addCPDHours = asyncHandler(async (req, res, next) => {
+  const user = await User.findById(req.user.id);
+
+  if (!user) {
+    return next(new ErrorResponse('No user is logged in at the moment', 400));
+  }
+
+  const { year, verifiable, nonVerifiable, ethics } = req.body;
+
+  const index = user.hours.findIndex((e) => e.year === year);
+
+  if (index === -1) {
+    return next(new ErrorResponse('Requested year is not found', 400));
+  }
+
+  if (ethics > verifiable) {
+    return next(
+      new ErrorResponse(
+        'Ethics hours cannot be greater than Verifiable hours',
+        400
+      )
+    );
+  }
+
+  if (verifiable > 0 && nonVerifiable > 0) {
+    return next(
+      new ErrorResponse(
+        'A course can only be either Verifiable or non-Verifiable. Cannot be both.',
+        400
+      )
+    );
+  }
+
+  const query = { _id: user._id, 'hours.year': year };
+
+  if (verifiable > 0) {
+    const update = {
+      $inc: {
+        'hours.$.verifiable': +verifiable,
+      },
+    };
+    await User.updateOne(query, update);
+  }
+
+  if (nonVerifiable > 0) {
+    const update = {
+      $inc: {
+        'hours.$.nonVerifiable': +nonVerifiable,
+      },
+    };
+    await User.updateOne(query, update);
+  }
+
+  if (ethics > 0) {
+    const update = {
+      $inc: {
+        'hours.$.ethics': +ethics,
+      },
+    };
+    await User.updateOne(query, update);
+  }
+
+  res.status(200).json({ success: 'true' });
+});
+
+//desc    POST add Non-Verifiable Event to current User
+//route   POST /api/cert/nonver
+//access  private
+exports.addNonVerEvent = asyncHandler(async (req, res, next) => {
+  const user = await User.findById(req.user.id);
+
+  if (!user) {
+    return next(new ErrorResponse('No user is logged in at the moment', 400));
+  }
+
+  const { date, hours, sessionName } = req.body;
+
+  if (!date || !hours || !sessionName) {
+    return next(
+      new ErrorResponse('Please provide all necessary information', 400)
+    );
+  }
+});
+
 //desc    DELETE Cert by ID
 //route   DELETE /api/cert/:id
 //access  public
-exports.deleteCertById = asyncHandler(async (req, res, next) => {
-  const cert = await Cert.findById(req.params.id);
+// exports.deleteCertById = asyncHandler(async (req, res, next) => {
+//   const cert = await Cert.findById(req.params.id);
 
-  if (!cert) {
-    return next(new ErrorResponse('This certificate does not exist.', 400));
-  }
+//   if (!cert) {
+//     return next(new ErrorResponse('This certificate does not exist.', 400));
+//   }
 
-  const certPic = 'cert/' + cert.imgUrl.split('/').pop();
+//   const certPic = 'cert/' + cert.imgUrl.split('/').pop();
 
-  const deleteParam = {
-    Bucket: process.env.BUCKET_NAME,
-    Key: certPic,
-  };
+//   const deleteParam = {
+//     Bucket: process.env.BUCKET_NAME,
+//     Key: certPic,
+//   };
 
-  const s3 = new aws.S3({
-    accessKeyId: process.env.ACCESSKEYID,
-    secretAccessKey: process.env.SECRETACCESSKEY,
-    Bucket: process.env.BUCKET_NAME,
-    region: process.env.REGION,
-  });
+//   const s3 = new aws.S3({
+//     accessKeyId: process.env.ACCESSKEYID,
+//     secretAccessKey: process.env.SECRETACCESSKEY,
+//     Bucket: process.env.BUCKET_NAME,
+//     region: process.env.REGION,
+//   });
 
-  await s3
-    .deleteObject(deleteParam, (err, data) => {
-      if (err) console.error('err: ', err);
-      if (data) console.log('data:', data);
-    })
-    .promise();
+//   await s3
+//     .deleteObject(deleteParam, (err, data) => {
+//       if (err) console.error('err: ', err);
+//       if (data) console.log('data:', data);
+//     })
+//     .promise();
 
-  await Cert.deleteOne({ _id: req.params.id });
+//   await Cert.deleteOne({ _id: req.params.id });
 
-  res.status(200).json({ success: 'true', data: 'Certificate deleted.' });
-});
+//   res.status(200).json({ success: 'true', data: 'Certificate deleted.' });
+// });
 
 //desc    DELETE all Certs img on S3
 //route   DELETE /api/cert/
 //access  public
-exports.deleteAllCerts = asyncHandler(async (req, res, next) => {
-  const certs = await Cert.find();
+// exports.deleteAllCerts = asyncHandler(async (req, res, next) => {
+//   const certs = await Cert.find();
 
-  const objects = certs.map((cert) => ({
-    Key: 'cert/' + cert.imgUrl.split('/').pop(),
-  }));
+//   const objects = certs.map((cert) => ({
+//     Key: 'cert/' + cert.imgUrl.split('/').pop(),
+//   }));
 
-  const deleteParam = {
-    Bucket: process.env.BUCKET_NAME,
-    Delete: { Objects: objects },
-  };
+//   const deleteParam = {
+//     Bucket: process.env.BUCKET_NAME,
+//     Delete: { Objects: objects },
+//   };
 
-  const s3 = new aws.S3({
-    accessKeyId: process.env.ACCESSKEYID,
-    secretAccessKey: process.env.SECRETACCESSKEY,
-    Bucket: process.env.BUCKET_NAME,
-    region: process.env.REGION,
-  });
+//   const s3 = new aws.S3({
+//     accessKeyId: process.env.ACCESSKEYID,
+//     secretAccessKey: process.env.SECRETACCESSKEY,
+//     Bucket: process.env.BUCKET_NAME,
+//     region: process.env.REGION,
+//   });
 
-  await s3
-    .deleteObjects(deleteParam, (err, data) => {
-      if (err) console.error('err: ', err);
-      if (data) console.log('data:', data);
-    })
-    .promise();
+//   await s3
+//     .deleteObjects(deleteParam, (err, data) => {
+//       if (err) console.error('err: ', err);
+//       if (data) console.log('data:', data);
+//     })
+//     .promise();
 
-  await Cert.deleteMany();
+//   await Cert.deleteMany();
 
-  res.status(200).json({
-    success: 'true',
-    data: { 'certificates deleted: ': certs.length },
-  });
-});
+//   res.status(200).json({
+//     success: 'true',
+//     data: { 'certificates deleted: ': certs.length },
+//   });
+// });
 
 // //desc    POST Cert
 // //route   POST /api/cert/

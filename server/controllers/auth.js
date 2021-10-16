@@ -111,73 +111,6 @@ exports.getCurrentUser = asyncHandler(async (req, res, next) => {
   });
 });
 
-//desc    POST add hours to current User
-//route   POST /api/auth/current/hours
-//access  private
-exports.addCPDHours = asyncHandler(async (req, res, next) => {
-  const user = await User.findById(req.user.id);
-
-  if (!user) {
-    return next(new ErrorResponse('No user is logged in at the moment', 400));
-  }
-
-  const { year, verifiable, nonVerifiable, ethics } = req.body;
-  const index = user.hours.findIndex((e) => e.year === year);
-
-  if (index === -1) {
-    return next(new ErrorResponse('Requested year is not found', 400));
-  }
-
-  if (ethics > verifiable) {
-    return next(
-      new ErrorResponse(
-        'Ethics hours cannot be greater than Verifiable hours',
-        400
-      )
-    );
-  }
-
-  if (verifiable > 0 && nonVerifiable > 0) {
-    return next(
-      new ErrorResponse(
-        'A course can only be either Verifiable or non-Verifiable. Cannot be both.',
-        400
-      )
-    );
-  }
-
-  const query = { _id: user._id, 'hours.year': year };
-
-  if (verifiable > 0) {
-    const update = {
-      $inc: {
-        'hours.$.verifiable': +verifiable,
-      },
-    };
-    await User.updateOne(query, update);
-  }
-
-  if (nonVerifiable > 0) {
-    const update = {
-      $inc: {
-        'hours.$.nonVerifiable': +nonVerifiable,
-      },
-    };
-    await User.updateOne(query, update);
-  }
-
-  if (ethics > 0) {
-    const update = {
-      $inc: {
-        'hours.$.ethics': +ethics,
-      },
-    };
-    await User.updateOne(query, update);
-  }
-
-  res.status(200).json({ success: 'true' });
-});
-
 //desc    LOGOUT user / clear cookie
 //route   GET /api/auth/logout
 //access  private
@@ -190,90 +123,6 @@ exports.logOut = asyncHandler(async (req, res, next) => {
     success: true,
     data: 'You have logged out',
   });
-});
-
-//desc    POST add verifiable hours to current User
-//route   POST /api/auth/current/verifiable
-//access  private
-/* CURRENTLY NOT USING */
-exports.addVerifiableHours = asyncHandler(async (req, res, next) => {
-  const user = await User.findById(req.user.id);
-
-  if (!user) {
-    return next(new ErrorResponse('No user is logged in at the moment', 400));
-  }
-
-  const { year, hours } = req.body;
-
-  const userHours = user.verifiable;
-  const findYear = userHours.findIndex((e) => e.year === year);
-
-  if (userHours.length === 0) {
-    userHours.push({
-      year: year,
-      hours: hours,
-    });
-  } else if (userHours.length > 0 && findYear !== -1) {
-    const query = { _id: user._id, 'verifiable.year': year };
-    const update = {
-      $inc: {
-        'verifiable.$.hours': +hours,
-      },
-    };
-    await User.updateOne(query, update);
-  } else {
-    userHours.push({
-      year: year,
-      hours: hours,
-    });
-  }
-
-  await user.save();
-
-  //the user data returned is one cycle out of date when updating via Mongo syntax
-  res.status(200).json({ success: 'true', data: user });
-});
-
-//desc    POST add non-verifiable hours to current User
-//route   POST /api/auth/current/nonverifiable
-//access  private
-/* CURRENTLY NOT USING */
-exports.addNonVerifiableHours = asyncHandler(async (req, res, next) => {
-  const user = await User.findById(req.user.id);
-
-  if (!user) {
-    return next(new ErrorResponse('No user is logged in at the moment', 400));
-  }
-
-  const { year, hours } = req.body;
-
-  const userHours = user.nonVerifiable;
-  const findYear = userHours.findIndex((e) => e.year === year);
-
-  if (userHours.length === 0) {
-    userHours.push({
-      year: year,
-      hours: hours,
-    });
-  } else if (userHours.length > 0 && findYear !== -1) {
-    const query = { _id: user._id, 'nonVerifiable.year': year };
-    const update = {
-      $inc: {
-        'nonVerifiable.$.hours': +hours,
-      },
-    };
-    await User.updateOne(query, update);
-  } else {
-    userHours.push({
-      year: year,
-      hours: hours,
-    });
-  }
-
-  await user.save();
-
-  //the user data returned is one cycle out of date when updating via Mongo syntax
-  res.status(200).json({ success: 'true', data: user });
 });
 
 /*** HELPER ***/
@@ -297,3 +146,87 @@ const sendTokenResponse = (user, statusCode, res) => {
     .cookie('token', token, options)
     .json({ token, user, options });
 };
+
+//desc    POST add verifiable hours to current User
+//route   POST /api/auth/current/verifiable
+//access  private
+/* CURRENTLY NOT USING */
+// exports.addVerifiableHours = asyncHandler(async (req, res, next) => {
+//   const user = await User.findById(req.user.id);
+
+//   if (!user) {
+//     return next(new ErrorResponse('No user is logged in at the moment', 400));
+//   }
+
+//   const { year, hours } = req.body;
+
+//   const userHours = user.verifiable;
+//   const findYear = userHours.findIndex((e) => e.year === year);
+
+//   if (userHours.length === 0) {
+//     userHours.push({
+//       year: year,
+//       hours: hours,
+//     });
+//   } else if (userHours.length > 0 && findYear !== -1) {
+//     const query = { _id: user._id, 'verifiable.year': year };
+//     const update = {
+//       $inc: {
+//         'verifiable.$.hours': +hours,
+//       },
+//     };
+//     await User.updateOne(query, update);
+//   } else {
+//     userHours.push({
+//       year: year,
+//       hours: hours,
+//     });
+//   }
+
+//   await user.save();
+
+//   //the user data returned is one cycle out of date when updating via Mongo syntax
+//   res.status(200).json({ success: 'true', data: user });
+// });
+
+//desc    POST add non-verifiable hours to current User
+//route   POST /api/auth/current/nonverifiable
+//access  private
+/* CURRENTLY NOT USING */
+// exports.addNonVerifiableHours = asyncHandler(async (req, res, next) => {
+//   const user = await User.findById(req.user.id);
+
+//   if (!user) {
+//     return next(new ErrorResponse('No user is logged in at the moment', 400));
+//   }
+
+//   const { year, hours } = req.body;
+
+//   const userHours = user.nonVerifiable;
+//   const findYear = userHours.findIndex((e) => e.year === year);
+
+//   if (userHours.length === 0) {
+//     userHours.push({
+//       year: year,
+//       hours: hours,
+//     });
+//   } else if (userHours.length > 0 && findYear !== -1) {
+//     const query = { _id: user._id, 'nonVerifiable.year': year };
+//     const update = {
+//       $inc: {
+//         'nonVerifiable.$.hours': +hours,
+//       },
+//     };
+//     await User.updateOne(query, update);
+//   } else {
+//     userHours.push({
+//       year: year,
+//       hours: hours,
+//     });
+//   }
+
+//   await user.save();
+
+//   //the user data returned is one cycle out of date when updating via Mongo syntax
+//   res.status(200).json({ success: 'true', data: user });
+// });

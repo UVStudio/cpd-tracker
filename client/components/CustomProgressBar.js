@@ -27,7 +27,9 @@ const CustomProgressBar = (props) => {
   return (
     <View>
       <View style={{ ...styles.bar, width: barWidth }} />
-      <View style={{ ...styles.progress, width: barProgress() }} />
+      <View
+        style={{ ...styles.progress, width: barProgress(), maxWidth: barWidth }}
+      />
     </View>
   );
 };

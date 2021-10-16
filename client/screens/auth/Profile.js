@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
-import { useDispatch } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 
 import * as authActions from '../../store/actions/auth';
 
@@ -8,6 +8,7 @@ import CustomButton from '../../components/CustomButton';
 import CustomScreenContainer from '../../components/CustomScreenContainer';
 
 const Profile = () => {
+  const user = useSelector((state) => state.auth.user);
   const dispatch = useDispatch();
 
   const logoutHandler = async () => {
@@ -17,6 +18,7 @@ const Profile = () => {
   return (
     <CustomScreenContainer>
       <Text>Profile Screen</Text>
+      <Text>Hello {user.name}!</Text>
       <CustomButton onSelect={logoutHandler}>Logout</CustomButton>
     </CustomScreenContainer>
   );

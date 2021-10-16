@@ -31,3 +31,16 @@ export const addCert = (file, year) => {
     }
   };
 };
+
+export const addCPDHours = (year, verifiable, nonVerifiable, ethics) => {
+  return async () => {
+    const body = { year, verifiable, nonVerifiable, ethics };
+
+    console.log('body: ', body);
+    try {
+      await axios.post(`${CURRENT_IP}/api/hours`, body);
+    } catch (err) {
+      console.log(err.message);
+    }
+  };
+};
