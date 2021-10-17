@@ -109,7 +109,7 @@ exports.deletePDF = asyncHandler(async (req, res, next) => {
     })
     .promise();
 
-  res.status(200).json({ success: 'true', data: 'Report deleted.' });
+  res.status(200).json({ success: true, data: 'Report deleted.' });
 });
 
 //desc    GET pdf Object by PDF ID

@@ -68,6 +68,7 @@ const buildPDF = async (
     .toArray(async (err, files) => {
       for (let i = 0; i < files.length; i++) {
         doc.fontSize(10).text(`Certificate #${i + 1}`);
+        doc.fontSize(10).text(files[i].metadata.courseName);
         let tempCertFile = await downloadFile(files[i]._id, gfsCerts);
 
         doc
@@ -117,6 +118,7 @@ const buildPDF = async (
           'Report has been uploaded to S3 and URL created successfully'
         );
 
+        fs.unlinkSync(`./uploads/${CPDFileName}`);
         res.status(200).send({ success: true });
       }
     });

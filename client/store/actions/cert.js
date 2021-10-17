@@ -38,7 +38,7 @@ export const addCPDHours = (year, verifiable, nonVerifiable, ethics) => {
 
     console.log('body: ', body);
     try {
-      await axios.post(`${CURRENT_IP}/api/hours`, body);
+      await axios.post(`${CURRENT_IP}/api/cert/hours`, body);
     } catch (err) {
       console.log(err.message);
     }

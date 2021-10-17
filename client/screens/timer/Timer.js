@@ -70,12 +70,13 @@ const Timer = () => {
     [dispatchFormState]
   );
 
+  const today = new Date(Date.now()).toDateString();
+  const hours = Math.round(seconds / 3600) / 100;
+
   //console.log('formState: ', formState);
 
-  const today = new Date(Date.now()).toDateString();
-  const hours = Math.round((seconds / 3600) * 100) / 100;
-
   const recordSession = async () => {
+    console.log('session length second ', seconds);
     console.log('session length hours ', hours);
     console.log('formatted todays date: ', today);
     console.log('current year: ', currentYear);
@@ -99,7 +100,6 @@ const Timer = () => {
   const finish = () => {
     setIsActive(false);
     setSessionLength(secondsToTime(seconds));
-    setSeconds(0);
   };
 
   useEffect(() => {

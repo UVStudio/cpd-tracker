@@ -1,4 +1,5 @@
 const fs = require('fs');
+const axios = require('axios');
 const path = require('path');
 const User = require('../models/User');
 const { fromPath } = require('pdf2pic');
@@ -21,12 +22,14 @@ const conn = mongoose.createConnection(process.env.MONGO_URI, {
 exports.uploadCert = asyncHandler(async (req, res, next) => {
   const file = req.file;
   const userId = req.user.id;
-  const year = req.body.year;
+  const { year, courseName } = req.body;
 
   let uploadFile;
 
-  if (!file || !year) {
-    return next(new ErrorResponse('Complete the form.', 400));
+  if (!file || !year || !courseName) {
+    return next(
+      new ErrorResponse('Please enter CPD year and course name', 400)
+    );
   }
 
   //clean file name
@@ -48,6 +51,9 @@ exports.uploadCert = asyncHandler(async (req, res, next) => {
     file: () => {
       return {
         filename: userId + '-' + year + '.jpg',
+        metadata: {
+          courseName,
+        },
         bucketName: 'uploads',
       };
     },
@@ -64,17 +70,15 @@ exports.uploadCert = asyncHandler(async (req, res, next) => {
     format: 'jpg',
   };
 
-  //convert file if PDF
+  //if PDF, convert and compress file
   if (ext === '.pdf') {
     const storeAsImage = fromPath(file.path, options);
     const pageToConvertAsImage = 1;
 
-    await storeAsImage(pageToConvertAsImage)
-      .then((resolve) => {
-        uploadFile = resolve;
-        return uploadFile;
-      })
-      .catch(console.log('not working'));
+    await storeAsImage(pageToConvertAsImage).then((resolve) => {
+      uploadFile = resolve;
+      return uploadFile;
+    });
   }
 
   //if png, jpeg or jpg, convert to jpg and compress
@@ -94,6 +98,8 @@ exports.uploadCert = asyncHandler(async (req, res, next) => {
   const stream = fs.createReadStream(
     uploadFile.path ? uploadFile.path : `./uploads/${newFileName}.jpg`
   );
+
+  //upload file to MongoDB, uploadFile is the file object to upload
   const response = await storage.fromStream(stream, req, uploadFile);
 
   fs.unlinkSync(file.path);
@@ -101,9 +107,10 @@ exports.uploadCert = asyncHandler(async (req, res, next) => {
     uploadFile.path ? uploadFile.path : `./uploads/${newFileName}.jpg`
   );
 
-  //upload file to MongoDB, uploadFile is the file object to upload
+  //create MongoDB object with the response given from successful stream upload of cert
   const certObj = await Cert.create({
     user: userId,
+    courseName,
     img: response.id,
     year,
   });

@@ -10,7 +10,7 @@ const CustomProgressBar = (props) => {
 
   //industry rules
   const verifiableHours = 20;
-  const nonVerifiableHours = 60;
+  const nonVerifiableHours = 20;
 
   const { progress, type } = props;
 

@@ -95,6 +95,7 @@ exports.login = asyncHandler(async (req, res, next) => {
 
   sendTokenResponse(user, 200, res);
 });
+
 //desc    GET current logged in user
 //route   GET /api/auth/current
 //access  private
@@ -109,6 +110,28 @@ exports.getCurrentUser = asyncHandler(async (req, res, next) => {
     success: true,
     data: user,
   });
+});
+
+//desc    UPDATE current logged in user
+//route   PUT /api/auth/
+//access  private
+exports.updateProfile = asyncHandler(async (req, res, next) => {
+  const { name, email, province } = req.body;
+
+  await User.updateOne(
+    { _id: req.user.id },
+    {
+      $set: {
+        name,
+        email,
+        province,
+        lastModifiedAt: Date.now(),
+      },
+    }
+  );
+  const userUpdated = await User.findById(req.user.id);
+
+  res.status(200).json({ success: true, data: userUpdated });
 });
 
 //desc    LOGOUT user / clear cookie

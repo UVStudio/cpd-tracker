@@ -29,6 +29,8 @@ exports.getAllCertObjsByUser = asyncHandler(async (req, res, next) => {
     return next(new ErrorResponse('This user has no certificates.', 400));
   }
 
+  console.log(certs);
+
   res.status(200).json({ success: true, data: certs });
 });
 
@@ -97,7 +99,9 @@ exports.addCPDHours = asyncHandler(async (req, res, next) => {
     await User.updateOne(query, update);
   }
 
-  res.status(200).json({ success: 'true' });
+  const userUpdated = await User.findById(req.user.id);
+
+  res.status(200).json({ success: true, data: userUpdated });
 });
 
 //desc    POST add Non-Verifiable Event to current User

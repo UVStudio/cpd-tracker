@@ -5,6 +5,10 @@ const CertSchema = new mongoose.Schema({
     type: mongoose.Schema.ObjectId,
     ref: 'User',
   },
+  courseName: {
+    type: String,
+    required: true,
+  },
   img: {
     type: mongoose.Schema.ObjectId,
   },
