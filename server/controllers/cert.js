@@ -107,21 +107,21 @@ exports.addCPDHours = asyncHandler(async (req, res, next) => {
 //desc    POST add Non-Verifiable Event to current User
 //route   POST /api/cert/nonver
 //access  private
-exports.addNonVerEvent = asyncHandler(async (req, res, next) => {
-  const user = await User.findById(req.user.id);
+// exports.addNonVerEvent = asyncHandler(async (req, res, next) => {
+//   const user = await User.findById(req.user.id);
 
-  if (!user) {
-    return next(new ErrorResponse('No user is logged in at the moment', 400));
-  }
+//   if (!user) {
+//     return next(new ErrorResponse('No user is logged in at the moment', 400));
+//   }
 
-  const { date, hours, sessionName } = req.body;
+//   const { date, hours, sessionName } = req.body;
 
-  if (!date || !hours || !sessionName) {
-    return next(
-      new ErrorResponse('Please provide all necessary information', 400)
-    );
-  }
-});
+//   if (!date || !hours || !sessionName) {
+//     return next(
+//       new ErrorResponse('Please provide all necessary information', 400)
+//     );
+//   }
+// });
 
 //desc    DELETE Cert by ID
 //route   DELETE /api/cert/:id

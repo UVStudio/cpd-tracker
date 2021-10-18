@@ -15,9 +15,12 @@ exports.createUser = asyncHandler(async (req, res, next) => {
     return next(new ErrorResponse('This user already exists', 400));
   }
 
-  if (!name || !email || !password) {
+  if (!name || !email || !password || !province) {
     return next(
-      new ErrorResponse('Please provide name, email and password', 400)
+      new ErrorResponse(
+        'Please provide name, email, password and province',
+        400
+      )
     );
   }
 
@@ -100,7 +103,7 @@ exports.login = asyncHandler(async (req, res, next) => {
 //route   GET /api/auth/current
 //access  private
 exports.getCurrentUser = asyncHandler(async (req, res, next) => {
-  const user = await User.findById(req.user.id);
+  const user = await User.findById(req.user.id).populate('nonver'); //populate target is small cap!
 
   if (!user) {
     return next(new ErrorResponse('No user is logged in at the moment', 400));

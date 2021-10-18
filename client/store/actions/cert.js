@@ -1,22 +1,23 @@
 import axios from 'axios';
 import { CURRENT_IP } from '../../serverConfig';
 
-export const saveVerCourse = (cert, year, courseName) => {
+export const saveVerCourse = (year, courseName, hours, ethicsHours, cert) => {
   return async () => {
     try {
-      //real cert vars
       const certName = cert.name;
       const uri = cert.uri;
 
       let formData = new FormData();
 
       formData.append('year', year);
+      formData.append('courseName', courseName);
+      formData.append('hours', hours);
+      formData.append('ethicsHours', ethicsHours);
       formData.append('cert', {
         uri: `${uri}`,
         type: '*/*',
         name: `${certName}`,
       });
-      formData.append('courseName', courseName);
 
       const config = {
         headers: {

@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useSelector } from 'react-redux';
+import React, { useState, useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import {
   View,
   Text,
@@ -8,6 +8,8 @@ import {
   Pressable,
 } from 'react-native';
 import currentYear from '../../utils/currentYear';
+
+import * as authActions from '../../store/actions/auth';
 
 import CustomText from '../../components/CustomText';
 import CustomTitle from '../../components/CustomTitle';
@@ -21,12 +23,24 @@ import CustomProgressBar from '../../components/CustomProgressBar';
 import CustomScreenContainer from '../../components/CustomScreenContainer';
 
 const Stats = () => {
-  const user = useSelector((state) => state.auth.user);
-  // const authState = useSelector((state) => state.auth);
-  // console.log('authState: ', authState);
-  const userHours = user.hours;
-
   const [showYear, setShowYear] = useState(currentYear);
+
+  const user = useSelector((state) => state.auth.user);
+  const userHours = user.data.hours;
+
+  const dispatch = useDispatch();
+
+  const loadUser = async () => {
+    try {
+      await dispatch(authActions.getAuthUser());
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  useEffect(() => {
+    loadUser();
+  }, []);
 
   return (
     <CustomScreenContainer>

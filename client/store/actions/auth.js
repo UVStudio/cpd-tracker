@@ -1,6 +1,12 @@
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { AUTHENTICATE, SET_DID_TRY_AL, LOGOUT, SET_USER } from '../types';
+import {
+  AUTHENTICATE,
+  SET_DID_TRY_AL,
+  LOGOUT,
+  SET_USER,
+  GET_USER,
+} from '../types';
 import { CURRENT_IP } from '../../serverConfig';
 
 let timer;
@@ -18,23 +24,24 @@ export const setDidTryAL = () => {
   return { type: SET_DID_TRY_AL };
 };
 
-export const register = (name, email, password) => {
+export const register = (name, email, province, password) => {
   return async (dispatch) => {
     const config = {
       headers: {
         'Content-Type': 'application/json',
       },
     };
-    const body = JSON.stringify({ name, email, password });
+    const body = JSON.stringify({ name, email, province, password });
 
     try {
       const response = await axios.post(
-        `${CURRENT_IP}/api/auth/register`,
+        `${CURRENT_IP}/api/auth/`,
         body,
         config
       );
 
       const resData = response.data;
+
       await dispatch(
         authenticate(resData.token, resData.user._id, oneMonth, resData.user)
       );
@@ -92,6 +99,21 @@ export const setAuthUser = (resData) => {
       type: SET_USER,
       user: resData,
     });
+  };
+};
+
+export const getAuthUser = () => {
+  return async (dispatch) => {
+    try {
+      const response = await axios.get(`${CURRENT_IP}/api/auth/current`);
+      const resData = response.data;
+      dispatch({
+        type: GET_USER,
+        user: resData,
+      });
+    } catch (err) {
+      throw new Error(err.response.data.error);
+    }
   };
 };
 

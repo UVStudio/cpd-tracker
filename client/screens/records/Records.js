@@ -72,21 +72,22 @@ const Records = () => {
 
   //if true, user is upload a cert. if not, app uploads default no-cert.jpg
   const [cert, setCert] = useState(null);
+  const placeholderYear = currentYear.toString();
 
   const dispatch = useDispatch();
 
   const [formState, dispatchFormState] = useReducer(formReducer, {
     inputValues: {
-      year: '',
-      date: '',
+      year: placeholderYear,
       name: '',
       hours: '',
+      ethicsHours: '',
     },
     inputValidities: {
-      year: false,
-      date: false,
+      year: true,
       name: false,
       hours: false,
+      ethicsHours: false,
     },
     formIsValid: false,
   });
@@ -161,19 +162,25 @@ const Records = () => {
     }
   };
 
-  const saveVerfiableCourse = async (year, courseName) => {
+  console.log('formState: ', formState);
+
+  const saveVerfiableCourse = async () => {
     try {
-      const courseName = 'courseName'; //fake course name for now
+      const { year, date, courseName, hours } = formState.inputValues;
 
       if (cert) {
-        await dispatch(certActions.saveVerCourse(cert, year, courseName));
+        await dispatch(
+          certActions.saveVerCourse(year, date, courseName, hours, cert)
+        );
       } else {
         const noCert = {
           name: 'no-cert.jpg',
           uri: 'https://cpdtracker.s3.us-east-2.amazonaws.com/cert/no-cert.jpg',
         };
 
-        await dispatch(certActions.saveVerCourse(noCert, year, courseName));
+        await dispatch(
+          certActions.saveVerCourse(year, date, courseName, hours, noCert)
+        );
       }
       setCert(null);
     } catch (err) {
@@ -212,8 +219,6 @@ const Records = () => {
   const pdfUri = `https://cpdtracker.s3.us-east-2.amazonaws.com/reports/${user._id}-2021-CPD-report.pdf`;
   const fileName = `${user.name}-CPD-report.pdf`;
 
-  const placeholderYear = currentYear.toString();
-
   return (
     <CustomScreenContainer>
       <CustomScrollView>
@@ -229,28 +234,17 @@ const Records = () => {
             placeholder={placeholderYear}
             placeholderColor={Colors.darkGrey}
             onInputChange={inputChangeHandler}
-            initialValue={placeholderYear}
-            required
-          />
-          <CustomInput
-            id="date"
-            label="Session Day and Month"
-            keyboardType="default"
-            autoCapitalize="none"
-            errorText="Please enter session date"
-            placeholder="dd/mm"
-            placeholderColor={Colors.lightGrey}
-            onInputChange={inputChangeHandler}
-            initialValue=""
+            //initialValue={placeholderYear}
+            //value={placeholderYear}
             required
           />
           <CustomInput
             id="name"
             label="Session Name"
             keyboardType="default"
-            autoCapitalize="none"
+            autoCapitalize="characters"
             errorText="Please enter session name"
-            placeholder="ie Ethics in Accounting"
+            placeholder="ie ETHICS IN ACCOUNTING"
             placeholderColor={Colors.lightGrey}
             onInputChange={inputChangeHandler}
             initialValue=""
@@ -259,10 +253,22 @@ const Records = () => {
           <CustomInput
             id="hours"
             label="Session Duration (hours)"
-            keyboardType="default"
+            keyboardType="numeric"
             autoCapitalize="none"
             errorText="Please enter session duration"
-            placeholder="2"
+            placeholder="ie: 2"
+            placeholderColor={Colors.lightGrey}
+            onInputChange={inputChangeHandler}
+            initialValue=""
+            required
+          />
+          <CustomInput
+            id="ethicsHours"
+            label="Ethics hours"
+            keyboardType="numeric"
+            autoCapitalize="none"
+            errorText="Please enter ethics hours count"
+            placeholder="ie: 0"
             placeholderColor={Colors.lightGrey}
             onInputChange={inputChangeHandler}
             initialValue=""

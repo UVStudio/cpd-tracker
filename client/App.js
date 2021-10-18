@@ -9,10 +9,12 @@ import ReduxThunk from 'redux-thunk';
 import AppNavigator from './navigation/AppNavigator';
 import authReducer from './store/reducers/auth';
 import reportReducer from './store/reducers/report';
+import nonVerReducer from './store/reducers/nonVer';
 
 const rootReducer = combineReducers({
   auth: authReducer,
   report: reportReducer,
+  nonVer: nonVerReducer,
 });
 
 const store = createStore(rootReducer, applyMiddleware(ReduxThunk));

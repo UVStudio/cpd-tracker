@@ -1,6 +1,7 @@
 import React, { useReducer, useEffect } from 'react';
 import { View, Text, TextInput, StyleSheet } from 'react-native';
 import { INPUT_CHANGE, INPUT_BLUR } from '../store/types';
+import currentYear from '../utils/currentYear';
 
 const inputReducer = (state, action) => {
   switch (action.type) {
@@ -55,6 +56,10 @@ const CustomInput = (props) => {
     if (props.minLength != null && text.length < props.minLength) {
       isValid = false;
     }
+    if (props.id === 'year' && text.length !== 4) {
+      isValid = false;
+    }
+
     dispatch({
       type: INPUT_CHANGE,
       value: text,

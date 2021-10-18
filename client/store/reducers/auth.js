@@ -1,4 +1,10 @@
-import { AUTHENTICATE, LOGOUT, SET_USER, SET_DID_TRY_AL } from '../types';
+import {
+  AUTHENTICATE,
+  LOGOUT,
+  SET_USER,
+  GET_USER,
+  SET_DID_TRY_AL,
+} from '../types';
 
 const initialState = {
   token: null,
@@ -25,6 +31,11 @@ export default (state = initialState, action) => {
         user: action.user,
       };
     case SET_USER:
+      return {
+        ...state,
+        user: action.user,
+      };
+    case GET_USER:
       return {
         ...state,
         user: action.user,

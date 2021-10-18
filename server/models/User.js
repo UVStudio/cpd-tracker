@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
+const NonVer = require('./NonVer');
 
 const UserSchema = new mongoose.Schema({
   name: {
@@ -34,15 +35,23 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Please state your provincial jurisdiction'],
   },
+  cert: [
+    {
+      type: mongoose.Schema.ObjectId,
+      ref: 'Cert',
+      required: true,
+    },
+  ],
+  nonver: [
+    {
+      type: mongoose.Schema.ObjectId,
+      ref: 'NonVer',
+      required: true,
+    },
+  ],
   hours: {
     type: Array,
   },
-  // verifiable: {
-  //   type: Array,
-  // },
-  // nonVerifiable: {
-  //   type: Array,
-  // },
   createdAt: {
     type: Date,
     default: Date.now,
@@ -53,6 +62,12 @@ const UserSchema = new mongoose.Schema({
   },
   verificationCode: String,
   verificationCodeExpire: Date,
+  // verifiable: {
+  //   type: Array,
+  // },
+  // nonVerifiable: {
+  //   type: Array,
+  // },
 });
 
 //encrypt password, if it is being modified

@@ -1,4 +1,5 @@
 //User
+export const SET_USER = 'SET_USER';
 export const GET_USER = 'GET_USER';
 
 //Authentication
@@ -6,7 +7,6 @@ export const AUTHENTICATE = 'AUTHENTICATE';
 export const LOGOUT = 'LOGOUT';
 export const SET_DID_TRY_AL = 'SET_DID_TRY_AL';
 export const FORM_INPUT_UPDATE = 'FORM_INPUT_UPDATE';
-export const SET_USER = 'SET_USER';
 
 //INPUT
 export const INPUT_CHANGE = 'INPUT_CHANGE';
@@ -17,3 +17,7 @@ export const REPORT_AVAILABLE = 'REPORT_AVAILABLE';
 export const REPORT_NOT_AVAILABLE = 'REPORT_NOT_AVAILABLE';
 
 //CERTIFICATES
+
+//NON-VERIAFIABLE
+export const ADD_NONVER_SESSION = 'ADD_NONVER_SESSION';
+export const GET_NONVER_SESSION = 'GET_NONVER_SESSION';

@@ -18,12 +18,14 @@ app.use(cookieParser());
 
 //Routes
 const cert = require('./routes/cert');
+const nonVer = require('./routes/nonver');
 const pdf = require('./routes/pdf');
 const auth = require('./routes/auth');
 const upload = require('./routes/upload');
 
 //Mount routes
 app.use('/api/cert', cert);
+app.use('/api/nonver', nonVer);
 app.use('/api/pdf', pdf);
 app.use('/api/auth', auth);
 app.use('/api/upload', upload);
