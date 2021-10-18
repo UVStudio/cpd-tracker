@@ -1,16 +1,25 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useReducer, useCallback } from 'react';
 import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
+import { downloadToFolder } from 'expo-file-dl';
+
 import * as Notifications from 'expo-notifications';
 import * as MediaLibrary from 'expo-media-library';
 import * as DocumentPicker from 'expo-document-picker';
-
 import * as reportActions from '../../store/actions/report';
 import * as certActions from '../../store/actions/cert';
 
-import { downloadToFolder } from 'expo-file-dl';
 import CustomButton from '../../components/CustomButton';
+import CustomText from '../../components/CustomText';
+import CustomTitle from '../../components/CustomTitle';
+import CustomInput from '../../components/CustomInput';
+import CustomGreyLine from '../../components/CustomGreyLine';
+import CustomScrollView from '../../components/CustomScrollView';
 import CustomScreenContainer from '../../components/CustomScreenContainer';
+import CustomOperationalContainer from '../../components/CustomOperationalContainer';
+import currentYear from '../../utils/currentYear';
+import Colors from '../../constants/Colors';
+import { FORM_INPUT_UPDATE } from '../../store/types';
 
 import {
   AndroidImportance,
@@ -28,17 +37,71 @@ Notifications.setNotificationHandler({
   }),
 });
 
+const formReducer = (state, action) => {
+  if (action.type === FORM_INPUT_UPDATE) {
+    const updatedValues = {
+      ...state.inputValues,
+      [action.input]: action.value,
+    };
+    const updatedValidities = {
+      ...state.inputValidities,
+      [action.input]: action.isValid,
+    };
+    let updatedFormIsValid = true;
+    for (const key in updatedValidities) {
+      updatedFormIsValid = updatedFormIsValid && updatedValidities[key];
+    }
+    return {
+      formIsValid: updatedFormIsValid,
+      inputValues: updatedValues,
+      inputValidities: updatedValidities,
+    };
+  }
+  return state;
+};
+
 const channelId = 'DownloadInfo';
 
 const Records = () => {
   const user = useSelector((state) => state.auth.user);
   const reportReady = useSelector((state) => state.report.report);
 
-  console.log('report state: ', reportReady);
+  //console.log('report state: ', reportReady);
+
+  const [downloadProgress, setDownloadProgress] = useState('0%');
+
+  //if true, user is upload a cert. if not, app uploads default no-cert.jpg
+  const [cert, setCert] = useState(null);
 
   const dispatch = useDispatch();
 
-  const [downloadProgress, setDownloadProgress] = useState('0%');
+  const [formState, dispatchFormState] = useReducer(formReducer, {
+    inputValues: {
+      year: '',
+      date: '',
+      name: '',
+      hours: '',
+    },
+    inputValidities: {
+      year: false,
+      date: false,
+      name: false,
+      hours: false,
+    },
+    formIsValid: false,
+  });
+
+  const inputChangeHandler = useCallback(
+    (inputIdentifier, inputValue, inputValidity) => {
+      dispatchFormState({
+        type: FORM_INPUT_UPDATE,
+        value: inputValue,
+        isValid: inputValidity,
+        input: inputIdentifier,
+      });
+    },
+    [dispatchFormState]
+  );
 
   const setNotificationChannel = async () => {
     const loadingChannel = await Notifications.getNotificationChannelAsync(
@@ -82,7 +145,7 @@ const Records = () => {
     setDownloadProgress(`${pctg.toFixed(0)}%`);
   };
 
-  const addCertHandler = async (year) => {
+  const addCertHandler = async () => {
     try {
       const file = await DocumentPicker.getDocumentAsync({
         type: '*/*',
@@ -91,8 +154,28 @@ const Records = () => {
 
       if (file.type === 'success') {
         console.log('success');
-        //await dispatch(certActions.addCert(file, year));
+        setCert(file);
       }
+    } catch (err) {
+      console.log(err.message);
+    }
+  };
+
+  const saveVerfiableCourse = async (year, courseName) => {
+    try {
+      const courseName = 'courseName'; //fake course name for now
+
+      if (cert) {
+        await dispatch(certActions.saveVerCourse(cert, year, courseName));
+      } else {
+        const noCert = {
+          name: 'no-cert.jpg',
+          uri: 'https://cpdtracker.s3.us-east-2.amazonaws.com/cert/no-cert.jpg',
+        };
+
+        await dispatch(certActions.saveVerCourse(noCert, year, courseName));
+      }
+      setCert(null);
     } catch (err) {
       console.log(err.message);
     }
@@ -127,30 +210,94 @@ const Records = () => {
   });
 
   const pdfUri = `https://cpdtracker.s3.us-east-2.amazonaws.com/reports/${user._id}-2021-CPD-report.pdf`;
-
   const fileName = `${user.name}-CPD-report.pdf`;
+
+  const placeholderYear = currentYear.toString();
 
   return (
     <CustomScreenContainer>
-      <Text>Hello {user.name}!</Text>
+      <CustomScrollView>
+        <CustomTitle>Add Verifiable Session</CustomTitle>
+        <CustomGreyLine />
+        <CustomOperationalContainer>
+          <CustomInput
+            id="year"
+            label="Session Year"
+            keyboardType="numeric"
+            autoCapitalize="none"
+            errorText="Please enter session year"
+            placeholder={placeholderYear}
+            placeholderColor={Colors.darkGrey}
+            onInputChange={inputChangeHandler}
+            initialValue={placeholderYear}
+            required
+          />
+          <CustomInput
+            id="date"
+            label="Session Day and Month"
+            keyboardType="default"
+            autoCapitalize="none"
+            errorText="Please enter session date"
+            placeholder="dd/mm"
+            placeholderColor={Colors.lightGrey}
+            onInputChange={inputChangeHandler}
+            initialValue=""
+            required
+          />
+          <CustomInput
+            id="name"
+            label="Session Name"
+            keyboardType="default"
+            autoCapitalize="none"
+            errorText="Please enter session name"
+            placeholder="ie Ethics in Accounting"
+            placeholderColor={Colors.lightGrey}
+            onInputChange={inputChangeHandler}
+            initialValue=""
+            required
+          />
+          <CustomInput
+            id="hours"
+            label="Session Duration (hours)"
+            keyboardType="default"
+            autoCapitalize="none"
+            errorText="Please enter session duration"
+            placeholder="2"
+            placeholderColor={Colors.lightGrey}
+            onInputChange={inputChangeHandler}
+            initialValue=""
+            required
+          />
 
-      <CustomButton onSelect={() => addCertHandler(2021)}>
-        Add Course Certificate
-      </CustomButton>
-
-      <CustomButton onSelect={() => generatePDFHandler(2021)}>
-        Generate PDF Report
-      </CustomButton>
-
-      <Text>Records Screen</Text>
-      {reportReady ? (
-        <View>
-          <CustomButton onSelect={downloadPDFHandler}>
-            Download PDF Report
+          <CustomButton
+            style={{ marginTop: 20 }}
+            onSelect={() => addCertHandler()}
+          >
+            Choose Course Certificate
           </CustomButton>
-          <Text>{downloadProgress}</Text>
-        </View>
-      ) : null}
+          <CustomText>{cert !== null ? 'file: ' + cert.name : null}</CustomText>
+          <CustomButton
+            style={{ marginTop: 10 }}
+            onSelect={() => saveVerfiableCourse(2021)}
+          >
+            Save Verifiable Course
+          </CustomButton>
+          <CustomButton
+            style={{ marginTop: 20 }}
+            onSelect={() => generatePDFHandler(2021)}
+          >
+            Generate PDF Report
+          </CustomButton>
+          {reportReady ? (
+            <View>
+              <CustomButton onSelect={downloadPDFHandler}>
+                Download PDF Report
+              </CustomButton>
+              <Text>{downloadProgress}</Text>
+            </View>
+          ) : null}
+        </CustomOperationalContainer>
+      </CustomScrollView>
     </CustomScreenContainer>
   );
 };

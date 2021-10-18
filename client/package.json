@@ -19,6 +19,7 @@
     "axios": "^0.22.0",
     "expo": "~42.0.1",
     "expo-app-loading": "^1.1.2",
+    "expo-document-picker": "~9.2.4",
     "expo-file-dl": "^2.0.0",
     "expo-linking": "^2.3.1",
     "expo-media-library": "~12.1.2",
@@ -38,8 +39,7 @@
     "react-redux": "^7.2.5",
     "redux": "^4.1.1",
     "redux-thunk": "^2.3.0",
-    "unimodules-permissions-interface": "^6.1.0",
-    "expo-document-picker": "~9.2.4"
+    "unimodules-permissions-interface": "^6.1.0"
   },
   "devDependencies": {
     "@babel/core": "^7.9.0"

@@ -89,7 +89,6 @@ const CustomInput = (props) => {
 const styles = StyleSheet.create({
   formControl: {
     width: '100%',
-    marginTop: 3,
   },
   label: {
     fontFamily: 'sans-serif-condensed',

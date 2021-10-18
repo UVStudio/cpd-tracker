@@ -8,7 +8,7 @@ const CustomOperationalContainer = (props) => {
 const styles = StyleSheet.create({
   operationalContainer: {
     width: '90%',
-    marginVertical: 20,
+    marginVertical: 15,
     alignItems: 'center',
     justifyContent: 'center',
   },
