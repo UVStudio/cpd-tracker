@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { CURRENT_IP } from '../../serverConfig';
 
-export const saveVerCourse = (year, courseName, hours, ethicsHours, cert) => {
+export const saveVerCourse = (year, hours, ethicsHours, courseName, cert) => {
   return async () => {
     try {
       const certName = cert.name;
@@ -10,9 +10,9 @@ export const saveVerCourse = (year, courseName, hours, ethicsHours, cert) => {
       let formData = new FormData();
 
       formData.append('year', year);
-      formData.append('courseName', courseName);
       formData.append('hours', hours);
       formData.append('ethicsHours', ethicsHours);
+      formData.append('courseName', courseName);
       formData.append('cert', {
         uri: `${uri}`,
         type: '*/*',
@@ -35,6 +35,7 @@ export const saveVerCourse = (year, courseName, hours, ethicsHours, cert) => {
   };
 };
 
+//NOT USED
 export const addCPDHours = (year, verifiable, nonVerifiable, ethics) => {
   return async () => {
     const body = { year, verifiable, nonVerifiable, ethics };

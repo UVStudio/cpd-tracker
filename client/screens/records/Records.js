@@ -8,11 +8,13 @@ import * as MediaLibrary from 'expo-media-library';
 import * as DocumentPicker from 'expo-document-picker';
 import * as reportActions from '../../store/actions/report';
 import * as certActions from '../../store/actions/cert';
+import * as authActions from '../../store/actions/auth';
 
 import CustomButton from '../../components/CustomButton';
 import CustomText from '../../components/CustomText';
 import CustomTitle from '../../components/CustomTitle';
 import CustomInput from '../../components/CustomInput';
+import CustomMessageCard from '../../components/CustomMessageCard';
 import CustomGreyLine from '../../components/CustomGreyLine';
 import CustomScrollView from '../../components/CustomScrollView';
 import CustomScreenContainer from '../../components/CustomScreenContainer';
@@ -66,28 +68,26 @@ const Records = () => {
   const user = useSelector((state) => state.auth.user);
   const reportReady = useSelector((state) => state.report.report);
 
-  //console.log('report state: ', reportReady);
-
   const [downloadProgress, setDownloadProgress] = useState('0%');
+  const [cert, setCert] = useState(null); //if true, app uploads a cert. if not, app uploads default no-cert.jpg from S3
+  const [msgCard, setMsgCard] = useState(false);
 
-  //if true, user is upload a cert. if not, app uploads default no-cert.jpg
-  const [cert, setCert] = useState(null);
-  const placeholderYear = currentYear.toString();
+  const placeholderYear = currentYear.toString(); //Expo crashes if not set to string
 
   const dispatch = useDispatch();
 
   const [formState, dispatchFormState] = useReducer(formReducer, {
     inputValues: {
       year: placeholderYear,
-      name: '',
       hours: '',
       ethicsHours: '',
+      courseName: '',
     },
     inputValidities: {
       year: true,
-      name: false,
       hours: false,
       ethicsHours: false,
+      courseName: false,
     },
     formIsValid: false,
   });
@@ -154,7 +154,6 @@ const Records = () => {
       });
 
       if (file.type === 'success') {
-        console.log('success');
         setCert(file);
       }
     } catch (err) {
@@ -162,15 +161,18 @@ const Records = () => {
     }
   };
 
+  const year = Number(formState.inputValues.year);
+  const hours = Number(formState.inputValues.hours);
+  const ethicsHours = Number(formState.inputValues.ethicsHours);
+  const { courseName } = formState.inputValues;
+
   console.log('formState: ', formState);
 
   const saveVerfiableCourse = async () => {
     try {
-      const { year, date, courseName, hours } = formState.inputValues;
-
       if (cert) {
         await dispatch(
-          certActions.saveVerCourse(year, date, courseName, hours, cert)
+          certActions.saveVerCourse(year, hours, ethicsHours, courseName, cert)
         );
       } else {
         const noCert = {
@@ -179,15 +181,24 @@ const Records = () => {
         };
 
         await dispatch(
-          certActions.saveVerCourse(year, date, courseName, hours, noCert)
+          certActions.saveVerCourse(
+            year,
+            hours,
+            ethicsHours,
+            courseName,
+            noCert
+          )
         );
       }
       setCert(null);
+      setMsgCard(true);
+      await dispatch(authActions.getUser());
     } catch (err) {
       console.log(err.message);
     }
   };
 
+  //Generate PDF Report
   const generatePDFHandler = async (year) => {
     try {
       await dispatch(reportActions.buildReport(year));
@@ -196,8 +207,14 @@ const Records = () => {
     }
   };
 
+  //Download PDF Report
+  const pdfUri = `https://cpdtracker.s3.us-east-2.amazonaws.com/reports/${
+    user._id
+  }-${year.toString()}-CPD-report.pdf`;
+  const fileName = `${user.name}-CPD-report.pdf`;
+
   const downloadPDFHandler = async () => {
-    const AWSFileName = `${user._id}-2021-CPD-report.pdf`;
+    const AWSFileName = `${user._id}-${year.toString()}-CPD-report.pdf`;
     try {
       await downloadToFolder(pdfUri, fileName, 'Download', channelId, {
         downloadProgressCallback: downloadProgressUpdater,
@@ -215,9 +232,6 @@ const Records = () => {
   useEffect(() => {
     getNotificationPermissions();
   });
-
-  const pdfUri = `https://cpdtracker.s3.us-east-2.amazonaws.com/reports/${user._id}-2021-CPD-report.pdf`;
-  const fileName = `${user.name}-CPD-report.pdf`;
 
   return (
     <CustomScreenContainer>
@@ -239,11 +253,11 @@ const Records = () => {
             required
           />
           <CustomInput
-            id="name"
-            label="Session Name"
+            id="courseName"
+            label="Course Name"
             keyboardType="default"
             autoCapitalize="characters"
-            errorText="Please enter session name"
+            errorText="Please enter verifiable course name"
             placeholder="ie ETHICS IN ACCOUNTING"
             placeholderColor={Colors.lightGrey}
             onInputChange={inputChangeHandler}
@@ -264,7 +278,7 @@ const Records = () => {
           />
           <CustomInput
             id="ethicsHours"
-            label="Ethics hours"
+            label="Ethics hours (hours count as ethics)"
             keyboardType="numeric"
             autoCapitalize="none"
             errorText="Please enter ethics hours count"
@@ -279,18 +293,18 @@ const Records = () => {
             style={{ marginTop: 20 }}
             onSelect={() => addCertHandler()}
           >
-            Choose Course Certificate
+            Select Course Certificate
           </CustomButton>
           <CustomText>{cert !== null ? 'file: ' + cert.name : null}</CustomText>
           <CustomButton
             style={{ marginTop: 10 }}
-            onSelect={() => saveVerfiableCourse(2021)}
+            onSelect={() => saveVerfiableCourse(year)}
           >
             Save Verifiable Course
           </CustomButton>
           <CustomButton
             style={{ marginTop: 20 }}
-            onSelect={() => generatePDFHandler(2021)}
+            onSelect={() => generatePDFHandler(year)}
           >
             Generate PDF Report
           </CustomButton>
@@ -304,6 +318,12 @@ const Records = () => {
           ) : null}
         </CustomOperationalContainer>
       </CustomScrollView>
+      {msgCard ? (
+        <CustomMessageCard
+          toShow={setMsgCard}
+          text="Veriable Course has been successfully saved."
+        />
+      ) : null}
     </CustomScreenContainer>
   );
 };

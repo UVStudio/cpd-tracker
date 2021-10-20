@@ -2,6 +2,7 @@ const fs = require('fs');
 const axios = require('axios');
 const path = require('path');
 const User = require('../models/User');
+const Cert = require('../models/Cert');
 const { fromPath } = require('pdf2pic');
 const Jimp = require('jimp');
 const ErrorResponse = require('../utils/errorResponse');
@@ -22,13 +23,14 @@ const conn = mongoose.createConnection(process.env.MONGO_URI, {
 exports.uploadCert = asyncHandler(async (req, res, next) => {
   const file = req.file;
   const userId = req.user.id;
-  const { year, courseName } = req.body;
+  let user = await User.findById(userId);
+  const { year, hours, ethicsHours, courseName } = req.body;
 
   let uploadFile;
 
-  if (!file || !year || !courseName) {
+  if (!year || !hours || !ethicsHours || !courseName || !file) {
     return next(
-      new ErrorResponse('Please enter CPD year and course name', 400)
+      new ErrorResponse('Please make sure all fields are filled out', 400)
     );
   }
 
@@ -52,7 +54,9 @@ exports.uploadCert = asyncHandler(async (req, res, next) => {
       return {
         filename: userId + '-' + year + '.jpg',
         metadata: {
+          userId,
           courseName,
+          year,
         },
         bucketName: 'uploads',
       };
@@ -110,14 +114,38 @@ exports.uploadCert = asyncHandler(async (req, res, next) => {
   //create MongoDB object with the response given from successful stream upload of cert
   const certObj = await Cert.create({
     user: userId,
+    year,
+    hours,
+    ethicsHours,
     courseName,
     img: response.id,
-    year,
   });
+
+  //push cert Obj's ID to user's cert array
+  const certArr = user.cert;
+  await certArr.push(certObj._id);
+
+  //inc user's hours.cert by hours
+  const certYear = certObj.year;
+  const certHours = certObj.hours;
+  const certEthicsHours = certObj.ethicsHours;
+  const query = { _id: userId, 'hours.year': certYear };
+  const update = {
+    $inc: {
+      'hours.$.verifiable': certHours,
+      'hours.$.ethics': certEthicsHours,
+    },
+  };
+
+  await User.updateOne(query, update);
+
+  await user.save();
+
+  user = await User.findById(req.user.id);
 
   res
     .status(200)
-    .json({ success: 'true', fileData: response, certData: certObj });
+    .json({ success: 'true', data: { file, cert: certObj, user } });
 });
 
 //@route   DELETE /api/upload/:id

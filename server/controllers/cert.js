@@ -5,6 +5,7 @@ const aws = require('aws-sdk');
 const { fromPath } = require('pdf2pic');
 const ErrorResponse = require('../utils/errorResponse');
 const asyncHandler = require('../middleware/async');
+const { deleteOne } = require('../models/Cert');
 
 //desc    GET Cert by ID
 //route   GET /api/cert/:id
@@ -29,81 +30,111 @@ exports.getAllCertObjsByUser = asyncHandler(async (req, res, next) => {
     return next(new ErrorResponse('This user has no certificates.', 400));
   }
 
-  console.log(certs);
-
   res.status(200).json({ success: true, data: certs });
+});
+
+//desc    DELETE cert Obj by ID, and cascade delete user cert Array and update hours array
+//route   DELETE /api/cert/:id
+//access  private
+exports.deleteCertObjById = asyncHandler(async (req, res, next) => {
+  const userId = req.user.id;
+  const certId = req.params.id;
+  const cert = await Cert.findById(certId);
+
+  if (!cert) {
+    return next(new ErrorResponse('Cert is not found', 400));
+  }
+
+  const certYear = cert.year;
+  const certHours = cert.hours;
+  const certEthicsHours = cert.ethicsHours;
+  const query = { _id: userId, 'hours.year': certYear };
+  const update = {
+    $inc: {
+      'hours.$.verifiable': -certHours,
+      'hours.$.ethics': -certEthicsHours,
+    },
+  };
+
+  await User.updateOne(query, update);
+  await Cert.deleteOne({ _id: certId });
+  await User.updateOne({ _id: userId }, { $pull: { cert: certId } });
+
+  const user = await User.findById(req.user.id);
+
+  res.status(200).json({ success: true, data: user });
 });
 
 /** NOT USED */
 //desc    POST add hours to current User
 //route   POST /api/cert/hours
 //access  private
-exports.addCPDHours = asyncHandler(async (req, res, next) => {
-  const user = await User.findById(req.user.id);
+// exports.addCPDHours = asyncHandler(async (req, res, next) => {
+//   const user = await User.findById(req.user.id);
 
-  if (!user) {
-    return next(new ErrorResponse('No user is logged in at the moment', 400));
-  }
+//   if (!user) {
+//     return next(new ErrorResponse('No user is logged in at the moment', 400));
+//   }
 
-  const { year, verifiable, nonVerifiable, ethics } = req.body;
+//   const { year, verifiable, nonVerifiable, ethics } = req.body;
 
-  const index = user.hours.findIndex((e) => e.year === year);
+//   const index = user.hours.findIndex((e) => e.year === year);
 
-  if (index === -1) {
-    return next(new ErrorResponse('Requested year is not found', 400));
-  }
+//   if (index === -1) {
+//     return next(new ErrorResponse('Requested year is not found', 400));
+//   }
 
-  if (ethics > verifiable) {
-    return next(
-      new ErrorResponse(
-        'Ethics hours cannot be greater than Verifiable hours',
-        400
-      )
-    );
-  }
+//   if (ethics > verifiable) {
+//     return next(
+//       new ErrorResponse(
+//         'Ethics hours cannot be greater than Verifiable hours',
+//         400
+//       )
+//     );
+//   }
 
-  if (verifiable > 0 && nonVerifiable > 0) {
-    return next(
-      new ErrorResponse(
-        'A course can only be either Verifiable or non-Verifiable. Cannot be both.',
-        400
-      )
-    );
-  }
+//   if (verifiable > 0 && nonVerifiable > 0) {
+//     return next(
+//       new ErrorResponse(
+//         'A course can only be either Verifiable or non-Verifiable. Cannot be both.',
+//         400
+//       )
+//     );
+//   }
 
-  const query = { _id: user._id, 'hours.year': year };
+//   const query = { _id: user._id, 'hours.year': year };
 
-  if (verifiable > 0) {
-    const update = {
-      $inc: {
-        'hours.$.verifiable': +verifiable,
-      },
-    };
-    await User.updateOne(query, update);
-  }
+//   if (verifiable > 0) {
+//     const update = {
+//       $inc: {
+//         'hours.$.verifiable': +verifiable,
+//       },
+//     };
+//     await User.updateOne(query, update);
+//   }
 
-  if (nonVerifiable > 0) {
-    const update = {
-      $inc: {
-        'hours.$.nonVerifiable': +nonVerifiable,
-      },
-    };
-    await User.updateOne(query, update);
-  }
+//   if (nonVerifiable > 0) {
+//     const update = {
+//       $inc: {
+//         'hours.$.nonVerifiable': +nonVerifiable,
+//       },
+//     };
+//     await User.updateOne(query, update);
+//   }
 
-  if (ethics > 0) {
-    const update = {
-      $inc: {
-        'hours.$.ethics': +ethics,
-      },
-    };
-    await User.updateOne(query, update);
-  }
+//   if (ethics > 0) {
+//     const update = {
+//       $inc: {
+//         'hours.$.ethics': +ethics,
+//       },
+//     };
+//     await User.updateOne(query, update);
+//   }
 
-  const userUpdated = await User.findById(req.user.id);
+//   const userUpdated = await User.findById(req.user.id);
 
-  res.status(200).json({ success: true, data: userUpdated });
-});
+//   res.status(200).json({ success: true, data: userUpdated });
+// });
 
 //desc    POST add Non-Verifiable Event to current User
 //route   POST /api/cert/nonver

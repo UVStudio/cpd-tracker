@@ -47,9 +47,11 @@ exports.addNonVerEvent = asyncHandler(async (req, res, next) => {
     sessionName,
   });
 
+  //push nonVer Obj ID to user's cert array
   const nonVerArr = user.nonver;
   await nonVerArr.push(nonVerObj._id);
 
+  //inc user's hour.nonVer by hours
   const query = { _id: userId, 'hours.year': year };
   const update = {
     $inc: {
@@ -86,18 +88,11 @@ exports.deleteNonVerObjById = asyncHandler(async (req, res, next) => {
   const userId = req.user.id;
   const nonVer = await NonVer.findById(nonVerId);
 
-  if (!nonVerId) {
+  if (!nonVer) {
     return next(
-      new ErrorResponse('This Non-Verifiable Session ID is incorrect', 400)
+      new ErrorResponse('This Non-Verifiable Session is not found', 400)
     );
   }
-
-  if (!userId) {
-    return next(new ErrorResponse('This user is not found', 400));
-  }
-
-  await NonVer.deleteOne({ _id: nonVerId });
-  await User.updateOne({ _id: userId }, { $pull: { nonver: nonVerId } });
 
   const nonVerYear = nonVer.year;
   const nonVerHours = nonVer.hours;
@@ -107,7 +102,10 @@ exports.deleteNonVerObjById = asyncHandler(async (req, res, next) => {
       'hours.$.nonVerifiable': -nonVerHours,
     },
   };
+
   await User.updateOne(query, update);
+  await User.updateOne({ _id: userId }, { $pull: { nonver: nonVerId } });
+  await NonVer.deleteOne({ _id: nonVerId });
 
   const user = await User.findById(userId);
 

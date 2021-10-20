@@ -168,7 +168,7 @@ const Timer = () => {
                 onSelect={recordSession}
                 style={{ marginVertical: 20 }}
               >
-                Save Session
+                Save Non-Verifiable Session
               </CustomButton>
             </View>
           ) : null}
