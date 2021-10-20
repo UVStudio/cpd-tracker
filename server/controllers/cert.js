@@ -34,6 +34,7 @@ exports.getAllCertObjsByUser = asyncHandler(async (req, res, next) => {
   res.status(200).json({ success: true, data: certs });
 });
 
+/** NOT USED */
 //desc    POST add hours to current User
 //route   POST /api/cert/hours
 //access  private

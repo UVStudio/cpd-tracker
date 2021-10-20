@@ -5,13 +5,15 @@ import { useSelector, useDispatch } from 'react-redux';
 import CustomButton from '../../components/CustomButton';
 import CustomInput from '../../components/CustomInput';
 import CustomTitle from '../../components/CustomTitle';
+import CustomMessageCard from '../../components/CustomMessageCard';
 import CustomScrollView from '../../components/CustomScrollView';
 import CustomGreyLine from '../../components/CustomGreyLine';
 import CustomThinGreyLine from '../../components/CustomThinGreyLine';
 import CustomScreenContainer from '../../components/CustomScreenContainer';
 import CustomOperationalContainer from '../../components/CustomOperationalContainer';
 
-import * as certActions from '../../store/actions/cert';
+import * as authActions from '../../store/actions/auth';
+import * as nonVerActions from '../../store/actions/nonVer';
 import { secondsToHms, secondsToTime } from '../../utils/timeConversions';
 import currentYear from '../../utils/currentYear';
 import Colors from '../../constants/Colors';
@@ -45,6 +47,9 @@ const Timer = () => {
   const [isActive, setIsActive] = useState(false);
   const [startButton, setStartButton] = useState('Start');
   const [sessionLength, setSessionLength] = useState('');
+  const [msgCard, setMsgCard] = useState(false);
+
+  const user = useSelector((state) => state.auth.user);
 
   const dispatch = useDispatch();
 
@@ -71,23 +76,27 @@ const Timer = () => {
   );
 
   const today = new Date(Date.now()).toDateString();
-  const hours = Math.round(seconds / 3600) / 100;
-
-  //console.log('formState: ', formState);
+  const hours = Number((seconds / 3600).toFixed(2));
 
   const recordSession = async () => {
-    console.log('session length second ', seconds);
-    console.log('session length hours ', hours);
-    console.log('formatted todays date: ', today);
-    console.log('current year: ', currentYear);
+    // console.log('session length second ', seconds);
+    // console.log('session length hours ', hours);
+    // console.log('typeof hours ', typeof hours);
+    // console.log('formatted todays date: ', today);
+    // console.log('current year: ', currentYear);
+    // console.log('formState: ', formState);
 
-    const verifiable = 0;
-    const ethics = 0;
+    const sessionName = formState.inputValues.sessionName;
 
     try {
       await dispatch(
-        certActions.addCPDHours(currentYear, verifiable, hours, ethics)
+        nonVerActions.addNonVerSession(currentYear, today, hours, sessionName)
       );
+      await dispatch(authActions.getUser());
+      setMsgCard(true);
+      setSeconds(0);
+      setSessionLength('');
+      formState.inputValues.sessionName = '';
     } catch (err) {
       console.log(err.message);
     }
@@ -119,6 +128,14 @@ const Timer = () => {
       setStartButton('Start');
     };
   }, [isActive, seconds]);
+
+  if (!user) {
+    return (
+      <View style={styles.indicatorContainer}>
+        <ActivityIndicator size="large" color={Colors.primary} />
+      </View>
+    );
+  }
 
   return (
     <CustomScreenContainer>
@@ -157,11 +174,23 @@ const Timer = () => {
           ) : null}
         </CustomOperationalContainer>
       </CustomScrollView>
+      {msgCard ? (
+        <CustomMessageCard
+          toShow={setMsgCard}
+          text="Non-Verifiable session has been successfully saved."
+        />
+      ) : null}
     </CustomScreenContainer>
   );
 };
 
 const styles = StyleSheet.create({
+  indicatorContainer: {
+    flex: 1,
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   timerContainer: {
     width: '100%',
     height: 70,

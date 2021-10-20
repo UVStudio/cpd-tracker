@@ -60,11 +60,11 @@ exports.addNonVerEvent = asyncHandler(async (req, res, next) => {
 
   await user.save();
 
-  res.status(200).json({ success: true, data: user });
+  res.status(200).json({ success: true, data: user.nonver });
 });
 
 //desc    GET All Non-Ver Session Objects by current user
-//route   GET /api/nonver/user
+//route   GET /api/nonver/
 //access  private
 exports.getAllNonVerObjsByUser = asyncHandler(async (req, res, next) => {
   const nonVers = await NonVer.find({ user: req.user.id });
@@ -75,8 +75,6 @@ exports.getAllNonVerObjsByUser = asyncHandler(async (req, res, next) => {
     );
   }
 
-  console.log(nonVers);
-
   res.status(200).json({ success: true, data: nonVers });
 });
 
@@ -86,7 +84,7 @@ exports.getAllNonVerObjsByUser = asyncHandler(async (req, res, next) => {
 exports.deleteNonVerObjById = asyncHandler(async (req, res, next) => {
   const nonVerId = req.params.id;
   const userId = req.user.id;
-  const user = await User.findById(userId);
+  const nonVer = await NonVer.findById(nonVerId);
 
   if (!nonVerId) {
     return next(
@@ -94,16 +92,24 @@ exports.deleteNonVerObjById = asyncHandler(async (req, res, next) => {
     );
   }
 
-  if (!user) {
+  if (!userId) {
     return next(new ErrorResponse('This user is not found', 400));
   }
 
-  await NonVer.deleteOne({ _id: ObjectId(nonVerId) });
+  await NonVer.deleteOne({ _id: nonVerId });
+  await User.updateOne({ _id: userId }, { $pull: { nonver: nonVerId } });
 
-  await User.updateOne(
-    { _id: ObjectId(userId) },
-    { $pull: { nonver: { _id: ObjectId(nonVerId) } } }
-  );
+  const nonVerYear = nonVer.year;
+  const nonVerHours = nonVer.hours;
+  const query = { _id: userId, 'hours.year': nonVerYear };
+  const update = {
+    $inc: {
+      'hours.$.nonVerifiable': -nonVerHours,
+    },
+  };
+  await User.updateOne(query, update);
+
+  const user = await User.findById(userId);
 
   res.status(200).json({ success: true, data: user });
 });

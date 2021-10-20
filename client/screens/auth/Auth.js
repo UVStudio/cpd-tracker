@@ -136,8 +136,8 @@ const Auth = () => {
 
   if (isLoading) {
     return (
-      <View>
-        <ActivityIndicator />
+      <View style={styles.indicatorContainer}>
+        <ActivityIndicator size="large" color={Colors.primary} />
       </View>
     );
   }
@@ -248,6 +248,12 @@ const Auth = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  indicatorContainer: {
+    flex: 1,
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   image: {
     flex: 1,

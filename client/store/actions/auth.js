@@ -52,7 +52,7 @@ export const register = (name, email, province, password) => {
         expirationDate,
         resData.user
       );
-      await dispatch(setAuthUser(resData.user));
+      await dispatch(setUser(resData.user));
     } catch (err) {
       throw new Error(err.response.data.error);
     }
@@ -86,14 +86,15 @@ export const login = (email, password) => {
         expirationDate,
         resData.user
       );
-      await dispatch(setAuthUser(resData.user));
+      await dispatch(setUser(resData.user));
+      //await dispatch(getUser(resData.user));
     } catch (err) {
       throw new Error(err.response.data.error);
     }
   };
 };
 
-export const setAuthUser = (resData) => {
+export const setUser = (resData) => {
   return (dispatch) => {
     dispatch({
       type: SET_USER,
@@ -102,14 +103,15 @@ export const setAuthUser = (resData) => {
   };
 };
 
-export const getAuthUser = () => {
+export const getUser = () => {
   return async (dispatch) => {
     try {
       const response = await axios.get(`${CURRENT_IP}/api/auth/current`);
-      const resData = response.data;
+      const user = response.data.data;
+
       dispatch({
         type: GET_USER,
-        user: resData,
+        user: user,
       });
     } catch (err) {
       throw new Error(err.response.data.error);

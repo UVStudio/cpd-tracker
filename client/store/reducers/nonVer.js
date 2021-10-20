@@ -2,7 +2,7 @@ import { ADD_NONVER_SESSION, GET_NONVER_SESSION } from '../types';
 
 const initialState = {
   hours: [],
-  sessions: [],
+  nonver: [],
 };
 
 export default (state = initialState, action) => {
@@ -10,12 +10,12 @@ export default (state = initialState, action) => {
     case GET_NONVER_SESSION:
       return {
         ...state,
-        sessions: action.sessions,
+        nonver: action.sessions,
       };
     case ADD_NONVER_SESSION:
       return {
         ...state,
-        sessions: action.sessions,
+        nonver: action.sessions,
       };
     default:
       return state;
