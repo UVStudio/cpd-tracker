@@ -10,7 +10,7 @@ const CustomMessageCard = (props) => {
     <View style={styles.container}>
       <View style={styles.innerContainer}>
         <Text style={styles.text}>{text}</Text>
-        <CustomButton style={{ marginTop: 15 }} onSelect={() => toShow(false)}>
+        <CustomButton style={{ marginTop: 15 }} onSelect={() => toShow('')}>
           Okay
         </CustomButton>
       </View>

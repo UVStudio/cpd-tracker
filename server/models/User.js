@@ -48,9 +48,26 @@ const UserSchema = new mongoose.Schema({
       required: true,
     },
   ],
-  hours: {
-    type: Array,
-  },
+  hours: [
+    {
+      year: {
+        type: Number,
+        required: true,
+      },
+      verifiable: {
+        type: Number,
+        required: true,
+      },
+      nonVerifiable: {
+        type: Number,
+        required: true,
+      },
+      ethics: {
+        type: Number,
+        required: true,
+      },
+    },
+  ],
   createdAt: {
     type: Date,
     default: Date.now,
@@ -61,12 +78,6 @@ const UserSchema = new mongoose.Schema({
   },
   verificationCode: String,
   verificationCodeExpire: Date,
-  // verifiable: {
-  //   type: Array,
-  // },
-  // nonVerifiable: {
-  //   type: Array,
-  // },
 });
 
 //encrypt password, if it is being modified

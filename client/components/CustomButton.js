@@ -11,10 +11,10 @@ import Colors from '../constants/Colors';
 
 const CustomButton = (props) => {
   return (
-    <View style={styles.buttonContainer}>
+    <View style={{ ...styles.buttonContainer, ...props.style }}>
       <View style={styles.shadow}>
         <TouchableHighlight
-          style={{ ...styles.button, ...props.style }}
+          style={styles.button}
           onPress={props.onSelect}
           underlayColor={Colors.light}
         >

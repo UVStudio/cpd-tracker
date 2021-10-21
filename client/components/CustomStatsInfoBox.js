@@ -4,7 +4,9 @@ import { View, Text, StyleSheet } from 'react-native';
 const CustomStatsInfoBox = (props) => {
   return (
     <View style={styles.container}>
-      <View style={{ alignItems: 'flex-start' }}>{props.children}</View>
+      <View style={{ alignItems: 'flex-start', width: '100%' }}>
+        {props.children}
+      </View>
     </View>
   );
 };

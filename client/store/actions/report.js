@@ -7,7 +7,7 @@ export const buildReport = (year) => {
     const body = { year: year };
 
     try {
-      const response = await axios.post(`${CURRENT_IP}/api/pdf/`, body);
+      await axios.post(`${CURRENT_IP}/api/pdf/`, body);
 
       dispatch({
         type: REPORT_AVAILABLE,
@@ -24,7 +24,7 @@ export const deleteReport = (pdf) => {
     const body = { pdf: pdf };
 
     try {
-      const response = await axios.put(`${CURRENT_IP}/api/pdf/`, body);
+      await axios.put(`${CURRENT_IP}/api/pdf/`, body);
 
       dispatch({
         type: REPORT_NOT_AVAILABLE,

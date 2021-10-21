@@ -70,7 +70,7 @@ const Records = () => {
 
   const [downloadProgress, setDownloadProgress] = useState('0%');
   const [cert, setCert] = useState(null); //if true, app uploads a cert. if not, app uploads default no-cert.jpg from S3
-  const [msgCard, setMsgCard] = useState(false);
+  const [cardText, setCardText] = useState('');
 
   const placeholderYear = currentYear.toString(); //Expo crashes if not set to string
 
@@ -166,7 +166,7 @@ const Records = () => {
   const ethicsHours = Number(formState.inputValues.ethicsHours);
   const { courseName } = formState.inputValues;
 
-  console.log('formState: ', formState);
+  //console.log('formState: ', formState);
 
   const saveVerfiableCourse = async () => {
     try {
@@ -191,7 +191,7 @@ const Records = () => {
         );
       }
       setCert(null);
-      setMsgCard(true);
+      setCardText('Verifiable session successfully saved');
       await dispatch(authActions.getUser());
     } catch (err) {
       console.log(err.message);
@@ -318,11 +318,8 @@ const Records = () => {
           ) : null}
         </CustomOperationalContainer>
       </CustomScrollView>
-      {msgCard ? (
-        <CustomMessageCard
-          toShow={setMsgCard}
-          text="Veriable Course has been successfully saved."
-        />
+      {cardText !== '' ? (
+        <CustomMessageCard text={cardText} toShow={setCardText} />
       ) : null}
     </CustomScreenContainer>
   );

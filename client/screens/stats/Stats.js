@@ -8,9 +8,14 @@ import {
   Pressable,
   useWindowDimensions,
 } from 'react-native';
-import currentYear from '../../utils/currentYear';
-import * as authActions from '../../store/actions/auth';
+import { downloadToFolder } from 'expo-file-dl';
 
+import * as Notifications from 'expo-notifications';
+import * as MediaLibrary from 'expo-media-library';
+import * as authActions from '../../store/actions/auth';
+import * as reportActions from '../../store/actions/report';
+
+import currentYear from '../../utils/currentYear';
 import CustomText from '../../components/CustomText';
 import CustomTitle from '../../components/CustomTitle';
 import CustomSubtitle from '../../components/CustomSubtitle';
@@ -24,14 +29,36 @@ import CustomProgressBar from '../../components/CustomProgressBar';
 import CustomScreenContainer from '../../components/CustomScreenContainer';
 import Colors from '../../constants/Colors';
 
+import {
+  AndroidImportance,
+  AndroidNotificationVisibility,
+  NotificationChannel,
+  NotificationChannelInput,
+  NotificationContentInput,
+} from 'expo-notifications';
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: false,
+    shouldSetBadge: false,
+  }),
+});
+
+const channelId = 'DownloadInfo';
+
 const Stats = () => {
   const [showYear, setShowYear] = useState(currentYear);
+  const [downloadProgress, setDownloadProgress] = useState('0%');
 
   const user = useSelector((state) => state.auth.user);
+  const reportReady = useSelector((state) => state.report.report);
+
   const userHours = user.hours;
 
   const dispatch = useDispatch();
 
+  //Load User
   useEffect(() => {
     loadUser();
   }, []);
@@ -43,6 +70,85 @@ const Stats = () => {
       console.log(err.message);
     }
   };
+
+  //PDF report begins
+  const setNotificationChannel = async () => {
+    const loadingChannel = await Notifications.getNotificationChannelAsync(
+      channelId
+    );
+
+    // if we didn't find a notification channel set how we like it, then we create one
+    if (loadingChannel == null) {
+      const channelOptions = {
+        name: channelId,
+        importance: AndroidImportance.HIGH,
+        lockscreenVisibility: AndroidNotificationVisibility.PUBLIC,
+        sound: 'default',
+        vibrationPattern: [250],
+        enableVibrate: true,
+      };
+      await Notifications.setNotificationChannelAsync(
+        channelId,
+        channelOptions
+      );
+    }
+  };
+
+  useEffect(() => {
+    setNotificationChannel();
+  });
+
+  const getMediaLibraryPermissions = async () => {
+    await MediaLibrary.requestPermissionsAsync();
+  };
+
+  const getNotificationPermissions = async () => {
+    await Notifications.requestPermissionsAsync();
+  };
+
+  const downloadProgressUpdater = ({
+    totalBytesWritten,
+    totalBytesExpectedToWrite,
+  }) => {
+    const pctg = 100 * (totalBytesWritten / totalBytesExpectedToWrite);
+    setDownloadProgress(`${pctg.toFixed(0)}%`);
+  };
+
+  //Generate PDF Report
+  const generatePDFHandler = async (year) => {
+    try {
+      await dispatch(reportActions.buildReport(year));
+    } catch (err) {
+      console.log(err.message);
+    }
+  };
+
+  //Download PDF Report
+  const pdfUri = `https://cpdtracker.s3.us-east-2.amazonaws.com/reports/${
+    user._id
+  }-${showYear.toString()}-CPD-report.pdf`;
+  const fileName = `${user.name}-${showYear.toString()}-CPD-report.pdf`;
+
+  const downloadPDFHandler = async () => {
+    const AWSFileName = `${user._id}-${showYear.toString()}-CPD-report.pdf`;
+    try {
+      await downloadToFolder(pdfUri, fileName, 'Download', channelId, {
+        downloadProgressCallback: downloadProgressUpdater,
+      });
+      await dispatch(reportActions.deleteReport(AWSFileName));
+      setDownloadProgress('0%');
+    } catch (err) {
+      console.log(err.message);
+    }
+  };
+
+  useEffect(() => {
+    getMediaLibraryPermissions();
+  });
+
+  useEffect(() => {
+    getNotificationPermissions();
+  });
 
   if (!user) {
     return (
@@ -58,7 +164,10 @@ const Stats = () => {
       <CustomGreyLine />
       {userHours.map((elem, index) => (
         <CustomAccordionUnit key={index}>
-          <Pressable onPress={() => setShowYear(userHours[index].year)}>
+          <Pressable
+            onPress={() => setShowYear(userHours[index].year)}
+            disabled={reportReady}
+          >
             <CustomSubtitle>{elem.year}</CustomSubtitle>
           </Pressable>
           <CustomThinGreyLine />
@@ -87,6 +196,29 @@ const Stats = () => {
                   Ethics Hours: {Number(elem.ethics).toFixed(2)}
                 </CustomText>
               </CustomStatsDivider>
+              {reportReady ? null : (
+                <View style={styles.fullWidthCenter}>
+                  <CustomButton
+                    style={{ marginTop: 10, width: '100%' }}
+                    onSelect={() => generatePDFHandler(showYear)}
+                  >
+                    Generate PDF Report
+                  </CustomButton>
+                </View>
+              )}
+              {reportReady ? (
+                <View style={styles.fullWidthCenter}>
+                  <CustomButton
+                    onSelect={downloadPDFHandler}
+                    style={{ width: '100%' }}
+                  >
+                    Click To Download Report
+                  </CustomButton>
+                  <Text style={{ alignSelf: 'center' }}>
+                    {downloadProgress}
+                  </Text>
+                </View>
+              ) : null}
             </CustomStatsInfoBox>
           ) : null}
         </CustomAccordionUnit>
@@ -101,29 +233,15 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
   },
-  cardContainer: {
-    position: 'absolute',
-    width: '86%',
-    height: 300,
-    backgroundColor: '#fff',
-    opacity: 1,
-    borderWidth: 5,
-    borderRadius: 10,
-    borderColor: Colors.primary,
-    //iOS shadow
-    shadowColor: '#171717',
-    shadowOffset: { width: 2, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 3,
-    //android shadow
-    elevation: 10,
-    shadowColor: '#000000',
-  },
   indicatorContainer: {
     flex: 1,
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  fullWidthCenter: {
+    width: '100%',
+    alignSelf: 'center',
   },
 });
 

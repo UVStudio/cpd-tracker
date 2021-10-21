@@ -47,7 +47,7 @@ const Timer = () => {
   const [isActive, setIsActive] = useState(false);
   const [startButton, setStartButton] = useState('Start');
   const [sessionLength, setSessionLength] = useState('');
-  const [msgCard, setMsgCard] = useState(false);
+  const [cardText, setCardText] = useState('');
 
   const user = useSelector((state) => state.auth.user);
 
@@ -93,7 +93,7 @@ const Timer = () => {
         nonVerActions.addNonVerSession(currentYear, today, hours, sessionName)
       );
       await dispatch(authActions.getUser());
-      setMsgCard(true);
+      setCardText('Non-Verifiable session successfully saved');
       setSeconds(0);
       setSessionLength('');
       formState.inputValues.sessionName = '';
@@ -174,11 +174,8 @@ const Timer = () => {
           ) : null}
         </CustomOperationalContainer>
       </CustomScrollView>
-      {msgCard ? (
-        <CustomMessageCard
-          toShow={setMsgCard}
-          text="Non-Verifiable session has been successfully saved."
-        />
+      {cardText !== '' ? (
+        <CustomMessageCard text={cardText} toShow={setCardText} />
       ) : null}
     </CustomScreenContainer>
   );

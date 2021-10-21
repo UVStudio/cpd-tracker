@@ -61,7 +61,6 @@ const downloadFile = (file_id, gfs) => {
 //route   POST /api/pdf/
 //access  private
 exports.producePDF = asyncHandler(async (req, res, next) => {
-  //console.log('req.body: ', req.body);
   const userId = req.user.id;
   const year = req.body.year;
   const searchTerm = `${userId}-${year}.jpg`;
@@ -70,7 +69,7 @@ exports.producePDF = asyncHandler(async (req, res, next) => {
 
   // write report to PDF
   const CPDFileName = `${userId}-${year}-CPD-report.pdf`;
-  const response = await buildPDF(
+  await buildPDF(
     res,
     conn,
     userId,
