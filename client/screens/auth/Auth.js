@@ -13,6 +13,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import CustomFormCard from '../../components/CustomFormCard';
 import CustomInput from '../../components/CustomInput';
 import CustomButton from '../../components/CustomButton';
+import CustomErrorCard from '../../components/CustomErrorCard';
 
 import * as authActions from '../../store/actions/auth';
 import { FORM_INPUT_UPDATE } from '../../store/types';
@@ -42,7 +43,7 @@ const formReducer = (state, action) => {
 
 const Auth = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(undefined);
+  const [error, setError] = useState('');
   const [isSignup, setIsSignup] = useState(false);
   const [isLogging, setIsLogging] = useState(false);
   const [isRegistering, setIsRegistering] = useState(false);
@@ -66,13 +67,7 @@ const Auth = () => {
     formIsValid: false,
   });
 
-  console.log('formState: ', formState);
-
-  useEffect(() => {
-    if (error) {
-      Alert.alert('An error occurred', error, [{ text: 'Okay' }]);
-    }
-  }, [error]);
+  //console.log('formState: ', formState);
 
   //regex for min 8, max 15, 1 lower, 1 upper, 1 num
   const pwRegex = new RegExp(/^((?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,16})$/);
@@ -81,19 +76,15 @@ const Auth = () => {
     let action;
     if (isSignup) {
       if (formState.inputValues.password !== formState.inputValues.password2) {
-        Alert.alert(
-          'Password Invalid',
-          'Please make sure your confirm password is identical to your password',
-          [{ text: 'Okay' }]
+        setError(
+          'Please make sure your "Confirm Password" is identical to your Password.'
         );
         return;
       }
 
       if (!pwRegex.test(formState.inputValues.password)) {
-        Alert.alert(
-          'We need a strong Password',
-          'Please make sure your password has at least 8 and fewer than 16 characters, 1 uppercase letter, 1 lowercase letter, and 1 number.',
-          [{ text: 'Okay' }]
+        setError(
+          'Please make sure your password has between 8 to 16 characters, including 1 uppercase letter, 1 lowercase letter, and 1 number.'
         );
         return;
       }
@@ -112,7 +103,7 @@ const Auth = () => {
         formState.inputValues.password
       );
     }
-    setError(null);
+    setError('');
     try {
       await dispatch(action);
     } catch (err) {
@@ -240,6 +231,9 @@ const Auth = () => {
             </View>
           </ScrollView>
         </CustomFormCard>
+        {error !== '' ? (
+          <CustomErrorCard error={error} toShow={setError} />
+        ) : null}
       </ImageBackground>
     </View>
   );

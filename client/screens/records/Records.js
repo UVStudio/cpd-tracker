@@ -1,12 +1,8 @@
 import React, { useEffect, useState, useReducer, useCallback } from 'react';
 import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
-import { downloadToFolder } from 'expo-file-dl';
 
-import * as Notifications from 'expo-notifications';
-import * as MediaLibrary from 'expo-media-library';
 import * as DocumentPicker from 'expo-document-picker';
-import * as reportActions from '../../store/actions/report';
 import * as certActions from '../../store/actions/cert';
 import * as authActions from '../../store/actions/auth';
 
@@ -14,6 +10,7 @@ import CustomButton from '../../components/CustomButton';
 import CustomText from '../../components/CustomText';
 import CustomTitle from '../../components/CustomTitle';
 import CustomInput from '../../components/CustomInput';
+import CustomErrorCard from '../../components/CustomErrorCard';
 import CustomMessageCard from '../../components/CustomMessageCard';
 import CustomGreyLine from '../../components/CustomGreyLine';
 import CustomScrollView from '../../components/CustomScrollView';
@@ -22,22 +19,6 @@ import CustomOperationalContainer from '../../components/CustomOperationalContai
 import currentYear from '../../utils/currentYear';
 import Colors from '../../constants/Colors';
 import { FORM_INPUT_UPDATE } from '../../store/types';
-
-import {
-  AndroidImportance,
-  AndroidNotificationVisibility,
-  NotificationChannel,
-  NotificationChannelInput,
-  NotificationContentInput,
-} from 'expo-notifications';
-
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: false,
-    shouldSetBadge: false,
-  }),
-});
 
 const formReducer = (state, action) => {
   if (action.type === FORM_INPUT_UPDATE) {
@@ -62,15 +43,12 @@ const formReducer = (state, action) => {
   return state;
 };
 
-const channelId = 'DownloadInfo';
-
 const Records = () => {
   const user = useSelector((state) => state.auth.user);
-  const reportReady = useSelector((state) => state.report.report);
 
-  const [downloadProgress, setDownloadProgress] = useState('0%');
   const [cert, setCert] = useState(null); //if true, app uploads a cert. if not, app uploads default no-cert.jpg from S3
   const [cardText, setCardText] = useState('');
+  const [error, setError] = useState('');
 
   const placeholderYear = currentYear.toString(); //Expo crashes if not set to string
 
@@ -104,48 +82,6 @@ const Records = () => {
     [dispatchFormState]
   );
 
-  const setNotificationChannel = async () => {
-    const loadingChannel = await Notifications.getNotificationChannelAsync(
-      channelId
-    );
-
-    // if we didn't find a notification channel set how we like it, then we create one
-    if (loadingChannel == null) {
-      const channelOptions = {
-        name: channelId,
-        importance: AndroidImportance.HIGH,
-        lockscreenVisibility: AndroidNotificationVisibility.PUBLIC,
-        sound: 'default',
-        vibrationPattern: [250],
-        enableVibrate: true,
-      };
-      await Notifications.setNotificationChannelAsync(
-        channelId,
-        channelOptions
-      );
-    }
-  };
-
-  useEffect(() => {
-    setNotificationChannel();
-  });
-
-  const getMediaLibraryPermissions = async () => {
-    await MediaLibrary.requestPermissionsAsync();
-  };
-
-  const getNotificationPermissions = async () => {
-    await Notifications.requestPermissionsAsync();
-  };
-
-  const downloadProgressUpdater = ({
-    totalBytesWritten,
-    totalBytesExpectedToWrite,
-  }) => {
-    const pctg = 100 * (totalBytesWritten / totalBytesExpectedToWrite);
-    setDownloadProgress(`${pctg.toFixed(0)}%`);
-  };
-
   const addCertHandler = async () => {
     try {
       const file = await DocumentPicker.getDocumentAsync({
@@ -158,6 +94,9 @@ const Records = () => {
       }
     } catch (err) {
       console.log(err.message);
+      setError(
+        'There is something wrong with our network. Please try again later.'
+      );
     }
   };
 
@@ -195,43 +134,11 @@ const Records = () => {
       await dispatch(authActions.getUser());
     } catch (err) {
       console.log(err.message);
+      setError(
+        'There is something wrong with our network. Please try again later.'
+      );
     }
   };
-
-  //Generate PDF Report
-  const generatePDFHandler = async (year) => {
-    try {
-      await dispatch(reportActions.buildReport(year));
-    } catch (err) {
-      console.log(err.message);
-    }
-  };
-
-  //Download PDF Report
-  const pdfUri = `https://cpdtracker.s3.us-east-2.amazonaws.com/reports/${
-    user._id
-  }-${year.toString()}-CPD-report.pdf`;
-  const fileName = `${user.name}-CPD-report.pdf`;
-
-  const downloadPDFHandler = async () => {
-    const AWSFileName = `${user._id}-${year.toString()}-CPD-report.pdf`;
-    try {
-      await downloadToFolder(pdfUri, fileName, 'Download', channelId, {
-        downloadProgressCallback: downloadProgressUpdater,
-      });
-      await dispatch(reportActions.deleteReport(AWSFileName));
-    } catch (err) {
-      console.log(err.message);
-    }
-  };
-
-  useEffect(() => {
-    getMediaLibraryPermissions();
-  });
-
-  useEffect(() => {
-    getNotificationPermissions();
-  });
 
   return (
     <CustomScreenContainer>
@@ -302,24 +209,13 @@ const Records = () => {
           >
             Save Verifiable Course
           </CustomButton>
-          <CustomButton
-            style={{ marginTop: 20 }}
-            onSelect={() => generatePDFHandler(year)}
-          >
-            Generate PDF Report
-          </CustomButton>
-          {reportReady ? (
-            <View>
-              <CustomButton onSelect={downloadPDFHandler}>
-                Download PDF Report
-              </CustomButton>
-              <Text>{downloadProgress}</Text>
-            </View>
-          ) : null}
         </CustomOperationalContainer>
       </CustomScrollView>
       {cardText !== '' ? (
         <CustomMessageCard text={cardText} toShow={setCardText} />
+      ) : null}
+      {error !== '' ? (
+        <CustomErrorCard error={error} toShow={setError} />
       ) : null}
     </CustomScreenContainer>
   );

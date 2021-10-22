@@ -1,15 +1,19 @@
 import React from 'react';
 import { Text, View, StyleSheet } from 'react-native';
 import CustomButton from './CustomButton';
+import CustomSubtitle from './CustomSubtitle';
 import Colors from '../constants/Colors';
 
-const CustomMessageCard = (props) => {
-  const { text, toShow } = props;
+const CustomErrorCard = (props) => {
+  const { error, toShow } = props;
 
   return (
     <View style={styles.container}>
       <View style={styles.innerContainer}>
-        <Text style={styles.text}>{text}</Text>
+        <CustomSubtitle style={{ alignSelf: 'center' }}>
+          An error has occurred!
+        </CustomSubtitle>
+        <Text style={styles.text}>{error}</Text>
         <CustomButton style={{ marginTop: 15 }} onSelect={() => toShow('')}>
           Okay
         </CustomButton>
@@ -24,8 +28,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     position: 'absolute',
-    width: '86%',
-    height: 200,
+    width: '88%',
     backgroundColor: '#fff',
     opacity: 1,
     borderWidth: 5,
@@ -42,7 +45,7 @@ const styles = StyleSheet.create({
   },
   innerContainer: {
     width: '100%',
-    padding: 20,
+    padding: 22,
     alignItems: 'center',
   },
   text: {
@@ -52,4 +55,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default CustomMessageCard;
+export default CustomErrorCard;

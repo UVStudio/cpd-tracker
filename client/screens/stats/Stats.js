@@ -15,11 +15,11 @@ import * as MediaLibrary from 'expo-media-library';
 import * as authActions from '../../store/actions/auth';
 import * as reportActions from '../../store/actions/report';
 
-import currentYear from '../../utils/currentYear';
 import CustomText from '../../components/CustomText';
 import CustomTitle from '../../components/CustomTitle';
 import CustomSubtitle from '../../components/CustomSubtitle';
 import CustomButton from '../../components/CustomButton';
+import CustomErrorCard from '../../components/CustomErrorCard';
 import CustomAccordionUnit from '../../components/CustomAccordionUnit';
 import CustomStatsDivider from '../../components/CustomStatsDivider';
 import CustomStatsInfoBox from '../../components/CustomStatsInfoBox';
@@ -27,6 +27,7 @@ import CustomGreyLine from '../../components/CustomGreyLine';
 import CustomThinGreyLine from '../../components/CustomThinGreyLine';
 import CustomProgressBar from '../../components/CustomProgressBar';
 import CustomScreenContainer from '../../components/CustomScreenContainer';
+import currentYear from '../../utils/currentYear';
 import Colors from '../../constants/Colors';
 
 import {
@@ -50,6 +51,7 @@ const channelId = 'DownloadInfo';
 const Stats = () => {
   const [showYear, setShowYear] = useState(currentYear);
   const [downloadProgress, setDownloadProgress] = useState('0%');
+  const [error, setError] = useState('');
 
   const user = useSelector((state) => state.auth.user);
   const reportReady = useSelector((state) => state.report.report);
@@ -68,6 +70,9 @@ const Stats = () => {
       await dispatch(authActions.getUser());
     } catch (err) {
       console.log(err.message);
+      setError(
+        'There is something wrong with our network. Please try again later.'
+      );
     }
   };
 
@@ -120,6 +125,9 @@ const Stats = () => {
       await dispatch(reportActions.buildReport(year));
     } catch (err) {
       console.log(err.message);
+      setError(
+        'There is something wrong with our network. Please try again later.'
+      );
     }
   };
 
@@ -139,6 +147,9 @@ const Stats = () => {
       setDownloadProgress('0%');
     } catch (err) {
       console.log(err.message);
+      setError(
+        'There is something wrong with our network. Please try again later.'
+      );
     }
   };
 
@@ -214,9 +225,9 @@ const Stats = () => {
                   >
                     Click To Download Report
                   </CustomButton>
-                  <Text style={{ alignSelf: 'center' }}>
+                  <CustomText style={{ alignSelf: 'center' }}>
                     {downloadProgress}
-                  </Text>
+                  </CustomText>
                 </View>
               ) : null}
             </CustomStatsInfoBox>
@@ -224,6 +235,9 @@ const Stats = () => {
         </CustomAccordionUnit>
       ))}
       <CustomButton onSelect={() => loadUser()}>Refresh Data</CustomButton>
+      {error !== '' ? (
+        <CustomErrorCard error={error} toShow={setError} />
+      ) : null}
     </CustomScreenContainer>
   );
 };

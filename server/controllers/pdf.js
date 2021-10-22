@@ -104,7 +104,7 @@ exports.deletePDF = asyncHandler(async (req, res, next) => {
   await s3
     .deleteObject(deleteParam, (err, data) => {
       if (err) console.error('err: ', err);
-      if (data) console.log('data:', data);
+      if (data) console.log('delete success');
     })
     .promise();
 

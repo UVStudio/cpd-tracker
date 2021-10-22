@@ -5,6 +5,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import CustomButton from '../../components/CustomButton';
 import CustomInput from '../../components/CustomInput';
 import CustomTitle from '../../components/CustomTitle';
+import CustomErrorCard from '../../components/CustomErrorCard';
 import CustomMessageCard from '../../components/CustomMessageCard';
 import CustomScrollView from '../../components/CustomScrollView';
 import CustomGreyLine from '../../components/CustomGreyLine';
@@ -48,6 +49,7 @@ const Timer = () => {
   const [startButton, setStartButton] = useState('Start');
   const [sessionLength, setSessionLength] = useState('');
   const [cardText, setCardText] = useState('');
+  const [error, setError] = useState('');
 
   const user = useSelector((state) => state.auth.user);
 
@@ -99,6 +101,7 @@ const Timer = () => {
       formState.inputValues.sessionName = '';
     } catch (err) {
       console.log(err.message);
+      setError(err.message);
     }
   };
 
@@ -176,6 +179,9 @@ const Timer = () => {
       </CustomScrollView>
       {cardText !== '' ? (
         <CustomMessageCard text={cardText} toShow={setCardText} />
+      ) : null}
+      {error !== '' ? (
+        <CustomErrorCard error={error} toShow={setError} />
       ) : null}
     </CustomScreenContainer>
   );
