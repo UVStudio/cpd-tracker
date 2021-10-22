@@ -18,7 +18,7 @@ app.use(cookieParser());
 
 //Routes
 const cert = require('./routes/cert');
-const nonVer = require('./routes/nonver');
+const nonVer = require('./routes/nonVer');
 const pdf = require('./routes/pdf');
 const auth = require('./routes/auth');
 const upload = require('./routes/upload');
