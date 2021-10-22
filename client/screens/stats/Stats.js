@@ -52,6 +52,9 @@ const Stats = () => {
   const [showYear, setShowYear] = useState(currentYear);
   const [downloadProgress, setDownloadProgress] = useState('0%');
   const [error, setError] = useState('');
+  const [generatingPDF, setGeneratingPDF] = useState(false);
+  const [downloadingPDF, setDownloadingPDF] = useState(false);
+  const [refreshingData, setRefreshingData] = useState(false);
 
   const user = useSelector((state) => state.auth.user);
   const reportReady = useSelector((state) => state.report.report);
@@ -66,6 +69,7 @@ const Stats = () => {
   }, []);
 
   const loadUser = async () => {
+    setRefreshingData(true);
     try {
       await dispatch(authActions.getUser());
     } catch (err) {
@@ -74,6 +78,7 @@ const Stats = () => {
         'There is something wrong with our network. Please try again later.'
       );
     }
+    setRefreshingData(false);
   };
 
   //PDF report begins
@@ -122,6 +127,7 @@ const Stats = () => {
   //Generate PDF Report
   const generatePDFHandler = async (year) => {
     try {
+      setGeneratingPDF(true);
       await dispatch(reportActions.buildReport(year));
     } catch (err) {
       console.log(err.message);
@@ -129,6 +135,7 @@ const Stats = () => {
         'There is something wrong with our network. Please try again later.'
       );
     }
+    setGeneratingPDF(false);
   };
 
   //Download PDF Report
@@ -138,6 +145,7 @@ const Stats = () => {
   const fileName = `${user.name}-${showYear.toString()}-CPD-report.pdf`;
 
   const downloadPDFHandler = async () => {
+    setDownloadingPDF(true);
     const AWSFileName = `${user._id}-${showYear.toString()}-CPD-report.pdf`;
     try {
       await downloadToFolder(pdfUri, fileName, 'Download', channelId, {
@@ -151,6 +159,7 @@ const Stats = () => {
         'There is something wrong with our network. Please try again later.'
       );
     }
+    setDownloadingPDF(false);
   };
 
   useEffect(() => {
@@ -207,7 +216,13 @@ const Stats = () => {
                   Ethics Hours: {Number(elem.ethics).toFixed(2)}
                 </CustomText>
               </CustomStatsDivider>
-              {reportReady ? null : (
+              {reportReady ? null : generatingPDF ? (
+                <View style={styles.fullWidthCenter}>
+                  <CustomButton style={{ marginTop: 10, width: '100%' }}>
+                    Generating Your PDF...
+                  </CustomButton>
+                </View>
+              ) : (
                 <View style={styles.fullWidthCenter}>
                   <CustomButton
                     style={{ marginTop: 10, width: '100%' }}
@@ -218,23 +233,40 @@ const Stats = () => {
                 </View>
               )}
               {reportReady ? (
-                <View style={styles.fullWidthCenter}>
-                  <CustomButton
-                    onSelect={downloadPDFHandler}
-                    style={{ width: '100%' }}
-                  >
-                    Click To Download Report
-                  </CustomButton>
-                  <CustomText style={{ alignSelf: 'center' }}>
-                    {downloadProgress}
-                  </CustomText>
-                </View>
+                downloadingPDF ? (
+                  <View style={styles.fullWidthCenter}>
+                    <CustomButton style={{ width: '100%' }}>
+                      Downloading Your Report...
+                    </CustomButton>
+                    <CustomText style={{ alignSelf: 'center' }}>
+                      {downloadProgress}
+                    </CustomText>
+                  </View>
+                ) : (
+                  <View style={styles.fullWidthCenter}>
+                    <CustomButton
+                      onSelect={downloadPDFHandler}
+                      style={{ width: '100%' }}
+                    >
+                      Click To Download Report
+                    </CustomButton>
+                    <CustomText style={{ alignSelf: 'center' }}>
+                      {downloadProgress}
+                    </CustomText>
+                  </View>
+                )
               ) : null}
             </CustomStatsInfoBox>
           ) : null}
         </CustomAccordionUnit>
       ))}
-      <CustomButton onSelect={() => loadUser()}>Refresh Data</CustomButton>
+      {refreshingData ? (
+        <CustomButton onSelect={() => loadUser()}>
+          Refreshing Your Data...
+        </CustomButton>
+      ) : (
+        <CustomButton onSelect={() => loadUser()}>Refresh Data</CustomButton>
+      )}
       {error !== '' ? (
         <CustomErrorCard error={error} toShow={setError} />
       ) : null}

@@ -16,7 +16,7 @@ const CustomButton = (props) => {
         <TouchableHighlight
           style={styles.button}
           onPress={props.onSelect}
-          underlayColor={Colors.light}
+          underlayColor={Colors.buttonPressed}
         >
           <Text style={styles.buttonText}>{props.children}</Text>
         </TouchableHighlight>

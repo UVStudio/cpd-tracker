@@ -74,6 +74,7 @@ const Auth = () => {
 
   const authHandler = async () => {
     let action;
+    setError('');
     if (isSignup) {
       if (formState.inputValues.password !== formState.inputValues.password2) {
         setError(
