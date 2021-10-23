@@ -20,6 +20,7 @@ import CustomTitle from '../../components/CustomTitle';
 import CustomSubtitle from '../../components/CustomSubtitle';
 import CustomButton from '../../components/CustomButton';
 import CustomErrorCard from '../../components/CustomErrorCard';
+import CustomMessageCard from '../../components/CustomMessageCard';
 import CustomAccordionUnit from '../../components/CustomAccordionUnit';
 import CustomStatsDivider from '../../components/CustomStatsDivider';
 import CustomStatsInfoBox from '../../components/CustomStatsInfoBox';
@@ -52,6 +53,7 @@ const Stats = () => {
   const [showYear, setShowYear] = useState(currentYear);
   const [downloadProgress, setDownloadProgress] = useState('0%');
   const [error, setError] = useState('');
+  const [cardText, setCardText] = useState('');
   const [generatingPDF, setGeneratingPDF] = useState(false);
   const [downloadingPDF, setDownloadingPDF] = useState(false);
   const [refreshingData, setRefreshingData] = useState(false);
@@ -69,6 +71,17 @@ const Stats = () => {
   }, []);
 
   const loadUser = async () => {
+    try {
+      await dispatch(authActions.getUser());
+    } catch (err) {
+      console.log(err.message);
+      setError(
+        'There is something wrong with our network. Please try again later.'
+      );
+    }
+  };
+
+  const refreshUser = async () => {
     setRefreshingData(true);
     try {
       await dispatch(authActions.getUser());
@@ -152,6 +165,9 @@ const Stats = () => {
         downloadProgressCallback: downloadProgressUpdater,
       });
       await dispatch(reportActions.deleteReport(AWSFileName));
+      setCardText(
+        'Report succesfully downloaded. It is in your Documents > Download folder.'
+      );
       setDownloadProgress('0%');
     } catch (err) {
       console.log(err.message);
@@ -261,7 +277,7 @@ const Stats = () => {
         </CustomAccordionUnit>
       ))}
       {refreshingData ? (
-        <CustomButton onSelect={() => loadUser()}>
+        <CustomButton onSelect={() => refreshUser()}>
           Refreshing Your Data...
         </CustomButton>
       ) : (
@@ -269,6 +285,9 @@ const Stats = () => {
       )}
       {error !== '' ? (
         <CustomErrorCard error={error} toShow={setError} />
+      ) : null}
+      {cardText !== '' ? (
+        <CustomMessageCard text={cardText} toShow={setCardText} />
       ) : null}
     </CustomScreenContainer>
   );
