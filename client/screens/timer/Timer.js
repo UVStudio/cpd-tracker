@@ -1,6 +1,7 @@
 import React, { useState, useReducer, useEffect, useCallback } from 'react';
 import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
+import { activateKeepAwake, deactivateKeepAwake } from 'expo-keep-awake';
 
 import CustomButton from '../../components/CustomButton';
 import CustomInput from '../../components/CustomInput';
@@ -106,12 +107,30 @@ const Timer = () => {
   };
 
   const toggle = () => {
+    if (seconds === 0) {
+      setCardText(
+        'The phone will stay awake while the timer is running. You might want to keep your phone charged.'
+      );
+    }
+    activateKeepAwake();
     setIsActive(!isActive);
   };
 
   const finish = () => {
+    if (seconds < 60) {
+      return setCardText(
+        'The shortest timed session you can save is one minute. Please study for a bit longer.'
+      );
+    }
+    deactivateKeepAwake();
     setIsActive(false);
     setSessionLength(secondsToTime(seconds));
+  };
+
+  const cancel = () => {
+    deactivateKeepAwake();
+    setIsActive(false);
+    setSeconds(0);
   };
 
   useEffect(() => {
@@ -143,7 +162,7 @@ const Timer = () => {
   return (
     <CustomScreenContainer>
       <CustomScrollView>
-        <CustomTitle>Record your session</CustomTitle>
+        <CustomTitle>Time your session</CustomTitle>
         <CustomGreyLine />
         <CustomOperationalContainer>
           <View style={styles.timerContainer}>
@@ -151,6 +170,11 @@ const Timer = () => {
           </View>
           <CustomButton onSelect={() => toggle()}>{startButton}</CustomButton>
           <CustomButton onSelect={() => finish()}>Finish Session</CustomButton>
+          {seconds > 0 && !isActive && sessionLength === '' ? (
+            <CustomButton onSelect={() => cancel()}>
+              Cancel Session
+            </CustomButton>
+          ) : null}
           <CustomThinGreyLine style={{ marginVertical: 20 }} />
           {sessionLength !== '' ? (
             <View style={styles.passFromOperationalContainer}>

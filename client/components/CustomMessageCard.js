@@ -25,7 +25,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     position: 'absolute',
     width: '86%',
-    height: 200,
     backgroundColor: '#fff',
     opacity: 1,
     borderWidth: 5,
@@ -43,11 +42,12 @@ const styles = StyleSheet.create({
   innerContainer: {
     width: '100%',
     padding: 20,
+    marginBottom: 5,
     alignItems: 'center',
   },
   text: {
     fontSize: 16,
-    marginVertical: 10,
+    marginBottom: 10,
     fontFamily: 'sans-serif-condensed',
   },
 });
