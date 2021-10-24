@@ -24,6 +24,8 @@ exports.createUser = asyncHandler(async (req, res, next) => {
     );
   }
 
+  console.log('currentYear: ', currentYear);
+
   const hours = [
     {
       year: currentYear + 1,
