@@ -24,39 +24,37 @@ exports.createUser = asyncHandler(async (req, res, next) => {
     );
   }
 
-  console.log('currentYear: ', currentYear);
+  const hours = [
+    {
+      year: currentYear + 1,
+      verifiable: 0,
+      nonVerifiable: 0,
+      ethics: 0,
+    },
+    {
+      year: currentYear,
+      verifiable: 0,
+      nonVerifiable: 0,
+      ethics: 0,
+    },
+    {
+      year: currentYear - 1,
+      verifiable: 0,
+      nonVerifiable: 0,
+      ethics: 0,
+    },
+  ];
 
-  // const hours = [
-  //   {
-  //     year: currentYear + 1,
-  //     verifiable: 0,
-  //     nonVerifiable: 0,
-  //     ethics: 0,
-  //   },
-  //   {
-  //     year: currentYear,
-  //     verifiable: 0,
-  //     nonVerifiable: 0,
-  //     ethics: 0,
-  //   },
-  //   {
-  //     year: currentYear - 1,
-  //     verifiable: 0,
-  //     nonVerifiable: 0,
-  //     ethics: 0,
-  //   },
-  // ];
+  user = await User.create({
+    name,
+    email,
+    password,
+    province,
+    hours,
+    role,
+  });
 
-  // user = await User.create({
-  //   name,
-  //   email,
-  //   password,
-  //   province,
-  //   hours,
-  //   role,
-  // });
-
-  // sendTokenResponse(user, 200, res);
+  sendTokenResponse(user, 200, res);
 });
 
 //desc    LOGIN user
