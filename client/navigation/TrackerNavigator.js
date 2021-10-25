@@ -6,6 +6,8 @@ import { MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
 import Auth from '../screens/auth/Auth';
 import Profile from '../screens/auth/Profile';
 import Stats from '../screens/stats/Stats';
+import CertHoursDetails from '../screens/stats/CertHoursDetails';
+import NonVerHoursDetails from '../screens/stats/NonVerHoursDetails';
 import Timer from '../screens/timer/Timer';
 import UploadSession from '../screens/timer/UploadSession';
 import Rules from '../screens/rules/Rules';
@@ -46,6 +48,14 @@ const CPDNavigator = () => {
   return (
     <CPDStackNavigator.Navigator screenOptions={defaultNavOptions}>
       <CPDStackNavigator.Screen name="Your CPD Statistics" component={Stats} />
+      <CPDStackNavigator.Screen
+        name="Verifiable Details"
+        component={CertHoursDetails}
+      />
+      <CPDStackNavigator.Screen
+        name="Non-Verifiable Details"
+        component={NonVerHoursDetails}
+      />
     </CPDStackNavigator.Navigator>
   );
 };

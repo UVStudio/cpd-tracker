@@ -49,7 +49,7 @@ Notifications.setNotificationHandler({
 
 const channelId = 'DownloadInfo';
 
-const Stats = () => {
+const Stats = ({ navigation }) => {
   const [showYear, setShowYear] = useState(currentYear);
   const [downloadProgress, setDownloadProgress] = useState('0%');
   const [error, setError] = useState('');
@@ -92,6 +92,15 @@ const Stats = () => {
       );
     }
     setRefreshingData(false);
+  };
+
+  //Session details
+  const verifiableHoursDetails = () => {
+    navigation.navigate('Verifiable Details');
+  };
+
+  const nonVerHoursDetails = () => {
+    navigation.navigate('Non-Verifiable Details', { year: showYear });
   };
 
   //PDF report begins
@@ -210,22 +219,27 @@ const Stats = () => {
           {showYear === elem.year ? (
             <CustomStatsInfoBox>
               <CustomStatsDivider>
-                <CustomText>
-                  Verifiable Hours: {Number(elem.verifiable).toFixed(2)}
-                </CustomText>
-                <CustomProgressBar
-                  progress={elem.verifiable}
-                  type="verifiable"
-                />
+                <Pressable onPress={() => verifiableHoursDetails()}>
+                  <CustomText>
+                    Verifiable Hours: {Number(elem.verifiable).toFixed(2)}
+                  </CustomText>
+                  <CustomProgressBar
+                    progress={elem.verifiable}
+                    type="verifiable"
+                  />
+                </Pressable>
               </CustomStatsDivider>
               <CustomStatsDivider>
-                <CustomText>
-                  Non-Verifiable Hours: {Number(elem.nonVerifiable).toFixed(2)}
-                </CustomText>
-                <CustomProgressBar
-                  progress={elem.nonVerifiable}
-                  type="nonVerifiable"
-                />
+                <Pressable onPress={() => nonVerHoursDetails()}>
+                  <CustomText>
+                    Non-Verifiable Hours:{' '}
+                    {Number(elem.nonVerifiable).toFixed(2)}
+                  </CustomText>
+                  <CustomProgressBar
+                    progress={elem.nonVerifiable}
+                    type="nonVerifiable"
+                  />
+                </Pressable>
               </CustomStatsDivider>
               <CustomStatsDivider>
                 <CustomText>

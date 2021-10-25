@@ -80,6 +80,23 @@ exports.getAllNonVerObjsByUser = asyncHandler(async (req, res, next) => {
   res.status(200).json({ success: true, data: nonVers });
 });
 
+//desc    GET All Non-Ver Session Objects by current user by year
+//route   GET /api/nonver/year
+//access  private
+exports.getAllNonVerObjsByYear = asyncHandler(async (req, res, next) => {
+  const user = await User.findById(req.user.id).populate('nonver');
+  const year = req.body.year;
+
+  if (!user) {
+    return next(new ErrorResponse('There is no user logged on', 400));
+  }
+
+  const nonVers = user.nonver;
+  const nonVersYear = nonVers.filter((nonVer) => nonVer.year === year);
+
+  res.status(200).json({ success: true, data: nonVersYear });
+});
+
 //desc    DELETE Non-Ver Session Objects by ID and Cascade to User's Non-Ver Array
 //route   DELETE /api/nonver/:id
 //access  private

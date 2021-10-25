@@ -33,6 +33,23 @@ exports.getAllCertObjsByUser = asyncHandler(async (req, res, next) => {
   res.status(200).json({ success: true, data: certs });
 });
 
+//desc    GET All Non-Ver Session Objects by current user by year
+//route   GET /api/cert/year
+//access  private
+exports.getAllCertObjsByYear = asyncHandler(async (req, res, next) => {
+  const user = await User.findById(req.user.id).populate('cert');
+  const year = req.body.year;
+
+  if (!user) {
+    return next(new ErrorResponse('There is no user logged on', 400));
+  }
+
+  const certs = user.cert;
+  const certsYear = certs.filter((cert) => cert.year === year);
+
+  res.status(200).json({ success: true, data: certsYear });
+});
+
 //desc    DELETE cert Obj by ID, and cascade delete user cert Array and update hours array
 //route   DELETE /api/cert/:id
 //access  private

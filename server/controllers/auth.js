@@ -103,7 +103,9 @@ exports.login = asyncHandler(async (req, res, next) => {
 //route   GET /api/auth/current
 //access  private
 exports.getCurrentUser = asyncHandler(async (req, res, next) => {
-  const user = await User.findById(req.user.id).populate('nonver'); //populate target is small cap!
+  const user = await User.findById(req.user.id)
+    .populate('cert')
+    .populate('nonver'); //populate target is small cap!
 
   if (!user) {
     return next(new ErrorResponse('No user is logged in at the moment', 400));
