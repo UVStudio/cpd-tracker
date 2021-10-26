@@ -7,7 +7,7 @@ const { currentYear } = require('../utils/currentYear');
 //route   POST /api/auth/
 //access  public
 exports.createUser = asyncHandler(async (req, res, next) => {
-  const { name, email, password, province, role } = req.body;
+  const { name, email, password, province, cpdMonth, cpdYear, role } = req.body;
 
   let user = await User.findOne({ email });
 
@@ -15,7 +15,7 @@ exports.createUser = asyncHandler(async (req, res, next) => {
     return next(new ErrorResponse('This user already exists', 400));
   }
 
-  if (!name || !email || !password || !province) {
+  if (!name || !email || !password || !province || !cpdMonth || !cpdYear) {
     return next(
       new ErrorResponse(
         'Please provide name, email, password and province',
@@ -24,32 +24,32 @@ exports.createUser = asyncHandler(async (req, res, next) => {
     );
   }
 
-  const hours = [
-    {
-      year: currentYear + 1,
+  const hours = [];
+  const yearsOfCPA = currentYear - cpdYear;
+  let yearsHistoricData;
+
+  if (yearsOfCPA > 2) {
+    yearsHistoricData = 2;
+  } else {
+    yearsHistoricData = yearsOfCPA;
+  }
+
+  for (let i = 0; i <= yearsHistoricData; i++) {
+    hours.push({
+      year: currentYear - i,
       verifiable: 0,
       nonVerifiable: 0,
       ethics: 0,
-    },
-    {
-      year: currentYear,
-      verifiable: 0,
-      nonVerifiable: 0,
-      ethics: 0,
-    },
-    {
-      year: currentYear - 1,
-      verifiable: 0,
-      nonVerifiable: 0,
-      ethics: 0,
-    },
-  ];
+    });
+  }
 
   user = await User.create({
     name,
     email,
     password,
     province,
+    cpdMonth,
+    cpdYear,
     hours,
     role,
   });
@@ -80,7 +80,8 @@ exports.login = asyncHandler(async (req, res, next) => {
   }
 
   //create hours objects in case user has skipped logging on for years
-  //const fakeCurrentYear = 2024;
+  //fakeCurrentYear replaces currentYear in test
+  //const fakeCurrentYear = 2022;
   const userHours = user.hours;
   const lastYearDB = userHours[0].year;
   const catchUpYears = currentYear - lastYearDB;

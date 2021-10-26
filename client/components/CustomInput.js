@@ -59,6 +59,12 @@ const CustomInput = (props) => {
     if (props.id === 'year' && text.length !== 4) {
       isValid = false;
     }
+    if (props.id === 'cpdYear' && Number(text) > currentYear) {
+      isValid = false;
+    }
+    if (props.month && Number(text) > 13) {
+      isValid = false;
+    }
 
     dispatch({
       type: INPUT_CHANGE,
@@ -73,7 +79,7 @@ const CustomInput = (props) => {
 
   return (
     <View style={styles.formControl}>
-      <Text style={styles.label}>{props.label}</Text>
+      {props.label ? <Text style={styles.label}>{props.label}</Text> : null}
       <TextInput
         {...props}
         style={styles.input}

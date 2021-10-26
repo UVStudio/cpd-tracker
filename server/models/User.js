@@ -34,6 +34,14 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Please state your provincial jurisdiction'],
   },
+  cpdMonth: {
+    type: Number,
+    required: true,
+  },
+  cpdYear: {
+    type: Number,
+    required: true,
+  },
   cert: [
     {
       type: mongoose.Schema.ObjectId,
@@ -65,6 +73,11 @@ const UserSchema = new mongoose.Schema({
       ethics: {
         type: Number,
         required: true,
+      },
+      override: {
+        type: Boolean,
+        required: true,
+        default: false,
       },
     },
   ],

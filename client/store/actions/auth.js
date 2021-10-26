@@ -24,14 +24,30 @@ export const setDidTryAL = () => {
   return { type: SET_DID_TRY_AL };
 };
 
-export const register = (name, email, province, password) => {
+export const register = (
+  name,
+  email,
+  province,
+  cpdMonth,
+  cpdYear,
+  password
+) => {
   return async (dispatch) => {
     const config = {
       headers: {
         'Content-Type': 'application/json',
       },
     };
-    const body = JSON.stringify({ name, email, province, password });
+    const body = JSON.stringify({
+      name,
+      email,
+      province,
+      cpdMonth,
+      cpdYear,
+      password,
+    });
+
+    console.log('body: ', body);
 
     try {
       const response = await axios.post(

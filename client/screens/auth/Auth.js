@@ -7,6 +7,7 @@ import {
   StyleSheet,
   ScrollView,
   ImageBackground,
+  Pressable,
 } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 
@@ -14,6 +15,9 @@ import CustomFormCard from '../../components/CustomFormCard';
 import CustomInput from '../../components/CustomInput';
 import CustomButton from '../../components/CustomButton';
 import CustomErrorCard from '../../components/CustomErrorCard';
+import CustomSelectField from '../../components/CustomSelectField';
+import CustomIndicator from '../../components/CustomIndicator';
+import CustomProvinceSelectionCard from '../../components/CustomProvinceSelectionCard';
 
 import * as authActions from '../../store/actions/auth';
 import { FORM_INPUT_UPDATE } from '../../store/types';
@@ -42,11 +46,13 @@ const formReducer = (state, action) => {
 };
 
 const Auth = () => {
-  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const [isSignup, setIsSignup] = useState(false);
   const [isLogging, setIsLogging] = useState(false);
   const [isRegistering, setIsRegistering] = useState(false);
+  const [provinceCard, setProvinceCard] = useState(false);
+  const [province, setProvince] = useState('');
 
   const dispatch = useDispatch();
 
@@ -55,6 +61,8 @@ const Auth = () => {
       name: '',
       email: '',
       province: '',
+      cpdMonth: '',
+      cpdYear: '',
       password: '',
       password2: '',
     },
@@ -62,12 +70,14 @@ const Auth = () => {
       name: false,
       email: false,
       province: false,
+      cpdMonth: false,
+      cpdYear: false,
       password: false,
     },
     formIsValid: false,
   });
 
-  //console.log('formState: ', formState);
+  console.log('formState: ', formState);
 
   //regex for min 8, max 15, 1 lower, 1 upper, 1 num
   const pwRegex = new RegExp(/^((?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,16})$/);
@@ -95,6 +105,8 @@ const Auth = () => {
         formState.inputValues.name,
         formState.inputValues.email,
         formState.inputValues.province,
+        formState.inputValues.cpdMonth,
+        formState.inputValues.cpdYear,
         formState.inputValues.password
       );
     } else {
@@ -126,13 +138,30 @@ const Auth = () => {
     [dispatchFormState]
   );
 
+  const selectProvince = () => {
+    setProvinceCard(true);
+  };
+
+  useEffect(() => {
+    dispatchFormState({
+      type: FORM_INPUT_UPDATE,
+      value: province,
+      isValid: province !== '' ? true : false,
+      input: 'province',
+    });
+  }, [province]);
+
   if (isLoading) {
-    return (
-      <View style={styles.indicatorContainer}>
-        <ActivityIndicator size="large" color={Colors.primary} />
-      </View>
-    );
+    return <CustomIndicator />;
   }
+
+  // CPA Membership Date instructions
+  // 1) use 2 card forms. 1st for year, 2nd for month. One leads to the other.
+  // 2) year must be less than currentYear + 1
+  // 3) Chosen year and month will be printed on registration form, and be parts of formState
+  // 4) year and month will be separate inputValues on formState
+  // 5) year type is number. If it is smaller than currentYear - 2, then we no additional logic is needed
+  // 6) additional logic will be needed to calculate partial year CPD requirement
 
   return (
     <View style={styles.container}>
@@ -168,17 +197,57 @@ const Auth = () => {
               style={styles.textInput}
             />
             {isSignup ? (
-              <CustomInput
-                id="province"
-                label="Province"
-                keyboardType="default"
-                autoCapitalize="none"
-                errorText="Please enter a valid provincial jurisdiction"
-                onInputChange={inputChangeHandler}
-                initialValue=""
-                required
-                style={styles.textInput}
-              />
+              <Pressable onPress={() => selectProvince()}>
+                <CustomSelectField
+                  id="province"
+                  label="Province"
+                  keyboardType="default"
+                  autoCapitalize="words"
+                  errorText="Please enter a valid provincial jurisdiction"
+                  initialValue=""
+                  value={province}
+                  required
+                  style={styles.textInput}
+                />
+              </Pressable>
+            ) : null}
+            {isSignup ? (
+              <View>
+                <Text style={styles.label}>
+                  CPA Membership Join Date: mm/yyyy
+                </Text>
+                <View style={styles.rowSpaceBetween}>
+                  <View style={{ width: '49%' }}>
+                    <CustomInput
+                      id="cpdMonth"
+                      keyboardType="numeric"
+                      autoCapitalize="none"
+                      minLength={2}
+                      placeholder="mm"
+                      errorText="Please enter a valid month in mm format"
+                      onInputChange={inputChangeHandler}
+                      initialValue=""
+                      month
+                      required
+                      style={styles.textInput}
+                    />
+                  </View>
+                  <View style={{ width: '49%' }}>
+                    <CustomInput
+                      id="cpdYear"
+                      keyboardType="numeric"
+                      autoCapitalize="none"
+                      minLength={4}
+                      placeholder="yyyy"
+                      errorText="Please enter a valid year in yyyy format"
+                      onInputChange={inputChangeHandler}
+                      initialValue=""
+                      required
+                      style={styles.textInput}
+                    />
+                  </View>
+                </View>
+              </View>
             ) : null}
             <CustomInput
               id="password"
@@ -186,7 +255,7 @@ const Auth = () => {
               keyboardType="default"
               secureTextEntry
               autoCapitalize="none"
-              minLength={6}
+              minLength={8}
               errorText="Please enter a valid password"
               onInputChange={inputChangeHandler}
               initialValue=""
@@ -200,7 +269,7 @@ const Auth = () => {
                 keyboardType="default"
                 secureTextEntry
                 autoCapitalize="none"
-                minLength={6}
+                minLength={8}
                 errorText="Please confirm your password"
                 onInputChange={inputChangeHandler}
                 initialValue=""
@@ -232,6 +301,12 @@ const Auth = () => {
             </View>
           </ScrollView>
         </CustomFormCard>
+        {provinceCard ? (
+          <CustomProvinceSelectionCard
+            toShow={setProvinceCard}
+            toSet={setProvince}
+          />
+        ) : null}
         {error !== '' ? (
           <CustomErrorCard error={error} toShow={setError} />
         ) : null}
@@ -244,20 +319,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  indicatorContainer: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   image: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
   authCard: {
-    maxWidth: 400,
-    maxHeight: 600,
     paddingHorizontal: 10,
     paddingVertical: 20,
     backgroundColor: '#fff',
@@ -276,6 +343,15 @@ const styles = StyleSheet.create({
   buttonGroupContainer: {
     marginTop: 15,
     alignItems: 'center',
+  },
+  label: {
+    fontFamily: 'sans-serif-condensed',
+    marginVertical: 2,
+    marginTop: 4,
+  },
+  rowSpaceBetween: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
 });
 
