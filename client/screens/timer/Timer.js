@@ -14,7 +14,7 @@ import CustomThinGreyLine from '../../components/CustomThinGreyLine';
 import CustomScreenContainer from '../../components/CustomScreenContainer';
 import CustomOperationalContainer from '../../components/CustomOperationalContainer';
 
-import * as authActions from '../../store/actions/auth';
+import * as userActions from '../../store/actions/user';
 import * as nonVerActions from '../../store/actions/nonVer';
 import { secondsToHms, secondsToTime } from '../../utils/timeConversions';
 import currentYear from '../../utils/currentYear';
@@ -95,7 +95,7 @@ const Timer = () => {
       await dispatch(
         nonVerActions.addNonVerSession(currentYear, today, hours, sessionName)
       );
-      await dispatch(authActions.getUser());
+      await dispatch(userActions.getUser());
       setCardText('Non-Verifiable session successfully saved');
       setSeconds(0);
       setSessionLength('');

@@ -17,10 +17,7 @@ exports.createUser = asyncHandler(async (req, res, next) => {
 
   if (!name || !email || !password || !province || !cpdMonth || !cpdYear) {
     return next(
-      new ErrorResponse(
-        'Please provide name, email, password and province',
-        400
-      )
+      new ErrorResponse('Please complete the registration form', 400)
     );
   }
 
@@ -116,6 +113,31 @@ exports.getCurrentUser = asyncHandler(async (req, res, next) => {
     success: true,
     data: user,
   });
+});
+
+//desc    OVERRIDE current logged in user
+//route   PUT /api/auth/override/
+//access  private
+exports.overrideHours = asyncHandler(async (req, res, next) => {
+  const userId = req.user.id;
+  const { year, certHours, nonVerHours, ethicsHours } = req.body;
+
+  const query = { _id: userId, 'hours.year': year };
+  const update = {
+    $set: {
+      'hours.$.verifiable': certHours,
+      'hours.$.nonVerifiable': nonVerHours,
+      'hours.$.ethics': ethicsHours,
+      'hours.$.override': true,
+      lastModifiedAt: Date.now(),
+    },
+  };
+
+  await User.updateOne(query, update);
+
+  const userUpdated = await User.findById(req.user.id);
+
+  res.status(200).json({ success: true, data: userUpdated });
 });
 
 //desc    UPDATE current logged in user

@@ -2,8 +2,6 @@ import React, { useReducer, useEffect, useCallback, useState } from 'react';
 import {
   View,
   Text,
-  Alert,
-  ActivityIndicator,
   StyleSheet,
   ScrollView,
   ImageBackground,

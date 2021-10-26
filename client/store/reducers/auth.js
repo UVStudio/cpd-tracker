@@ -35,11 +35,6 @@ export default (state = initialState, action) => {
         ...state,
         user: action.user,
       };
-    case GET_USER:
-      return {
-        ...state,
-        user: action.user,
-      };
     case LOGOUT:
       return {
         ...initialState,

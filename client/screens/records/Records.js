@@ -4,7 +4,7 @@ import { useSelector, useDispatch } from 'react-redux';
 
 import * as DocumentPicker from 'expo-document-picker';
 import * as certActions from '../../store/actions/cert';
-import * as authActions from '../../store/actions/auth';
+import * as userActions from '../../store/actions/user';
 
 import CustomButton from '../../components/CustomButton';
 import CustomText from '../../components/CustomText';
@@ -131,7 +131,7 @@ const Records = () => {
       }
       setCert(null);
       setCardText('Verifiable session successfully saved');
-      await dispatch(authActions.getUser());
+      await dispatch(userActions.getUser());
     } catch (err) {
       console.log(err.message);
       setError(

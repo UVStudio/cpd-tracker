@@ -1,12 +1,6 @@
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {
-  AUTHENTICATE,
-  SET_DID_TRY_AL,
-  LOGOUT,
-  SET_USER,
-  GET_USER,
-} from '../types';
+import { AUTHENTICATE, SET_DID_TRY_AL, LOGOUT, SET_USER } from '../types';
 import { CURRENT_IP } from '../../serverConfig';
 
 let timer;
@@ -46,8 +40,6 @@ export const register = (
       cpdYear,
       password,
     });
-
-    console.log('body: ', body);
 
     try {
       const response = await axios.post(
@@ -116,22 +108,6 @@ export const setUser = (resData) => {
       type: SET_USER,
       user: resData,
     });
-  };
-};
-
-export const getUser = () => {
-  return async (dispatch) => {
-    try {
-      const response = await axios.get(`${CURRENT_IP}/api/auth/current`);
-      const user = response.data.data;
-
-      dispatch({
-        type: GET_USER,
-        user: user,
-      });
-    } catch (err) {
-      throw new Error(err.response.data.error);
-    }
   };
 };
 

@@ -12,10 +12,11 @@ import { downloadToFolder } from 'expo-file-dl';
 
 import * as Notifications from 'expo-notifications';
 import * as MediaLibrary from 'expo-media-library';
-import * as authActions from '../../store/actions/auth';
+import * as userActions from '../../store/actions/user';
 import * as reportActions from '../../store/actions/report';
 
 import CustomText from '../../components/CustomText';
+import CustomBoldText from '../../components/CustomBoldText';
 import CustomTitle from '../../components/CustomTitle';
 import CustomSubtitle from '../../components/CustomSubtitle';
 import CustomButton from '../../components/CustomButton';
@@ -67,12 +68,12 @@ const Stats = ({ navigation }) => {
 
   //Load User
   useEffect(() => {
-    loadUser();
+    loadUser().then(() => console.log(user));
   }, []);
 
   const loadUser = async () => {
     try {
-      await dispatch(authActions.getUser());
+      await dispatch(userActions.getUser());
     } catch (err) {
       console.log(err.message);
       setError(
@@ -84,7 +85,7 @@ const Stats = ({ navigation }) => {
   const refreshUser = async () => {
     setRefreshingData(true);
     try {
-      await dispatch(authActions.getUser());
+      await dispatch(userActions.getUser());
     } catch (err) {
       console.log(err.message);
       setError(
@@ -96,7 +97,7 @@ const Stats = ({ navigation }) => {
 
   //Session details
   const verifiableHoursDetails = () => {
-    navigation.navigate('Verifiable Details');
+    navigation.navigate('Verifiable Details', { year: showYear });
   };
 
   const nonVerHoursDetails = () => {
@@ -218,15 +219,22 @@ const Stats = ({ navigation }) => {
           <CustomThinGreyLine />
           {showYear === elem.year ? (
             <CustomStatsInfoBox>
+              {elem.override ? (
+                <CustomBoldText style={{ marginBottom: 10 }}>
+                  Past CPD Hours Data
+                </CustomBoldText>
+              ) : null}
               <CustomStatsDivider>
                 <Pressable onPress={() => verifiableHoursDetails()}>
                   <CustomText>
                     Verifiable Hours: {Number(elem.verifiable).toFixed(2)}
                   </CustomText>
-                  <CustomProgressBar
-                    progress={elem.verifiable}
-                    type="verifiable"
-                  />
+                  {!elem.override ? (
+                    <CustomProgressBar
+                      progress={elem.verifiable}
+                      type="verifiable"
+                    />
+                  ) : null}
                 </Pressable>
               </CustomStatsDivider>
               <CustomStatsDivider>
@@ -235,10 +243,12 @@ const Stats = ({ navigation }) => {
                     Non-Verifiable Hours:{' '}
                     {Number(elem.nonVerifiable).toFixed(2)}
                   </CustomText>
-                  <CustomProgressBar
-                    progress={elem.nonVerifiable}
-                    type="nonVerifiable"
-                  />
+                  {!elem.override ? (
+                    <CustomProgressBar
+                      progress={elem.nonVerifiable}
+                      type="nonVerifiable"
+                    />
+                  ) : null}
                 </Pressable>
               </CustomStatsDivider>
               <CustomStatsDivider>
@@ -246,22 +256,28 @@ const Stats = ({ navigation }) => {
                   Ethics Hours: {Number(elem.ethics).toFixed(2)}
                 </CustomText>
               </CustomStatsDivider>
-              {reportReady ? null : generatingPDF ? (
+
+              {!elem.override ? (
                 <View style={styles.fullWidthCenter}>
-                  <CustomButton style={{ marginTop: 10, width: '100%' }}>
-                    Generating Your PDF...
-                  </CustomButton>
+                  {reportReady ? null : generatingPDF ? (
+                    <View style={styles.fullWidthCenter}>
+                      <CustomButton style={{ marginTop: 15, width: '100%' }}>
+                        Generating Your PDF...
+                      </CustomButton>
+                    </View>
+                  ) : (
+                    <View style={styles.fullWidthCenter}>
+                      <CustomButton
+                        style={{ marginTop: 15, width: '100%' }}
+                        onSelect={() => generatePDFHandler(showYear)}
+                      >
+                        Generate PDF Report
+                      </CustomButton>
+                    </View>
+                  )}
                 </View>
-              ) : (
-                <View style={styles.fullWidthCenter}>
-                  <CustomButton
-                    style={{ marginTop: 10, width: '100%' }}
-                    onSelect={() => generatePDFHandler(showYear)}
-                  >
-                    Generate PDF Report
-                  </CustomButton>
-                </View>
-              )}
+              ) : null}
+
               {reportReady ? (
                 downloadingPDF ? (
                   <View style={styles.fullWidthCenter}>

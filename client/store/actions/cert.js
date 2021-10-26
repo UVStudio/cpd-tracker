@@ -26,7 +26,7 @@ export const saveVerCourse = (year, hours, ethicsHours, courseName, cert) => {
         },
       };
 
-      console.log('formData: ', formData);
+      //console.log('formData: ', formData);
 
       await axios.post(`${CURRENT_IP}/api/upload`, formData, config);
     } catch (err) {
@@ -36,15 +36,15 @@ export const saveVerCourse = (year, hours, ethicsHours, courseName, cert) => {
 };
 
 //NOT USED
-export const addCPDHours = (year, verifiable, nonVerifiable, ethics) => {
-  return async () => {
-    const body = { year, verifiable, nonVerifiable, ethics };
+// export const addCPDHours = (year, verifiable, nonVerifiable, ethics) => {
+//   return async () => {
+//     const body = { year, verifiable, nonVerifiable, ethics };
 
-    console.log('body: ', body);
-    try {
-      await axios.post(`${CURRENT_IP}/api/cert/hours`, body);
-    } catch (err) {
-      console.log(err.message);
-    }
-  };
-};
+//     console.log('body: ', body);
+//     try {
+//       await axios.post(`${CURRENT_IP}/api/cert/hours`, body);
+//     } catch (err) {
+//       console.log(err.message);
+//     }
+//   };
+// };
