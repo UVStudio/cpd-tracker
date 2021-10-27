@@ -222,7 +222,7 @@ const Auth = () => {
                       autoCapitalize="none"
                       minLength={2}
                       placeholder="mm"
-                      errorText="Please enter a valid month in mm format"
+                      errorText="Please enter a valid month"
                       onInputChange={inputChangeHandler}
                       initialValue=""
                       month
@@ -237,7 +237,7 @@ const Auth = () => {
                       autoCapitalize="none"
                       minLength={4}
                       placeholder="yyyy"
-                      errorText="Please enter a valid year in yyyy format"
+                      errorText="Please enter a valid year"
                       onInputChange={inputChangeHandler}
                       initialValue=""
                       required

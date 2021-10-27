@@ -37,8 +37,11 @@ exports.createUser = asyncHandler(async (req, res, next) => {
       verifiable: 0,
       nonVerifiable: 0,
       ethics: 0,
+      override: false,
     });
   }
+
+  hours[0].override = true;
 
   user = await User.create({
     name,

@@ -68,7 +68,14 @@ const Stats = ({ navigation }) => {
 
   //Load User
   useEffect(() => {
-    loadUser().then(() => console.log(user));
+    loadUser().then(() => {
+      const yearsToOverride = userHours.filter(
+        (hours) => !hours.override && hours.year !== currentYear
+      );
+      if (yearsToOverride.length > 0) {
+        navigation.navigate('CPD Hours Setup', { yearsToOverride });
+      }
+    });
   }, []);
 
   const loadUser = async () => {
@@ -195,6 +202,8 @@ const Stats = ({ navigation }) => {
   useEffect(() => {
     getNotificationPermissions();
   });
+
+  console.log('user: ', user);
 
   if (!user) {
     return (
