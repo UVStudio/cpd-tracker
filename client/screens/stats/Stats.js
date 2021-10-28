@@ -6,7 +6,6 @@ import {
   ActivityIndicator,
   StyleSheet,
   Pressable,
-  useWindowDimensions,
 } from 'react-native';
 import { downloadToFolder } from 'expo-file-dl';
 
@@ -25,12 +24,12 @@ import CustomMessageCard from '../../components/CustomMessageCard';
 import CustomAccordionUnit from '../../components/CustomAccordionUnit';
 import CustomStatsDivider from '../../components/CustomStatsDivider';
 import CustomStatsInfoBox from '../../components/CustomStatsInfoBox';
+import CustomIndicator from '../../components/CustomIndicator';
 import CustomGreyLine from '../../components/CustomGreyLine';
 import CustomThinGreyLine from '../../components/CustomThinGreyLine';
 import CustomProgressBar from '../../components/CustomProgressBar';
 import CustomScreenContainer from '../../components/CustomScreenContainer';
 import currentYear from '../../utils/currentYear';
-import Colors from '../../constants/Colors';
 
 import {
   AndroidImportance,
@@ -52,6 +51,7 @@ const channelId = 'DownloadInfo';
 
 const Stats = ({ navigation }) => {
   const [showYear, setShowYear] = useState(currentYear);
+  const [loading, setLoading] = useState(true);
   const [downloadProgress, setDownloadProgress] = useState('0%');
   const [error, setError] = useState('');
   const [cardText, setCardText] = useState('');
@@ -59,26 +59,31 @@ const Stats = ({ navigation }) => {
   const [downloadingPDF, setDownloadingPDF] = useState(false);
   const [refreshingData, setRefreshingData] = useState(false);
 
-  const user = useSelector((state) => state.user.user);
+  const authState = useSelector((state) => state.auth.user);
+  const userState = useSelector((state) => state.user.user);
   const reportReady = useSelector((state) => state.report.report);
+
+  const user = userState ? userState : authState;
 
   const userHours = user.hours;
 
   const dispatch = useDispatch();
 
-  //Load User
   useEffect(() => {
+    setLoading(true);
     loadUser().then(() => {
-      const yearsToOverride = userHours.filter(
-        (hours) => hours.historic && !hours.overriden
-      );
+      const yearsToOverride = userHours
+        .filter((hours) => hours.historic)
+        .filter((hours) => !hours.overriden);
       if (yearsToOverride.length > 0) {
         navigation.navigate('CPD Hours Setup', { yearsToOverride });
       }
     });
+    setLoading(false);
   }, []);
 
   const loadUser = async () => {
+    setLoading(true);
     try {
       await dispatch(userActions.getUser());
     } catch (err) {
@@ -87,6 +92,7 @@ const Stats = ({ navigation }) => {
         'There is something wrong with our network. Please try again later.'
       );
     }
+    setLoading(false);
   };
 
   const refreshUser = async () => {
@@ -203,14 +209,8 @@ const Stats = ({ navigation }) => {
     getNotificationPermissions();
   });
 
-  console.log('user: ', user);
-
-  if (!user) {
-    return (
-      <View style={styles.indicatorContainer}>
-        <ActivityIndicator size="large" color={Colors.primary} />
-      </View>
-    );
+  if (loading) {
+    return <CustomIndicator />;
   }
 
   return (

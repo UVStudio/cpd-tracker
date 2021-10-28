@@ -1,7 +1,7 @@
 import { GET_USER } from '../types';
 
 const initialState = {
-  user: {},
+  user: undefined,
 };
 
 export default (state = initialState, action) => {

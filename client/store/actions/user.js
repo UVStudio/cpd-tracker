@@ -12,16 +12,18 @@ export const overrideHours = (year, certHours, nonVerHours, ethicsHours) => {
 
     const body = JSON.stringify({ year, certHours, nonVerHours, ethicsHours });
 
-    //console.log('body: ', body);
-
     try {
       const response = await axios.put(
         `${CURRENT_IP}/api/user/override`,
         body,
         config
       );
+      const user = response.data.data;
 
-      //console.log('response: ', response);
+      dispatch({
+        type: GET_USER,
+        user: user,
+      });
     } catch (err) {
       throw new Error(err.response.data.error);
     }
@@ -34,7 +36,7 @@ export const getUser = () => {
       const response = await axios.get(`${CURRENT_IP}/api/auth/current`);
       const user = response.data.data;
 
-      //console.log('user: ', user);
+      console.log('get user action: ', user);
 
       dispatch({
         type: GET_USER,

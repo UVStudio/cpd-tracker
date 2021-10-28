@@ -45,14 +45,11 @@ const formReducer = (state, action) => {
 
 const PastCPDHoursInput = (props) => {
   const { yearsToOverride } = props.route.params;
-  console.log('yearsToOverride: ', yearsToOverride);
-
-  const navigation = useNavigation();
-
-  //console.log('navigation: ', navigation);
+  //console.log('yearsToOverride: ', yearsToOverride);
 
   const [error, setError] = useState('');
 
+  const navigation = useNavigation();
   const dispatch = useDispatch();
 
   const [formState, dispatchFormState] = useReducer(formReducer, {
@@ -75,7 +72,7 @@ const PastCPDHoursInput = (props) => {
     formIsValid: false,
   });
 
-  console.log(formState);
+  // console.log(formState);
 
   const inputChangeHandler = useCallback(
     (inputIdentifier, inputValue, inputValidity) => {
@@ -90,6 +87,7 @@ const PastCPDHoursInput = (props) => {
   );
 
   const saveDataHandler = async () => {
+    setError('');
     try {
       await dispatch(
         userActions.overrideHours(
@@ -109,10 +107,13 @@ const PastCPDHoursInput = (props) => {
           )
         );
       }
-      await dispatch(userActions.getUser());
+      //await dispatch(userActions.getUser());
       navigation.navigate('Your CPD Statistics');
     } catch (err) {
       console.log(err.message);
+      setError(
+        'There is something wrong with our network. Please try again later.'
+      );
     }
   };
 
