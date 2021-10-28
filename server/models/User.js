@@ -74,10 +74,15 @@ const UserSchema = new mongoose.Schema({
         type: Number,
         required: true,
       },
-      override: {
+      overriden: {
         type: Boolean,
         required: true,
         default: false,
+      },
+      historic: {
+        type: Boolean,
+        required: true,
+        default: true,
       },
     },
   ],

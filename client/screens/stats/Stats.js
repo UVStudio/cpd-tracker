@@ -59,7 +59,7 @@ const Stats = ({ navigation }) => {
   const [downloadingPDF, setDownloadingPDF] = useState(false);
   const [refreshingData, setRefreshingData] = useState(false);
 
-  const user = useSelector((state) => state.auth.user);
+  const user = useSelector((state) => state.user.user);
   const reportReady = useSelector((state) => state.report.report);
 
   const userHours = user.hours;
@@ -70,7 +70,7 @@ const Stats = ({ navigation }) => {
   useEffect(() => {
     loadUser().then(() => {
       const yearsToOverride = userHours.filter(
-        (hours) => !hours.override && hours.year !== currentYear
+        (hours) => hours.historic && !hours.overriden
       );
       if (yearsToOverride.length > 0) {
         navigation.navigate('CPD Hours Setup', { yearsToOverride });
@@ -228,7 +228,7 @@ const Stats = ({ navigation }) => {
           <CustomThinGreyLine />
           {showYear === elem.year ? (
             <CustomStatsInfoBox>
-              {elem.override ? (
+              {elem.historic ? (
                 <CustomBoldText style={{ marginBottom: 10 }}>
                   Past CPD Hours Data
                 </CustomBoldText>
@@ -238,7 +238,7 @@ const Stats = ({ navigation }) => {
                   <CustomText>
                     Verifiable Hours: {Number(elem.verifiable).toFixed(2)}
                   </CustomText>
-                  {!elem.override ? (
+                  {!elem.historic ? (
                     <CustomProgressBar
                       progress={elem.verifiable}
                       type="verifiable"
@@ -252,7 +252,7 @@ const Stats = ({ navigation }) => {
                     Non-Verifiable Hours:{' '}
                     {Number(elem.nonVerifiable).toFixed(2)}
                   </CustomText>
-                  {!elem.override ? (
+                  {!elem.historic ? (
                     <CustomProgressBar
                       progress={elem.nonVerifiable}
                       type="nonVerifiable"
@@ -266,7 +266,7 @@ const Stats = ({ navigation }) => {
                 </CustomText>
               </CustomStatsDivider>
 
-              {!elem.override ? (
+              {!elem.historic ? (
                 <View style={styles.fullWidthCenter}>
                   {reportReady ? null : generatingPDF ? (
                     <View style={styles.fullWidthCenter}>

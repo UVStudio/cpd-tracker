@@ -75,7 +75,7 @@ const Auth = () => {
     formIsValid: false,
   });
 
-  console.log('formState: ', formState);
+  //console.log('formState: ', formState);
 
   //regex for min 8, max 15, 1 lower, 1 upper, 1 num
   const pwRegex = new RegExp(/^((?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,16})$/);
@@ -136,7 +136,7 @@ const Auth = () => {
     [dispatchFormState]
   );
 
-  const selectProvince = () => {
+  const selectProvinceHandler = () => {
     setProvinceCard(true);
   };
 
@@ -152,14 +152,6 @@ const Auth = () => {
   if (isLoading) {
     return <CustomIndicator />;
   }
-
-  // CPA Membership Date instructions
-  // 1) use 2 card forms. 1st for year, 2nd for month. One leads to the other.
-  // 2) year must be less than currentYear + 1
-  // 3) Chosen year and month will be printed on registration form, and be parts of formState
-  // 4) year and month will be separate inputValues on formState
-  // 5) year type is number. If it is smaller than currentYear - 2, then we no additional logic is needed
-  // 6) additional logic will be needed to calculate partial year CPD requirement
 
   return (
     <View style={styles.container}>
@@ -195,7 +187,7 @@ const Auth = () => {
               style={styles.textInput}
             />
             {isSignup ? (
-              <Pressable onPress={() => selectProvince()}>
+              <Pressable onPress={() => selectProvinceHandler()}>
                 <CustomSelectField
                   id="province"
                   label="Province"

@@ -35,6 +35,7 @@ const CustomInput = (props) => {
     if (inputState.touched) {
       onInputChange(id, inputState.value, inputState.isValid);
     }
+    // console.log('id: ', typeof id);
   }, [inputState, onInputChange, id]);
 
   const textChangeHandler = (text) => {
