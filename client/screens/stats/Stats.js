@@ -29,7 +29,9 @@ import CustomGreyLine from '../../components/CustomGreyLine';
 import CustomThinGreyLine from '../../components/CustomThinGreyLine';
 import CustomProgressBar from '../../components/CustomProgressBar';
 import CustomScreenContainer from '../../components/CustomScreenContainer';
+
 import currentYear from '../../utils/currentYear';
+import { hoursRequiredLogic } from '../../utils/hoursRequiredLogic';
 
 import {
   AndroidImportance,
@@ -64,23 +66,9 @@ const Stats = ({ navigation }) => {
   const reportReady = useSelector((state) => state.report.report);
 
   const user = userState ? userState : authState;
-
   const userHours = user.hours;
 
   const dispatch = useDispatch();
-
-  useEffect(() => {
-    setLoading(true);
-    loadUser().then(() => {
-      const yearsToOverride = userHours
-        .filter((hours) => hours.historic)
-        .filter((hours) => !hours.overriden);
-      if (yearsToOverride.length > 0) {
-        navigation.navigate('CPD Hours Setup', { yearsToOverride });
-      }
-    });
-    setLoading(false);
-  }, []);
 
   const loadUser = async () => {
     setLoading(true);
@@ -94,6 +82,25 @@ const Stats = ({ navigation }) => {
     }
     setLoading(false);
   };
+
+  useEffect(() => {
+    setLoading(true);
+    loadUser().then(() => {
+      const yearsToOverride = userHours
+        .filter((hours) => hours.historic)
+        .filter((hours) => !hours.overriden);
+      if (yearsToOverride.length > 0) {
+        navigation.navigate('CPD Hours Setup', { yearsToOverride });
+      }
+      setLoading(false);
+    });
+  }, []);
+
+  const hoursRequired = hoursRequiredLogic(user);
+  //console.log('hours required: ', hoursRequired);
+
+  //CPD Month proration calculation helper
+  //console.log(Math.round(((12 - (user.cpdMonth - 1)) / 12) * 40));
 
   const refreshUser = async () => {
     setRefreshingData(true);
@@ -111,6 +118,10 @@ const Stats = ({ navigation }) => {
   //Session details
   const verifiableHoursDetails = () => {
     navigation.navigate('Verifiable Details', { year: showYear });
+  };
+
+  const totalCPDHoursDetails = () => {
+    navigation.navigate('Total CPD Details', { year: showYear });
   };
 
   const nonVerHoursDetails = () => {
@@ -236,7 +247,14 @@ const Stats = ({ navigation }) => {
               <CustomStatsDivider>
                 <Pressable onPress={() => verifiableHoursDetails()}>
                   <CustomText>
-                    Verifiable Hours: {Number(elem.verifiable).toFixed(2)}
+                    Verifiable Hours:{' '}
+                    {!elem.historic
+                      ? Number(elem.verifiable).toFixed(1) +
+                        ' ' +
+                        '/' +
+                        ' ' +
+                        Number(hoursRequired.currentYearNeedVerHours).toFixed(1)
+                      : Number(elem.verifiable).toFixed(1)}
                   </CustomText>
                   {!elem.historic ? (
                     <CustomProgressBar
@@ -247,22 +265,47 @@ const Stats = ({ navigation }) => {
                 </Pressable>
               </CustomStatsDivider>
               <CustomStatsDivider>
-                <Pressable onPress={() => nonVerHoursDetails()}>
+                <Pressable onPress={() => totalCPDHoursDetails()}>
                   <CustomText>
-                    Non-Verifiable Hours:{' '}
-                    {Number(elem.nonVerifiable).toFixed(2)}
+                    Total CPD Hours:{' '}
+                    {!elem.historic
+                      ? Number(elem.nonVerifiable + elem.verifiable).toFixed(
+                          1
+                        ) +
+                        ' ' +
+                        '/' +
+                        ' ' +
+                        Number(hoursRequired.currentYearNeedCPDHours).toFixed(1)
+                      : Number(elem.nonVerifiable + elem.verifiable).toFixed(1)}
                   </CustomText>
                   {!elem.historic ? (
                     <CustomProgressBar
-                      progress={elem.nonVerifiable}
-                      type="nonVerifiable"
+                      progress={elem.nonVerifiable + elem.verifiable}
+                      type="total-CPD"
                     />
                   ) : null}
                 </Pressable>
               </CustomStatsDivider>
               <CustomStatsDivider>
+                <Pressable onPress={() => nonVerHoursDetails()}>
+                  <CustomText>
+                    Non-Verifiable Hours:{' '}
+                    {Number(elem.nonVerifiable).toFixed(1)}
+                  </CustomText>
+                </Pressable>
+              </CustomStatsDivider>
+              <CustomStatsDivider>
                 <CustomText>
-                  Ethics Hours: {Number(elem.ethics).toFixed(2)}
+                  Ethics Hours:{' '}
+                  {!elem.historic
+                    ? Number(elem.ethics).toFixed(1) +
+                      ' ' +
+                      '/' +
+                      ' ' +
+                      Number(hoursRequired.currentYearNeedEthicsHours).toFixed(
+                        1
+                      )
+                    : Number(elem.ethics).toFixed(1)}
                 </CustomText>
               </CustomStatsDivider>
 
@@ -344,6 +387,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   fullWidthCenter: {
+    marginTop: 5,
     width: '100%',
     alignSelf: 'center',
   },

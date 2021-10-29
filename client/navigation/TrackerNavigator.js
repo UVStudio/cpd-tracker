@@ -8,6 +8,7 @@ import Profile from '../screens/auth/Profile';
 import Stats from '../screens/stats/Stats';
 import CertHoursDetails from '../screens/stats/CertHoursDetails';
 import NonVerHoursDetails from '../screens/stats/NonVerHoursDetails';
+import TotalCPDHoursDetails from '../screens/stats/TotalCPDHoursDetails';
 import PastCPDHoursInput from '../screens/stats/PastCPDHoursInput';
 import Timer from '../screens/timer/Timer';
 import UploadSession from '../screens/timer/UploadSession';
@@ -56,6 +57,10 @@ const CPDNavigator = () => {
       <CPDStackNavigator.Screen
         name="Non-Verifiable Details"
         component={NonVerHoursDetails}
+      />
+      <CPDStackNavigator.Screen
+        name="Total CPD Details"
+        component={TotalCPDHoursDetails}
       />
       <CPDStackNavigator.Screen
         name="CPD Hours Setup"

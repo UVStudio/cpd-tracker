@@ -36,7 +36,7 @@ export const getUser = () => {
       const response = await axios.get(`${CURRENT_IP}/api/auth/current`);
       const user = response.data.data;
 
-      console.log('get user action: ', user);
+      //console.log('get user action: ', user);
 
       dispatch({
         type: GET_USER,
