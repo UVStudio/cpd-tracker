@@ -48,6 +48,7 @@ const PastCPDHoursInput = (props) => {
   //console.log('yearsToOverride: ', yearsToOverride);
 
   const [error, setError] = useState('');
+  const [savingCPD, setSavingCPD] = useState(false);
 
   const navigation = useNavigation();
   const dispatch = useDispatch();
@@ -88,6 +89,7 @@ const PastCPDHoursInput = (props) => {
 
   const saveDataHandler = async () => {
     setError('');
+    setSavingCPD(true);
     try {
       await dispatch(
         userActions.overrideHours(
@@ -107,9 +109,11 @@ const PastCPDHoursInput = (props) => {
           )
         );
       }
+      setSavingCPD(false);
       //await dispatch(userActions.getUser());
       navigation.navigate('Your CPD Statistics');
     } catch (err) {
+      setSavingCPD(false);
       console.log(err.message);
       setError(
         'There is something wrong with our network. Please try again later.'
@@ -197,9 +201,13 @@ const PastCPDHoursInput = (props) => {
             </View>
           </CustomStatsInfoBox>
         ))}
-        <CustomButton onSelect={() => saveDataHandler()}>
-          Save CPD Data
-        </CustomButton>
+        {savingCPD ? (
+          <CustomButton>Saving CPD Data...</CustomButton>
+        ) : (
+          <CustomButton onSelect={() => saveDataHandler()}>
+            Save CPD Data
+          </CustomButton>
+        )}
       </CustomScrollView>
       {error ? <CustomErrorCard text={error} toShow={setError} /> : null}
     </CustomScreenContainer>

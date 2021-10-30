@@ -68,12 +68,18 @@ const Stats = ({ navigation }) => {
   const user = userState ? userState : authState;
   const userHours = user.hours;
 
+  const yearsToOverride = userHours
+    .filter((hours) => hours.historic)
+    .filter((hours) => !hours.overriden);
+  //console.log('years to override: ', yearsToOverride);
+
   const dispatch = useDispatch();
 
   const loadUser = async () => {
     setLoading(true);
     try {
       await dispatch(userActions.getUser());
+      //console.log('loadUser ran userHours: ', userHours);
     } catch (err) {
       console.log(err.message);
       setError(
@@ -84,23 +90,29 @@ const Stats = ({ navigation }) => {
   };
 
   useEffect(() => {
-    setLoading(true);
-    loadUser().then(() => {
-      const yearsToOverride = userHours
-        .filter((hours) => hours.historic)
-        .filter((hours) => !hours.overriden);
-      if (yearsToOverride.length > 0) {
-        navigation.navigate('CPD Hours Setup', { yearsToOverride });
-      }
-      setLoading(false);
-    });
+    loadUser();
   }, []);
 
   const hoursRequired = hoursRequiredLogic(user);
-  //console.log('hours required: ', hoursRequired);
+  console.log('hours required: ', hoursRequired);
+
+  const { currentYearNeedCPDHours } = hoursRequired;
+
+  useEffect(() => {
+    if (yearsToOverride.length > 0) {
+      navigation.navigate('CPD Hours Setup', { yearsToOverride });
+      return;
+    }
+
+    if (currentYearNeedCPDHours === 20 && yearsToOverride.length === 0) {
+      setCardText(
+        'While you are only required to obtain 20 CPD hours this year, you are encouraged to get more, so you will have an easier time meeting the requirements of the 3 year rolling requirement in the near future.'
+      );
+    }
+  }, [currentYearNeedCPDHours]);
 
   //CPD Month proration calculation helper
-  //console.log(Math.round(((12 - (user.cpdMonth - 1)) / 12) * 40));
+  //console.log(Math.round(((12 - (user.cpdMonth - 1)) / 12) * 20));
 
   const refreshUser = async () => {
     setRefreshingData(true);
@@ -200,7 +212,8 @@ const Stats = ({ navigation }) => {
       });
       await dispatch(reportActions.deleteReport(AWSFileName));
       setCardText(
-        'Report succesfully downloaded. It is in your Documents > Download folder.'
+        `Report succesfully downloaded. For Android users, the PDF is located in Documents > Download folder.
+        The iOS users, the PDF is where you have chosen to save it.`
       );
       setDownloadProgress('0%');
     } catch (err) {
