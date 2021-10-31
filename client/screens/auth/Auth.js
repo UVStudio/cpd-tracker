@@ -7,7 +7,7 @@ import {
   ImageBackground,
   Pressable,
 } from 'react-native';
-import { useSelector, useDispatch } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
 import CustomFormCard from '../../components/CustomFormCard';
 import CustomInput from '../../components/CustomInput';
@@ -335,9 +335,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   label: {
-    fontFamily: 'sans-serif-condensed',
     marginVertical: 2,
     marginTop: 4,
+    fontFamily:
+      Platform.OS === 'android'
+        ? 'sans-serif-condensed'
+        : 'AvenirNextCondensed-Medium',
   },
   rowSpaceBetween: {
     flexDirection: 'row',

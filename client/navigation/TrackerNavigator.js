@@ -1,4 +1,5 @@
 import React from 'react';
+import { Platform } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
@@ -21,7 +22,10 @@ const defaultNavOptions = {
     backgroundColor: Colors.primary,
   },
   headerTitleStyle: {
-    fontFamily: 'sans-serif-light',
+    fontFamily:
+      Platform.OS === 'android'
+        ? 'sans-serif-light'
+        : 'AvenirNextCondensed-Medium',
     fontSize: 24,
   },
   headerBackTitleStyle: {

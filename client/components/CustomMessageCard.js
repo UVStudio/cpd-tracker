@@ -1,5 +1,5 @@
 import React from 'react';
-import { Text, View, StyleSheet } from 'react-native';
+import { Text, View, StyleSheet, Platform } from 'react-native';
 import CustomButton from './CustomButton';
 import Colors from '../constants/Colors';
 
@@ -48,7 +48,10 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 16,
     marginBottom: 10,
-    fontFamily: 'sans-serif-condensed',
+    fontFamily:
+      Platform.OS === 'android'
+        ? 'sans-serif-condensed'
+        : 'AvenirNextCondensed-Medium',
   },
 });
 

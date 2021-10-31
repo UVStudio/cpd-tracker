@@ -228,14 +228,20 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   timeText: {
-    fontFamily: 'sans-serif-light',
     fontSize: 40,
     color: Colors.darkGrey,
+    fontFamily:
+      Platform.OS === 'android'
+        ? 'sans-serif-condensed'
+        : 'AvenirNextCondensed-UltraLight',
   },
   sessionLengthText: {
-    fontFamily: 'sans-serif-condensed',
     fontSize: 20,
     marginBottom: 15,
+    fontFamily:
+      Platform.OS === 'android'
+        ? 'sans-serif-condensed'
+        : 'AvenirNextCondensed-Medium',
   },
   passFromOperationalContainer: {
     width: '100%',

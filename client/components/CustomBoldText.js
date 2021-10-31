@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { Text, StyleSheet, Platform } from 'react-native';
 import Colors from '../constants/Colors';
 
 const CustomBoldText = (props) => {
@@ -11,7 +11,10 @@ const CustomBoldText = (props) => {
 const styles = StyleSheet.create({
   subtitle: {
     fontSize: 18,
-    fontFamily: 'sans-serif-condensed',
+    fontFamily:
+      Platform.OS === 'android'
+        ? 'sans-serif-condensed'
+        : 'AvenirNextCondensed-Medium',
     color: Colors.dark,
   },
 });

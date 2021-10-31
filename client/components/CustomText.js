@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Platform } from 'react-native';
 import Colors from '../constants/Colors';
 
 const CustomText = (props) => {
@@ -11,8 +11,11 @@ const CustomText = (props) => {
 const styles = StyleSheet.create({
   subtitle: {
     fontSize: 16,
-    fontFamily: 'sans-serif-condensed',
     color: Colors.darkGrey,
+    fontFamily:
+      Platform.OS === 'android'
+        ? 'sans-serif-condensed'
+        : 'AvenirNextCondensed-Medium',
   },
 });
 

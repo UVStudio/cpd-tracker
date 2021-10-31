@@ -1,5 +1,5 @@
 import React, { useReducer, useEffect } from 'react';
-import { View, Text, TextInput, StyleSheet } from 'react-native';
+import { View, Text, TextInput, StyleSheet, Platform } from 'react-native';
 import { INPUT_CHANGE, INPUT_BLUR } from '../store/types';
 import currentYear from '../utils/currentYear';
 
@@ -103,26 +103,35 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   label: {
-    fontFamily: 'sans-serif-condensed',
     marginVertical: 2,
     marginTop: 4,
+    fontFamily:
+      Platform.OS === 'android'
+        ? 'sans-serif-condensed'
+        : 'AvenirNextCondensed-Medium',
   },
   input: {
     fontSize: 16,
-    fontFamily: 'sans-serif-condensed',
     paddingHorizontal: 4,
-    paddingVertical: 2,
+    paddingVertical: Platform.OS === 'android' ? 2 : 4,
     borderColor: '#ccc',
     borderWidth: 1,
+    fontFamily:
+      Platform.OS === 'android'
+        ? 'sans-serif-condensed'
+        : 'AvenirNextCondensed-Medium',
   },
   errorContainer: {
     marginVertical: 2,
     marginBottom: 4,
   },
   errorText: {
-    fontFamily: 'sans-serif-condensed',
     color: 'red',
     fontSize: 13,
+    fontFamily:
+      Platform.OS === 'android'
+        ? 'sans-serif-condensed'
+        : 'AvenirNextCondensed-Medium',
   },
 });
 

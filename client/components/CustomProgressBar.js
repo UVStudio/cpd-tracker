@@ -10,17 +10,19 @@ const CustomProgressBar = (props) => {
   const barWidth = 0.75 * width;
 
   //industry rules; default 20 hours
-  const verifiableHours = 20;
-  const totalCPDHours = 40;
+  // const verifiableHours = 20;
+  // const totalCPDHours = 40;
 
-  const { progress, type } = props;
+  const { progress, type, hoursRequired } = props;
+  //console.log('hours required obj: ', hoursRequired);
+  const { currentYearNeedCPDHours, currentYearNeedVerHours } = hoursRequired;
 
   const barProgress = () => {
     let progressWidth;
     if (type === 'verifiable') {
-      progressWidth = (progress / verifiableHours) * barWidth;
+      progressWidth = (progress / currentYearNeedVerHours) * barWidth;
     } else {
-      progressWidth = (progress / totalCPDHours) * barWidth;
+      progressWidth = (progress / currentYearNeedCPDHours) * barWidth;
     }
     return progressWidth;
   };

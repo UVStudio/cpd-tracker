@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, Pressable } from 'react-native';
+import { View, Text, StyleSheet, Pressable, Platform } from 'react-native';
 import CustomText from './CustomText';
 import Colors from '../constants/Colors';
 import Provinces from '../constants/Provinces';
@@ -56,7 +56,10 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 16,
     marginVertical: 6,
-    fontFamily: 'sans-serif-condensed',
+    fontFamily:
+      Platform.OS === 'android'
+        ? 'sans-serif-condensed'
+        : 'AvenirNextCondensed-Medium',
   },
 });
 

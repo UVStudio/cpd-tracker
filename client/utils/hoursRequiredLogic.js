@@ -45,11 +45,11 @@ const hoursRequiredLogic = (user) => {
   let pastNonVerHours = 0;
   let pastEthicsHours = 0;
 
-  //if CPD Year is more than 2 years ago, 3 year rolling applies
+  //if CPD Year is more than 2 years ago, 3 year rolling applies universally
   if (cpdYear < lastYearDB) {
     totalRollingCPDHoursRequired = 120;
-    totalRollingEthicsRequired = 4;
     totalRollingVerRequired = totalRollingCPDHoursRequired / 2;
+    totalRollingEthicsRequired = 4;
 
     for (let i = 1; i < hours.length; i++) {
       pastVerHours = pastVerHours + hours[i].verifiable;
@@ -62,13 +62,12 @@ const hoursRequiredLogic = (user) => {
     currentYearNeedVerHours = totalRollingVerRequired - pastVerHours;
     currentYearNeedEthicsHours = totalRollingEthicsRequired - pastEthicsHours;
 
-    if (currentYearNeedVerHours < 10) {
-      currentYearNeedVerHours = 10;
-    }
     if (currentYearNeedCPDHours < 20) {
       currentYearNeedCPDHours = 20;
     }
-
+    if (currentYearNeedVerHours < 10) {
+      currentYearNeedVerHours = 10;
+    }
     if (currentYearNeedEthicsHours < 0) {
       currentYearNeedEthicsHours = 0;
     }
@@ -115,11 +114,11 @@ const hoursRequiredLogic = (user) => {
     currentYearNeedEthicsHours = totalRollingEthicsRequired - pastEthicsHours;
 
     //minimum required is 10/20
-    if (currentYearNeedVerHours < 10) {
-      currentYearNeedVerHours = 10;
-    }
     if (currentYearNeedCPDHours < 20) {
       currentYearNeedCPDHours = 20;
+    }
+    if (currentYearNeedVerHours < 10) {
+      currentYearNeedVerHours = 10;
     }
     if (currentYearNeedEthicsHours < 0) {
       currentYearNeedEthicsHours = 1;
@@ -127,33 +126,16 @@ const hoursRequiredLogic = (user) => {
   }
 
   //if CPD Year is 1 year ago, total CPD required is 20 as the 3 year rolling requirement is not applicable
-  if (cpdYear === hours[1].year) {
-    //3 year rolling requirement does not apply, but the app should recommend doing 20/40 hours
+  if (hours.length === 2 && cpdYear === hours[1].year) {
+    //3 year rolling requirement does not apply, but the app should recommend doing more
     //instead of the minimum of 10/20
-    totalRollingCPDHoursRequired === 40;
-    totalRollingEthicsRequired = 1;
+    totalRollingCPDHoursRequired = 20;
     totalRollingVerRequired = totalRollingCPDHoursRequired / 2;
+    totalRollingEthicsRequired = 1;
 
-    for (let i = 1; i < hours.length; i++) {
-      pastVerHours = pastVerHours + hours[i].verifiable;
-      pastNonVerHours = pastNonVerHours + hours[i].nonVerifiable;
-      pastEthicsHours = pastEthicsHours + hours[i].ethics;
-    }
-
-    currentYearNeedCPDHours =
-      totalRollingCPDHoursRequired - (pastVerHours + pastNonVerHours);
-    currentYearNeedVerHours = totalRollingVerRequired - pastVerHours;
-    currentYearNeedEthicsHours = totalRollingEthicsRequired - pastEthicsHours;
-
-    if (currentYearNeedVerHours < 10) {
-      currentYearNeedVerHours = 10;
-    }
-    if (currentYearNeedCPDHours < 20) {
-      currentYearNeedCPDHours = 20;
-    }
-    if (currentYearNeedEthicsHours < 0) {
-      currentYearNeedEthicsHours = 1;
-    }
+    currentYearNeedCPDHours = 20;
+    currentYearNeedVerHours = 10;
+    currentYearNeedEthicsHours = 1;
   }
 
   //if CPD Year is current year
@@ -171,11 +153,11 @@ const hoursRequiredLogic = (user) => {
       case 'Saskatchewan':
       case 'Nova Scotia':
       case 'Yukon':
-        totalRollingCPDHoursRequired = 40; //3 year rolling requirement fully applies
+        totalRollingCPDHoursRequired = 20; //3 year rolling requirement fully applies
         totalRollingEthicsRequired = 1;
         break;
       case 'Ontario':
-        totalRollingCPDHoursRequired = ontarioProration() === 120 ? 40 : 0;
+        totalRollingCPDHoursRequired = ontarioProration() === 120 ? 20 : 0;
         totalRollingEthicsRequired = 1;
         break;
       case 'Prince Edward Island':
@@ -184,9 +166,7 @@ const hoursRequiredLogic = (user) => {
         break;
     }
     totalRollingVerRequired =
-      totalRollingCPDHoursRequired > 0
-        ? Number(totalRollingCPDHoursRequired / 2).toFixed(1)
-        : 0;
+      totalRollingCPDHoursRequired > 0 ? totalRollingCPDHoursRequired / 2 : 0;
 
     currentYearNeedCPDHours = totalRollingCPDHoursRequired;
     currentYearNeedVerHours = totalRollingVerRequired;

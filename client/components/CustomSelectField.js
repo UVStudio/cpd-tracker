@@ -1,6 +1,5 @@
-import React, { useReducer, useEffect } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import currentYear from '../utils/currentYear';
+import React from 'react';
+import { View, Text, StyleSheet, Platform } from 'react-native';
 
 const CustomSelectField = (props) => {
   const { value } = props;
@@ -20,26 +19,35 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   label: {
-    fontFamily: 'sans-serif-condensed',
     marginVertical: 2,
     marginTop: 4,
+    fontFamily:
+      Platform.OS === 'android'
+        ? 'sans-serif-condensed'
+        : 'AvenirNextCondensed-Medium',
   },
   input: {
     fontSize: 16,
-    fontFamily: 'sans-serif-condensed',
     paddingHorizontal: 6,
     paddingVertical: 6,
     borderColor: '#ccc',
     borderWidth: 1,
+    fontFamily:
+      Platform.OS === 'android'
+        ? 'sans-serif-condensed'
+        : 'AvenirNextCondensed-Medium',
   },
   errorContainer: {
     marginVertical: 2,
     marginBottom: 4,
   },
   errorText: {
-    fontFamily: 'sans-serif-condensed',
     color: 'red',
     fontSize: 13,
+    fontFamily:
+      Platform.OS === 'android'
+        ? 'sans-serif-condensed'
+        : 'AvenirNextCondensed-Medium',
   },
 });
 

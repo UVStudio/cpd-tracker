@@ -1,6 +1,4 @@
 import React from 'react';
-import { View, Text } from 'react-native';
-import { useSelector } from 'react-redux';
 
 import CustomTitle from '../../components/CustomTitle';
 import CustomGreyLine from '../../components/CustomGreyLine';

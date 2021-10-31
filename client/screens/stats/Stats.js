@@ -96,7 +96,11 @@ const Stats = ({ navigation }) => {
   const hoursRequired = hoursRequiredLogic(user);
   console.log('hours required: ', hoursRequired);
 
-  const { currentYearNeedCPDHours } = hoursRequired;
+  const {
+    currentYearNeedCPDHours,
+    currentYearNeedVerHours,
+    currentYearNeedEthicsHours,
+  } = hoursRequired;
 
   useEffect(() => {
     if (yearsToOverride.length > 0) {
@@ -106,7 +110,7 @@ const Stats = ({ navigation }) => {
 
     if (currentYearNeedCPDHours === 20 && yearsToOverride.length === 0) {
       setCardText(
-        'While you are only required to obtain 20 CPD hours this year, you are encouraged to get more, so you will have an easier time meeting the requirements of the 3 year rolling requirement in the near future.'
+        'While you are only required to obtain 20 CPD hours this year, 10 of which needs to be verifiable, you are encouraged to get 2x as many, so you will have an easier time meeting the CPD 3 year rolling requirement in the near future.'
       );
     }
   }, [currentYearNeedCPDHours]);
@@ -266,12 +270,13 @@ const Stats = ({ navigation }) => {
                         ' ' +
                         '/' +
                         ' ' +
-                        Number(hoursRequired.currentYearNeedVerHours).toFixed(1)
+                        Number(currentYearNeedVerHours).toFixed(1)
                       : Number(elem.verifiable).toFixed(1)}
                   </CustomText>
                   {!elem.historic ? (
                     <CustomProgressBar
                       progress={elem.verifiable}
+                      hoursRequired={hoursRequired}
                       type="verifiable"
                     />
                   ) : null}
@@ -288,12 +293,13 @@ const Stats = ({ navigation }) => {
                         ' ' +
                         '/' +
                         ' ' +
-                        Number(hoursRequired.currentYearNeedCPDHours).toFixed(1)
+                        Number(currentYearNeedCPDHours).toFixed(1)
                       : Number(elem.nonVerifiable + elem.verifiable).toFixed(1)}
                   </CustomText>
                   {!elem.historic ? (
                     <CustomProgressBar
                       progress={elem.nonVerifiable + elem.verifiable}
+                      hoursRequired={hoursRequired}
                       type="total-CPD"
                     />
                   ) : null}
@@ -315,9 +321,7 @@ const Stats = ({ navigation }) => {
                       ' ' +
                       '/' +
                       ' ' +
-                      Number(hoursRequired.currentYearNeedEthicsHours).toFixed(
-                        1
-                      )
+                      Number(currentYearNeedEthicsHours).toFixed(1)
                     : Number(elem.ethics).toFixed(1)}
                 </CustomText>
               </CustomStatsDivider>

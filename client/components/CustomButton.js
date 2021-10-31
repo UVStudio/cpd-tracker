@@ -3,8 +3,8 @@ import {
   Text,
   View,
   TouchableHighlight,
-  Pressable,
   StyleSheet,
+  Platform,
 } from 'react-native';
 
 import Colors from '../constants/Colors';
@@ -39,7 +39,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     textAlign: 'center',
     color: 'white',
-    fontFamily: 'sans-serif-condensed',
+    fontFamily:
+      Platform.OS === 'android'
+        ? 'sans-serif-condensed'
+        : 'AvenirNextCondensed-Medium',
   },
   shadow: {
     shadowColor: '#888',

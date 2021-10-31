@@ -19,6 +19,7 @@ const Profile = () => {
     <CustomScreenContainer>
       <Text>Profile Screen</Text>
       <Text>Hello {user.name}!</Text>
+      <Text>You report to {user.province}.</Text>
       <CustomButton onSelect={logoutHandler}>Logout</CustomButton>
     </CustomScreenContainer>
   );
