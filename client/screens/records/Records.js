@@ -165,7 +165,7 @@ const Records = () => {
             keyboardType="default"
             autoCapitalize="characters"
             errorText="Please enter verifiable course name"
-            placeholder="ie ETHICS IN ACCOUNTING"
+            placeholder="ie: ETHICS IN ACCOUNTING"
             placeholderColor={Colors.lightGrey}
             onInputChange={inputChangeHandler}
             initialValue=""

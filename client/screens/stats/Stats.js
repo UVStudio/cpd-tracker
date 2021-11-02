@@ -94,7 +94,7 @@ const Stats = ({ navigation }) => {
   }, []);
 
   const hoursRequired = hoursRequiredLogic(user);
-  console.log('hours required: ', hoursRequired);
+  //console.log('hours required: ', hoursRequired);
 
   const {
     currentYearNeedCPDHours,

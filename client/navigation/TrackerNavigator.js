@@ -121,17 +121,17 @@ export const BottomTabNavigator = () => {
   return (
     <TrackerBottomTabNavigator.Navigator screenOptions={bottomTabOptions}>
       <TrackerBottomTabNavigator.Screen
-        name="CPD Stats"
+        name="Statistics"
         component={CPDNavigator}
         options={{ headerShown: false }}
       />
       <TrackerBottomTabNavigator.Screen
-        name="Timer"
+        name="Non-Verifiable"
         component={TimerNavigator}
         options={{ headerShown: false }}
       />
       <TrackerBottomTabNavigator.Screen
-        name="Records"
+        name="Verifiable"
         component={RecordsNavigator}
         options={{ headerShown: false }}
       />
@@ -153,10 +153,10 @@ const bottomTabOptions = ({ route }) => ({
   tabBarIcon: ({ focused, color }) => {
     let iconName;
 
-    if (route.name === 'Timer') {
+    if (route.name === 'Non-Verifiable') {
       iconName = focused ? 'timer' : 'timer-outline';
       return <Ionicons name={iconName} size={32} color={color} />;
-    } else if (route.name === 'Records') {
+    } else if (route.name === 'Verifiable') {
       iconName = focused ? 'document-attach' : 'document-attach-outline';
       return <Ionicons name={iconName} size={32} color={color} />;
     } else if (route.name === 'Rules') {
@@ -165,7 +165,7 @@ const bottomTabOptions = ({ route }) => ({
     } else if (route.name === 'Profile') {
       iconName = focused ? 'account' : 'account-outline';
       return <MaterialCommunityIcons name={iconName} size={32} color={color} />;
-    } else if (route.name === 'CPD Stats') {
+    } else if (route.name === 'Statistics') {
       iconName = focused ? 'stats-chart' : 'stats-chart-outline';
       return <Ionicons name={iconName} size={32} color={color} />;
     }

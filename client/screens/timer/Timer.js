@@ -1,12 +1,15 @@
 import React, { useState, useReducer, useEffect, useCallback } from 'react';
-import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
+import { View, Text, Button, Pressable, StyleSheet } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 import { activateKeepAwake, deactivateKeepAwake } from 'expo-keep-awake';
+import DateTimePicker from '@react-native-community/datetimepicker';
 
+import CustomIndicator from '../../components/CustomIndicator';
 import CustomButton from '../../components/CustomButton';
 import CustomInput from '../../components/CustomInput';
 import CustomTitle from '../../components/CustomTitle';
 import CustomErrorCard from '../../components/CustomErrorCard';
+import CustomSelectField from '../../components/CustomSelectField';
 import CustomMessageCard from '../../components/CustomMessageCard';
 import CustomScrollView from '../../components/CustomScrollView';
 import CustomGreyLine from '../../components/CustomGreyLine';
@@ -51,17 +54,28 @@ const Timer = () => {
   const [sessionLength, setSessionLength] = useState('');
   const [cardText, setCardText] = useState('');
   const [error, setError] = useState('');
+  const [savingDirect, setSavingDirect] = useState(false);
+  const [savingTimed, setSavingTimed] = useState(false);
 
-  const user = useSelector((state) => state.auth.user);
+  //for direct Input only
+  const [date, setDate] = useState(new Date(Date.now()));
+  const [show, setShow] = useState(false);
+
+  const authState = useSelector((state) => state.auth.user);
+  const userState = useSelector((state) => state.user.user);
+
+  const user = userState ? userState : authState;
 
   const dispatch = useDispatch();
 
   const [formState, dispatchFormState] = useReducer(formReducer, {
     inputValues: {
       sessionName: '',
+      directHours: '',
     },
     inputValidities: {
       sessionName: false,
+      directHours: false,
     },
     formIsValid: false,
   });
@@ -81,14 +95,14 @@ const Timer = () => {
   const today = new Date(Date.now()).toDateString();
   const hours = Number((seconds / 3600).toFixed(2));
 
-  const recordSession = async () => {
+  const saveTimedSession = async () => {
     // console.log('session length second ', seconds);
     // console.log('session length hours ', hours);
     // console.log('typeof hours ', typeof hours);
     // console.log('formatted todays date: ', today);
     // console.log('current year: ', currentYear);
     // console.log('formState: ', formState);
-
+    setSavingTimed(true);
     const sessionName = formState.inputValues.sessionName;
 
     try {
@@ -96,11 +110,13 @@ const Timer = () => {
         nonVerActions.addNonVerSession(currentYear, today, hours, sessionName)
       );
       await dispatch(userActions.getUser());
+      setSavingTimed(false);
       setCardText('Non-Verifiable session successfully saved');
       setSeconds(0);
       setSessionLength('');
       formState.inputValues.sessionName = '';
     } catch (err) {
+      setSavingTimed(false);
       console.log(err.message);
       setError(err.message);
     }
@@ -151,18 +167,49 @@ const Timer = () => {
     };
   }, [isActive, seconds]);
 
+  const onChange = (event, selectedDate) => {
+    const currentDate = selectedDate || date;
+    setShow(Platform.OS === 'ios');
+    setDate(currentDate);
+  };
+
+  const formattedDate = date.toDateString();
+  const year = formattedDate.split(' ').pop();
+  //console.log('direct input date formatted: ', formattedDate);
+  //console.log('year: ', year);
+
+  const saveDirectSession = async () => {
+    setSavingDirect(true);
+    const sessionName = formState.inputValues.sessionName;
+    const directHours = Number(formState.inputValues.directHours);
+
+    try {
+      await dispatch(
+        nonVerActions.addNonVerSession(
+          year,
+          formattedDate,
+          directHours,
+          sessionName
+        )
+      );
+      await dispatch(userActions.getUser());
+      setSavingDirect(false);
+      setCardText('Non-Verifiable session successfully saved');
+    } catch (err) {
+      console.log(err.message);
+      setError(err.message);
+      setSavingDirect(false);
+    }
+  };
+
   if (!user) {
-    return (
-      <View style={styles.indicatorContainer}>
-        <ActivityIndicator size="large" color={Colors.primary} />
-      </View>
-    );
+    return <CustomIndicator />;
   }
 
   return (
     <CustomScreenContainer>
       <CustomScrollView>
-        <CustomTitle>Time your session</CustomTitle>
+        <CustomTitle>Time Your Session</CustomTitle>
         <CustomGreyLine />
         <CustomOperationalContainer>
           <View style={styles.timerContainer}>
@@ -191,14 +238,84 @@ const Timer = () => {
                 required
                 onInputChange={inputChangeHandler}
               />
-              <CustomButton
-                onSelect={recordSession}
-                style={{ marginVertical: 20 }}
-              >
-                Save Non-Verifiable Session
-              </CustomButton>
+              {savingTimed ? (
+                <CustomButton style={{ marginVertical: 20 }}>
+                  Saving...
+                </CustomButton>
+              ) : (
+                <CustomButton
+                  onSelect={saveTimedSession}
+                  style={{ marginVertical: 20 }}
+                >
+                  Save Timed Session
+                </CustomButton>
+              )}
             </View>
           ) : null}
+        </CustomOperationalContainer>
+        <CustomTitle>Direct Session Input</CustomTitle>
+        <CustomGreyLine />
+        <CustomOperationalContainer>
+          <View style={{ width: '100%' }}>
+            <Pressable onPress={() => setShow(true)}>
+              <CustomSelectField
+                id="directDate"
+                label="Session Date"
+                keyboardType="numeric"
+                autoCapitalize="none"
+                errorText="Please enter session year"
+                placeholderColor={Colors.darkGrey}
+                value={formattedDate}
+                required
+              />
+            </Pressable>
+          </View>
+          {show && (
+            <DateTimePicker
+              testID="dateTimePicker"
+              value={date}
+              mode={'date'}
+              is24Hour={true}
+              display="default"
+              onChange={onChange}
+            />
+          )}
+          <CustomInput
+            id="sessionName"
+            label="Session Name"
+            keyboardType="default"
+            autoCapitalize="characters"
+            errorText="Please enter verifiable course name"
+            placeholder="ie: ACCOUNTING MAGAZINE READING"
+            placeholderColor={Colors.lightGrey}
+            onInputChange={inputChangeHandler}
+            initialValue=""
+            required
+          />
+          <CustomInput
+            id="directHours"
+            label="Session Duration (hours)"
+            keyboardType="numeric"
+            autoCapitalize="none"
+            errorText="Please enter session duration"
+            placeholder="ie: 2"
+            placeholderColor={Colors.lightGrey}
+            onInputChange={inputChangeHandler}
+            initialValue=""
+            required
+          />
+          {savingDirect ? (
+            <CustomButton style={{ marginVertical: 20 }}>
+              Saving...
+            </CustomButton>
+          ) : (
+            <CustomButton
+              onSelect={saveDirectSession}
+              style={{ marginVertical: 20 }}
+            >
+              Save Direct Session
+            </CustomButton>
+          )}
         </CustomOperationalContainer>
       </CustomScrollView>
       {cardText !== '' ? (

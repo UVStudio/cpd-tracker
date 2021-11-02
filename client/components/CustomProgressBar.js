@@ -51,7 +51,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.light,
     borderRadius: 2,
     marginVertical: 2,
-    top: -15,
+    top: -9,
   },
 });
 

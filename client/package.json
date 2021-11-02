@@ -40,7 +40,8 @@
     "redux": "^4.1.1",
     "redux-thunk": "^2.3.0",
     "unimodules-permissions-interface": "^6.1.0",
-    "expo-keep-awake": "~9.2.0"
+    "expo-keep-awake": "~9.2.0",
+    "@react-native-community/datetimepicker": "3.5.2"
   },
   "devDependencies": {
     "@babel/core": "^7.9.0"
