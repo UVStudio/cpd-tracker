@@ -3,7 +3,7 @@ const ErrorResponse = require('../utils/errorResponse');
 const asyncHandler = require('../middleware/async');
 const { currentYear } = require('../utils/currentYear');
 
-//desc    OVERRIDE current logged in user
+//desc    OVERRIDE past years stats of current logged in user
 //route   PUT /api/user/override/
 //access  private
 exports.overrideHours = asyncHandler(async (req, res, next) => {

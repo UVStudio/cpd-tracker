@@ -1,7 +1,16 @@
 const User = require('../models/User');
+const Cert = require('../models/Cert');
+const NonVer = require('../models/NonVer');
+const mongoose = require('mongoose');
+const ObjectId = require('mongodb').ObjectId;
 const ErrorResponse = require('../utils/errorResponse');
 const asyncHandler = require('../middleware/async');
 const { currentYear } = require('../utils/currentYear');
+
+const conn = mongoose.createConnection(process.env.MONGO_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
 
 //desc    CREATE user
 //route   POST /api/auth/
@@ -157,6 +166,42 @@ exports.logOut = asyncHandler(async (req, res, next) => {
   });
 });
 
+//desc    DELETE current user
+//route   DELETE api/auth/
+//access  private
+exports.deleteCurrentUser = asyncHandler(async (req, res, next) => {
+  const userId = req.user.id;
+
+  const filesToDelete = await conn.db
+    .collection('uploads.files')
+    .find({ 'metadata.userId': userId })
+    .toArray();
+  const filesToDeleteIds = filesToDelete.map((file) => file._id);
+
+  const filesResult = await conn.db
+    .collection('uploads.files')
+    .deleteMany({ 'metadata.userId': userId });
+
+  const chunksResult = await conn.db
+    .collection('uploads.chunks')
+    .deleteMany({ files_id: { $in: filesToDeleteIds } });
+
+  const certsToDelete = await Cert.deleteMany({ user: userId });
+  const nonVersToDelete = await NonVer.deleteMany({ user: userId });
+
+  await User.findByIdAndDelete(userId);
+
+  res.status(200).json({
+    success: true,
+    data: {
+      filesResult,
+      chunksResult,
+      certsToDelete,
+      nonVersToDelete,
+    },
+  });
+});
+
 /*** HELPER ***/
 const sendTokenResponse = (user, statusCode, res) => {
   const token = user.getSignedJwtToken();
@@ -178,87 +223,3 @@ const sendTokenResponse = (user, statusCode, res) => {
     .cookie('token', token, options)
     .json({ token, user, options });
 };
-
-//desc    POST add verifiable hours to current User
-//route   POST /api/auth/current/verifiable
-//access  private
-/* CURRENTLY NOT USING */
-// exports.addVerifiableHours = asyncHandler(async (req, res, next) => {
-//   const user = await User.findById(req.user.id);
-
-//   if (!user) {
-//     return next(new ErrorResponse('No user is logged in at the moment', 400));
-//   }
-
-//   const { year, hours } = req.body;
-
-//   const userHours = user.verifiable;
-//   const findYear = userHours.findIndex((e) => e.year === year);
-
-//   if (userHours.length === 0) {
-//     userHours.push({
-//       year: year,
-//       hours: hours,
-//     });
-//   } else if (userHours.length > 0 && findYear !== -1) {
-//     const query = { _id: user._id, 'verifiable.year': year };
-//     const update = {
-//       $inc: {
-//         'verifiable.$.hours': +hours,
-//       },
-//     };
-//     await User.updateOne(query, update);
-//   } else {
-//     userHours.push({
-//       year: year,
-//       hours: hours,
-//     });
-//   }
-
-//   await user.save();
-
-//   //the user data returned is one cycle out of date when updating via Mongo syntax
-//   res.status(200).json({ success: 'true', data: user });
-// });
-
-//desc    POST add non-verifiable hours to current User
-//route   POST /api/auth/current/nonverifiable
-//access  private
-/* CURRENTLY NOT USING */
-// exports.addNonVerifiableHours = asyncHandler(async (req, res, next) => {
-//   const user = await User.findById(req.user.id);
-
-//   if (!user) {
-//     return next(new ErrorResponse('No user is logged in at the moment', 400));
-//   }
-
-//   const { year, hours } = req.body;
-
-//   const userHours = user.nonVerifiable;
-//   const findYear = userHours.findIndex((e) => e.year === year);
-
-//   if (userHours.length === 0) {
-//     userHours.push({
-//       year: year,
-//       hours: hours,
-//     });
-//   } else if (userHours.length > 0 && findYear !== -1) {
-//     const query = { _id: user._id, 'nonVerifiable.year': year };
-//     const update = {
-//       $inc: {
-//         'nonVerifiable.$.hours': +hours,
-//       },
-//     };
-//     await User.updateOne(query, update);
-//   } else {
-//     userHours.push({
-//       year: year,
-//       hours: hours,
-//     });
-//   }
-
-//   await user.save();
-
-//   //the user data returned is one cycle out of date when updating via Mongo syntax
-//   res.status(200).json({ success: 'true', data: user });
-// });

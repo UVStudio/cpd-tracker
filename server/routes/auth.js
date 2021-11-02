@@ -5,6 +5,7 @@ const {
   updateProfile,
   login,
   logOut,
+  deleteCurrentUser,
 } = require('../controllers/auth');
 
 const router = express.Router();
@@ -16,5 +17,6 @@ router.put('/', protect, updateProfile);
 router.get('/current', protect, getCurrentUser);
 router.post('/login', login);
 router.post('/logout', logOut);
+router.delete('/', protect, deleteCurrentUser);
 
 module.exports = router;
