@@ -193,8 +193,8 @@ const Timer = () => {
         )
       );
       await dispatch(userActions.getUser());
-      setSavingDirect(false);
       setCardText('Non-Verifiable session successfully saved');
+      setSavingDirect(false);
     } catch (err) {
       console.log(err.message);
       setError(err.message);
@@ -240,7 +240,7 @@ const Timer = () => {
               />
               {savingTimed ? (
                 <CustomButton style={{ marginVertical: 20 }}>
-                  Saving...
+                  Saving Session...
                 </CustomButton>
               ) : (
                 <CustomButton
@@ -306,7 +306,7 @@ const Timer = () => {
           />
           {savingDirect ? (
             <CustomButton style={{ marginVertical: 20 }}>
-              Saving...
+              Saving Direct Session...
             </CustomButton>
           ) : (
             <CustomButton

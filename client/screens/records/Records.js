@@ -49,6 +49,7 @@ const Records = () => {
   const [cert, setCert] = useState(null); //if true, app uploads a cert. if not, app uploads default no-cert.jpg from S3
   const [cardText, setCardText] = useState('');
   const [error, setError] = useState('');
+  const [savingCourse, setSavingCourse] = useState(false);
 
   const placeholderYear = currentYear.toString(); //Expo crashes if not set to string
 
@@ -108,6 +109,7 @@ const Records = () => {
   //console.log('formState: ', formState);
 
   const saveVerfiableCourse = async () => {
+    setSavingCourse(true);
     try {
       if (cert) {
         await dispatch(
@@ -132,8 +134,10 @@ const Records = () => {
       setCert(null);
       setCardText('Verifiable session successfully saved');
       await dispatch(userActions.getUser());
+      setSavingCourse(false);
     } catch (err) {
       console.log(err.message);
+      setSavingCourse(false);
       setError(
         'There is something wrong with our network. Please try again later.'
       );
@@ -203,12 +207,18 @@ const Records = () => {
             Select Course Certificate
           </CustomButton>
           <CustomText>{cert !== null ? 'file: ' + cert.name : null}</CustomText>
-          <CustomButton
-            style={{ marginTop: 10 }}
-            onSelect={() => saveVerfiableCourse(year)}
-          >
-            Save Verifiable Course
-          </CustomButton>
+          {savingCourse ? (
+            <CustomButton style={{ marginTop: 10 }}>
+              Saving Course...
+            </CustomButton>
+          ) : (
+            <CustomButton
+              style={{ marginTop: 10 }}
+              onSelect={() => saveVerfiableCourse(year)}
+            >
+              Save Verifiable Course
+            </CustomButton>
+          )}
         </CustomOperationalContainer>
       </CustomScrollView>
       {cardText !== '' ? (

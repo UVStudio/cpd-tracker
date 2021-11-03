@@ -8,4 +8,7 @@ export default {
   grey: '#bbb',
   darkGrey: '#888',
   lightGrey: '#ddd',
+  brightGreen: '#2EDF38',
+  red: '#D61102',
+  lightRed: '#FF2B1C',
 };

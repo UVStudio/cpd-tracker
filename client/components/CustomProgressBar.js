@@ -27,11 +27,34 @@ const CustomProgressBar = (props) => {
     return progressWidth;
   };
 
+  const barType = () => {
+    let color;
+    if (type === 'verifiable') {
+      if (progress > currentYearNeedVerHours) {
+        color = Colors.brightGreen;
+      } else {
+        color = Colors.light;
+      }
+    } else {
+      if (progress > currentYearNeedCPDHours) {
+        color = Colors.brightGreen;
+      } else {
+        color = Colors.light;
+      }
+    }
+    return color;
+  };
+
   return (
     <View>
       <View style={{ ...styles.bar, width: barWidth }} />
       <View
-        style={{ ...styles.progress, width: barProgress(), maxWidth: barWidth }}
+        style={{
+          ...styles.progress,
+          width: barProgress(),
+          backgroundColor: barType(),
+          maxWidth: barWidth,
+        }}
       />
     </View>
   );
@@ -48,7 +71,6 @@ const styles = StyleSheet.create({
   progress: {
     width: 0,
     height: 5,
-    backgroundColor: Colors.light,
     borderRadius: 2,
     marginVertical: 2,
     top: -9,

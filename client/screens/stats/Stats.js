@@ -71,7 +71,6 @@ const Stats = ({ navigation }) => {
   const yearsToOverride = userHours
     .filter((hours) => hours.historic)
     .filter((hours) => !hours.overriden);
-  //console.log('years to override: ', yearsToOverride);
 
   const dispatch = useDispatch();
 
@@ -79,7 +78,6 @@ const Stats = ({ navigation }) => {
     setLoading(true);
     try {
       await dispatch(userActions.getUser());
-      //console.log('loadUser ran userHours: ', userHours);
     } catch (err) {
       console.log(err.message);
       setError(
@@ -94,7 +92,8 @@ const Stats = ({ navigation }) => {
   }, []);
 
   const hoursRequired = hoursRequiredLogic(user);
-  //console.log('hours required: ', hoursRequired);
+  // console.log('hours required: ', hoursRequired);
+  // console.log('yearsOverride: ', yearsToOverride.length);
 
   const {
     currentYearNeedCPDHours,
@@ -107,13 +106,12 @@ const Stats = ({ navigation }) => {
       navigation.navigate('CPD Hours Setup', { yearsToOverride });
       return;
     }
-
     if (currentYearNeedCPDHours === 20 && yearsToOverride.length === 0) {
       setCardText(
         'While you are only required to obtain 20 CPD hours this year, 10 of which needs to be verifiable, you are encouraged to get 2x as many, so you will have an easier time meeting the CPD 3 year rolling requirement in the near future.'
       );
     }
-  }, [currentYearNeedCPDHours]);
+  }, [userState, currentYearNeedCPDHours, yearsToOverride]);
 
   //CPD Month proration calculation helper
   //console.log(Math.round(((12 - (user.cpdMonth - 1)) / 12) * 20));
@@ -217,7 +215,8 @@ const Stats = ({ navigation }) => {
       await dispatch(reportActions.deleteReport(AWSFileName));
       setCardText(
         `Report succesfully downloaded. For Android users, the PDF is located in Documents > Download folder.
-        The iOS users, the PDF is where you have chosen to save it.`
+
+For iOS users, the PDF is where you have chosen to save it.`
       );
       setDownloadProgress('0%');
     } catch (err) {

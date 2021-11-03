@@ -117,6 +117,17 @@ export const logout = () => {
   return { type: LOGOUT };
 };
 
+export const deleteCurrentUser = () => {
+  return async (dispatch) => {
+    dispatch(logout());
+    try {
+      await axios.delete(`${CURRENT_IP}/api/auth/`);
+    } catch (err) {
+      throw new Error(err.response.data.error);
+    }
+  };
+};
+
 /** UTILS */
 const clearLogoutTimer = () => {
   if (timer) {

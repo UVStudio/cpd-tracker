@@ -24,7 +24,6 @@ export const addNonVerSession = (year, date, hours, sessionName) => {
   return async (dispatch) => {
     try {
       const body = { year, date, hours, sessionName };
-      console.log('body: ', body);
       const response = await axios.post(`${CURRENT_IP}/api/nonver`, body);
 
       const sessions = response.data.data;

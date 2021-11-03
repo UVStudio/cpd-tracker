@@ -1,23 +1,16 @@
 import React from 'react';
-import {
-  Text,
-  View,
-  TouchableHighlight,
-  Pressable,
-  StyleSheet,
-  Platform,
-} from 'react-native';
+import { Text, View, Pressable, StyleSheet, Platform } from 'react-native';
 
 import Colors from '../constants/Colors';
 
-const CustomButton = (props) => {
+const CustomRedButton = (props) => {
   return (
     <View style={{ ...styles.buttonContainer, ...props.style }}>
       <View style={styles.shadow}>
         <Pressable
           style={styles.button}
           onPress={props.onSelect}
-          android_ripple={{ color: Colors.buttonPressed }}
+          android_ripple={{ color: Colors.lightRed }}
         >
           <Text style={styles.buttonText}>{props.children}</Text>
         </Pressable>
@@ -32,7 +25,7 @@ const styles = StyleSheet.create({
     marginVertical: 5,
   },
   button: {
-    backgroundColor: Colors.primary,
+    backgroundColor: Colors.red,
   },
   buttonText: {
     fontSize: 16,
@@ -42,8 +35,8 @@ const styles = StyleSheet.create({
     color: 'white',
     fontFamily:
       Platform.OS === 'android'
-        ? 'sans-serif-condensed'
-        : 'AvenirNextCondensed-Medium',
+        ? 'sans-serif-medium'
+        : 'AvenirNextCondensed-Bold',
   },
   shadow: {
     shadowColor: '#888',
@@ -54,4 +47,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default CustomButton;
+export default CustomRedButton;

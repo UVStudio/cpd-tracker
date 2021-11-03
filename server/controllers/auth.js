@@ -198,6 +198,7 @@ exports.deleteCurrentUser = asyncHandler(async (req, res, next) => {
       chunksResult,
       certsToDelete,
       nonVersToDelete,
+      userDeleted: userId,
     },
   });
 });
