@@ -142,6 +142,19 @@ const Stats = ({ navigation }) => {
     navigation.navigate('Non-Verifiable Details', { year: showYear });
   };
 
+  //Ethics Required vs Recommended
+  const ethicsReqOrRec = () => {
+    return userHours[0].year === currentYear &&
+      showYear === currentYear &&
+      userHours.length === 3
+      ? ' required'
+      : userHours[0].year === currentYear &&
+        showYear === currentYear &&
+        userHours.length < 3
+      ? ' recommended'
+      : null;
+  };
+
   //PDF report begins
   const setNotificationChannel = async () => {
     const loadingChannel = await Notifications.getNotificationChannelAsync(
@@ -271,6 +284,7 @@ For iOS users, the PDF is where you have chosen to save it.`
                         ' ' +
                         Number(currentYearNeedVerHours).toFixed(1)
                       : Number(elem.verifiable).toFixed(1)}
+                    {userHours[0].year === showYear ? ' required' : null}
                   </CustomText>
                   {!elem.historic ? (
                     <CustomProgressBar
@@ -294,6 +308,7 @@ For iOS users, the PDF is where you have chosen to save it.`
                         ' ' +
                         Number(currentYearNeedCPDHours).toFixed(1)
                       : Number(elem.nonVerifiable + elem.verifiable).toFixed(1)}
+                    {userHours[0].year === showYear ? ' required' : null}
                   </CustomText>
                   {!elem.historic ? (
                     <CustomProgressBar
@@ -322,6 +337,7 @@ For iOS users, the PDF is where you have chosen to save it.`
                       ' ' +
                       Number(currentYearNeedEthicsHours).toFixed(1)
                     : Number(elem.ethics).toFixed(1)}
+                  {ethicsReqOrRec()}
                 </CustomText>
               </CustomStatsDivider>
 

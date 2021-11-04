@@ -32,8 +32,20 @@ const hoursRequiredLogic = (user) => {
     }
   };
 
+  const novaScotiaLogic = () => {
+    if (cpdYear >= 2021) {
+      return 120;
+    }
+  };
+
+  const novaScotiaEthicsLogic = () => {
+    if (cpdYear >= 2021) {
+      return 4;
+    }
+  };
+
   const lastYearDB = hours[hours.length - 1].year;
-  const catchUpYears = currentYear - lastYearDB;
+  //const catchUpYears = currentYear - lastYearDB;
 
   let totalRollingCPDHoursRequired,
     totalRollingEthicsRequired,
@@ -44,6 +56,8 @@ const hoursRequiredLogic = (user) => {
   let pastVerHours = 0;
   let pastNonVerHours = 0;
   let pastEthicsHours = 0;
+  let NBVarCarriedOverPotential = 0;
+  let NBNonVarCarriedOverPotential = 0;
 
   //if CPD Year is more than 2 years ago, 3 year rolling applies universally
   if (cpdYear < lastYearDB) {
@@ -71,6 +85,20 @@ const hoursRequiredLogic = (user) => {
     if (currentYearNeedEthicsHours < 0) {
       currentYearNeedEthicsHours = 0;
     }
+
+    //New Brunswick carried over calculation
+    if (province === 'New Brunswick') {
+      if (hours[1].verifiable > 20) {
+        NBVarCarriedOverPotential = hours[1].verifiable - 20;
+        NBNonVarCarriedOverPotential = hours[1].nonVerifiable - 20;
+        if (NBVarCarriedOverPotential > 40) {
+          NBVarCarriedOverPotential = 40;
+        }
+        if (NBNonVarCarriedOverPotential > 40) {
+          NBNonVarCarriedOverPotential = 40;
+        }
+      }
+    }
   }
 
   //if CPD Year is 2 years ago, 3 year rolling requirement is province dependent
@@ -85,11 +113,13 @@ const hoursRequiredLogic = (user) => {
       case 'Manitoba':
       case 'New Brunswick':
       case 'Saskatchewan':
-      case 'Nova Scotia':
       case 'Yukon':
         totalRollingCPDHoursRequired = 120; //3 year rolling requirement fully applies
         totalRollingEthicsRequired = 4;
         break;
+      case 'Nova Scotia':
+        totalRollingCPDHoursRequired = novaScotiaLogic();
+        totalRollingEthicsRequired = novaScotiaEthicsLogic();
       case 'Ontario':
         totalRollingCPDHoursRequired = ontarioProration();
         totalRollingEthicsRequired = ontarioEthicsProration();
@@ -123,6 +153,20 @@ const hoursRequiredLogic = (user) => {
     if (currentYearNeedEthicsHours < 0) {
       currentYearNeedEthicsHours = 1;
     }
+
+    //New Brunswick carried over calculation
+    if (province === 'New Brunswick') {
+      if (hours[1].verifiable > 20) {
+        NBVarCarriedOverPotential = hours[1].verifiable - 20;
+        NBNonVarCarriedOverPotential = hours[1].nonVerifiable - 20;
+        if (NBVarCarriedOverPotential > 40) {
+          NBVarCarriedOverPotential = 40;
+        }
+        if (NBNonVarCarriedOverPotential > 40) {
+          NBNonVarCarriedOverPotential = 40;
+        }
+      }
+    }
   }
 
   //if CPD Year is 1 year ago, total CPD required is 20 as the 3 year rolling requirement is not applicable
@@ -136,6 +180,20 @@ const hoursRequiredLogic = (user) => {
     currentYearNeedCPDHours = 20;
     currentYearNeedVerHours = 10;
     currentYearNeedEthicsHours = 1;
+
+    //New Brunswick carried over calculation
+    if (province === 'New Brunswick') {
+      if (hours[1].verifiable > 20) {
+        NBVarCarriedOverPotential = hours[1].verifiable - 20;
+        NBNonVarCarriedOverPotential = hours[1].nonVerifiable - 20;
+        if (NBVarCarriedOverPotential > 40) {
+          NBVarCarriedOverPotential = 40;
+        }
+        if (NBNonVarCarriedOverPotential > 40) {
+          NBNonVarCarriedOverPotential = 40;
+        }
+      }
+    }
   }
 
   //if CPD Year is current year
@@ -151,7 +209,7 @@ const hoursRequiredLogic = (user) => {
       case 'Manitoba':
       case 'New Brunswick':
       case 'Saskatchewan':
-      case 'Nova Scotia':
+      case 'Nova Scotia': //new non-exempt rule started in 2021, so NS belongs to this category
       case 'Yukon':
         totalRollingCPDHoursRequired = 20; //3 year rolling requirement fully applies
         totalRollingEthicsRequired = 1;
@@ -183,6 +241,8 @@ const hoursRequiredLogic = (user) => {
     pastVerHours,
     pastNonVerHours,
     pastEthicsHours,
+    NBVarCarriedOverPotential,
+    NBNonVarCarriedOverPotential,
   };
 };
 
