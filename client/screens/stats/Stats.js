@@ -112,7 +112,6 @@ const Stats = ({ navigation }) => {
       );
     }
   }, [userState]);
-  //[userState, currentYearNeedCPDHours, yearsToOverride]
 
   //CPD Month proration calculation helper
   //console.log(Math.round(((12 - (user.cpdMonth - 1)) / 12) * 20));
