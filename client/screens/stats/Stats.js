@@ -111,7 +111,8 @@ const Stats = ({ navigation }) => {
         'While you are only required to obtain 20 CPD hours this year, 10 of which needs to be verifiable, you are encouraged to get 2x as many, so you will have an easier time meeting the CPD 3 year rolling requirement in the near future.'
       );
     }
-  }, [userState, currentYearNeedCPDHours, yearsToOverride]);
+  }, [yearsToOverride]);
+  //[userState, currentYearNeedCPDHours, yearsToOverride]
 
   //CPD Month proration calculation helper
   //console.log(Math.round(((12 - (user.cpdMonth - 1)) / 12) * 20));
