@@ -51,7 +51,7 @@ exports.createUser = asyncHandler(async (req, res, next) => {
     });
   }
 
-  hours[0].historic = false;
+  //hours[0].historic = false;
   console.log('hours: ', hours);
 
   user = await User.create({
