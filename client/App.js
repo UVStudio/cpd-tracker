@@ -10,12 +10,14 @@ import AppNavigator from './navigation/AppNavigator';
 import authReducer from './store/reducers/auth';
 import userReducer from './store/reducers/user';
 import reportReducer from './store/reducers/report';
+import certReducer from './store/reducers/cert';
 import nonVerReducer from './store/reducers/nonVer';
 
 const rootReducer = combineReducers({
   auth: authReducer,
   user: userReducer,
   report: reportReducer,
+  cert: certReducer,
   nonVer: nonVerReducer,
 });
 

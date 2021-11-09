@@ -110,6 +110,15 @@ const Records = () => {
 
   const saveVerfiableCourse = async () => {
     setSavingCourse(true);
+
+    if (!year || !hours || !courseName) {
+      setCardText(
+        'Session Year, Course Name, and Session Duration are required'
+      );
+      setSavingCourse(false);
+      return;
+    }
+
     try {
       if (cert) {
         await dispatch(
@@ -207,18 +216,20 @@ const Records = () => {
             Select Course Certificate
           </CustomButton>
           <CustomText>{cert !== null ? 'file: ' + cert.name : null}</CustomText>
-          {savingCourse ? (
-            <CustomButton style={{ marginTop: 10 }}>
-              Saving Course...
-            </CustomButton>
-          ) : (
-            <CustomButton
-              style={{ marginTop: 10 }}
-              onSelect={() => saveVerfiableCourse(year)}
-            >
-              Save Verifiable Course
-            </CustomButton>
-          )}
+          {cert ? (
+            savingCourse ? (
+              <CustomButton style={{ marginTop: 10 }}>
+                Saving Course...
+              </CustomButton>
+            ) : (
+              <CustomButton
+                style={{ marginTop: 10 }}
+                onSelect={() => saveVerfiableCourse(year)}
+              >
+                Save Verifiable Course
+              </CustomButton>
+            )
+          ) : null}
         </CustomOperationalContainer>
       </CustomScrollView>
       {cardText !== '' ? (

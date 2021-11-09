@@ -11,7 +11,7 @@ const router = express.Router();
 const { protect } = require('../middleware/auth');
 
 router.get('/', protect, getAllCertObjsByUser);
-router.get('/year', protect, getAllCertObjsByYear);
+router.get('/:year', protect, getAllCertObjsByYear);
 router.delete('/:id', protect, deleteCertObjById);
 router.get('/:id', getCertObjById);
 

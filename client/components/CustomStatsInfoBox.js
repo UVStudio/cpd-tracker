@@ -3,7 +3,7 @@ import { View, Text, StyleSheet } from 'react-native';
 
 const CustomStatsInfoBox = (props) => {
   return (
-    <View style={styles.container}>
+    <View style={{ ...styles.container, ...props.style }}>
       <View style={{ alignItems: 'flex-start', width: '100%' }}>
         {props.children}
       </View>

@@ -26,8 +26,6 @@ exports.uploadCert = asyncHandler(async (req, res, next) => {
   let user = await User.findById(userId);
   const { year, hours, ethicsHours, courseName } = req.body;
 
-  console.log('req.body: ', req.body);
-
   let uploadFile;
 
   if (!year || !hours || !ethicsHours || !courseName || !file) {
@@ -67,7 +65,7 @@ exports.uploadCert = asyncHandler(async (req, res, next) => {
 
   const ext = path.extname(newFileName);
 
-  //setup pdf2jpg options
+  //setup pdf2pic options
   const options = {
     density: 100,
     quality: 60,

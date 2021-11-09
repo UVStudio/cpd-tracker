@@ -33,6 +33,8 @@ All data and certificates will be erased permanently. The app does not keep any 
       <Text>Profile Screen</Text>
       <Text>Hello {user.name}!</Text>
       <Text>You report to {user.province}.</Text>
+      <Text>Your CPD year: {user.cpdYear}</Text>
+      <Text>Your CPD month: {user.cpdMonth}</Text>
       <CustomButton onSelect={logoutHandler}>Logout</CustomButton>
       <CustomButton onSelect={cardTextHandler}>
         Delete Your Account

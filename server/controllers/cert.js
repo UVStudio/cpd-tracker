@@ -20,7 +20,7 @@ exports.getCertObjById = asyncHandler(async (req, res, next) => {
   res.status(200).json({ success: true, data: cert });
 });
 
-//desc    GET Certs by current user
+//desc    GET Certs Objs by current user
 //route   GET /api/cert/user
 //access  private
 exports.getAllCertObjsByUser = asyncHandler(async (req, res, next) => {
@@ -33,12 +33,14 @@ exports.getAllCertObjsByUser = asyncHandler(async (req, res, next) => {
   res.status(200).json({ success: true, data: certs });
 });
 
-//desc    GET All Non-Ver Session Objects by current user by year
+//desc    GET All Certs Objects by current user by year
 //route   GET /api/cert/year
 //access  private
 exports.getAllCertObjsByYear = asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.user.id).populate('cert');
-  const year = req.body.year;
+  const yearParam = req.params.year;
+
+  const year = Number(yearParam);
 
   if (!user) {
     return next(new ErrorResponse('There is no user logged on', 400));

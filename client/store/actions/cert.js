@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { GET_USER_CERTS, GET_USER_CERTS_YEAR } from '../types';
 import { CURRENT_IP } from '../../serverConfig';
 
 export const saveVerCourse = (year, hours, ethicsHours, courseName, cert) => {
@@ -35,16 +36,33 @@ export const saveVerCourse = (year, hours, ethicsHours, courseName, cert) => {
   };
 };
 
-//NOT USED
-// export const addCPDHours = (year, verifiable, nonVerifiable, ethics) => {
-//   return async () => {
-//     const body = { year, verifiable, nonVerifiable, ethics };
+export const getAllCertObjsByUser = () => {
+  return async (dispatch) => {
+    try {
+      const response = await axios.get(`${CURRENT_IP}/api/cert/user`);
+      const data = response.data.data;
+      dispatch({
+        type: GET_USER_CERTS,
+        certs: data,
+      });
+    } catch (err) {
+      console.log(err.message);
+    }
+  };
+};
 
-//     console.log('body: ', body);
-//     try {
-//       await axios.post(`${CURRENT_IP}/api/cert/hours`, body);
-//     } catch (err) {
-//       console.log(err.message);
-//     }
-//   };
-// };
+export const getAllCertObjsByYear = (year) => {
+  return async (dispatch) => {
+    try {
+      const response = await axios.get(`${CURRENT_IP}/api/cert/${year}`);
+      const data = response.data.data;
+
+      dispatch({
+        type: GET_USER_CERTS_YEAR,
+        certs: data,
+      });
+    } catch (err) {
+      console.log(err.message);
+    }
+  };
+};
