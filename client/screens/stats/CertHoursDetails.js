@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 
 import * as certsActions from '../../store/actions/cert';
@@ -7,9 +6,11 @@ import * as certsActions from '../../store/actions/cert';
 import CustomTitle from '../../components/CustomTitle';
 import CustomText from '../../components/CustomText';
 import CustomGreyLine from '../../components/CustomGreyLine';
-import CustomThinGreyLine from '../../components/CustomThinGreyLine';
+import CustomFaintThinGreyLine from '../../components/CustomFaintThinGreyLine';
 import CustomErrorCard from '../../components/CustomErrorCard';
 import CustomStatsInfoBox from '../../components/CustomStatsInfoBox';
+import CustomIndicator from '../../components/CustomIndicator';
+import CustomScrollView from '../../components/CustomScrollView';
 import CustomOperationalContainer from '../../components/CustomOperationalContainer';
 import CustomScreenContainer from '../../components/CustomScreenContainer';
 
@@ -46,18 +47,20 @@ const CertHoursDetails = (props) => {
 
   return (
     <CustomScreenContainer>
-      <CustomTitle>Verifiable Hours for {year}</CustomTitle>
-      <CustomGreyLine />
-      {certsYearState.map((cert, index) => (
-        <CustomOperationalContainer key={index} style={{ marginVertical: 5 }}>
-          <CustomStatsInfoBox style={{ marginVertical: 0 }}>
-            <CustomText>Course Name: {cert.courseName}</CustomText>
-            <CustomText>Hours: {cert.hours}</CustomText>
-            <CustomText>Ethics Hours: {cert.ethicsHours}</CustomText>
-          </CustomStatsInfoBox>
-          <CustomThinGreyLine />
-        </CustomOperationalContainer>
-      ))}
+      <CustomScrollView>
+        <CustomTitle>Verifiable Hours for {year}</CustomTitle>
+        <CustomGreyLine />
+        {certsYearState.map((cert, index) => (
+          <CustomOperationalContainer key={index} style={{ marginVertical: 0 }}>
+            <CustomStatsInfoBox style={{ marginVertical: 5 }}>
+              <CustomText>Course Name: {cert.courseName}</CustomText>
+              <CustomText>Hours: {cert.hours}</CustomText>
+              <CustomText>Ethics Hours: {cert.ethicsHours}</CustomText>
+            </CustomStatsInfoBox>
+            <CustomFaintThinGreyLine />
+          </CustomOperationalContainer>
+        ))}
+      </CustomScrollView>
       {error !== '' ? (
         <CustomErrorCard error={error} toShow={setError} />
       ) : null}

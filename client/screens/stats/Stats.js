@@ -1,12 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import {
-  View,
-  Text,
-  ActivityIndicator,
-  StyleSheet,
-  Pressable,
-} from 'react-native';
+import { View, StyleSheet, Pressable } from 'react-native';
 import { downloadToFolder } from 'expo-file-dl';
 
 import * as Notifications from 'expo-notifications';
@@ -28,6 +22,7 @@ import CustomIndicator from '../../components/CustomIndicator';
 import CustomGreyLine from '../../components/CustomGreyLine';
 import CustomThinGreyLine from '../../components/CustomThinGreyLine';
 import CustomProgressBar from '../../components/CustomProgressBar';
+import CustomScrollView from '../../components/CustomScrollView';
 import CustomScreenContainer from '../../components/CustomScreenContainer';
 
 import currentYear from '../../utils/currentYear';
@@ -255,148 +250,152 @@ For iOS users, the PDF is where you have chosen to save it.`
 
   return (
     <CustomScreenContainer>
-      <CustomTitle>Statistics Overview</CustomTitle>
-      <CustomGreyLine />
-      {userHours.map((elem, index) => (
-        <CustomAccordionUnit key={index}>
-          <Pressable
-            onPress={() => setShowYear(userHours[index].year)}
-            disabled={reportReady}
-          >
-            <CustomSubtitle>{elem.year}</CustomSubtitle>
-          </Pressable>
-          <CustomThinGreyLine />
-          {showYear === elem.year ? (
-            <CustomStatsInfoBox>
-              {elem.historic ? (
-                <CustomBoldText style={{ marginBottom: 10 }}>
-                  Past CPD Hours Data
-                </CustomBoldText>
-              ) : null}
-              <CustomStatsDivider>
-                <Pressable onPress={() => verifiableHoursDetails()}>
+      <CustomScrollView>
+        <CustomTitle>Statistics Overview</CustomTitle>
+        <CustomGreyLine />
+        {userHours.map((elem, index) => (
+          <CustomAccordionUnit key={index}>
+            <Pressable
+              onPress={() => setShowYear(userHours[index].year)}
+              disabled={reportReady}
+            >
+              <CustomSubtitle>{elem.year}</CustomSubtitle>
+            </Pressable>
+            <CustomThinGreyLine />
+            {showYear === elem.year ? (
+              <CustomStatsInfoBox>
+                {elem.historic ? (
+                  <CustomBoldText style={{ marginBottom: 10 }}>
+                    Past CPD Hours Data
+                  </CustomBoldText>
+                ) : null}
+                <CustomStatsDivider>
+                  <Pressable onPress={() => verifiableHoursDetails()}>
+                    <CustomText>
+                      Verifiable Hours:{' '}
+                      {!elem.historic
+                        ? Number(elem.verifiable).toFixed(1) +
+                          ' ' +
+                          '/' +
+                          ' ' +
+                          Number(currentYearNeedVerHours).toFixed(1)
+                        : Number(elem.verifiable).toFixed(1)}
+                      {userHours[0].year === showYear ? ' required' : null}
+                    </CustomText>
+                    {!elem.historic ? (
+                      <CustomProgressBar
+                        progress={elem.verifiable}
+                        hoursRequired={hoursRequired}
+                        type="verifiable"
+                      />
+                    ) : null}
+                  </Pressable>
+                </CustomStatsDivider>
+                <CustomStatsDivider>
+                  <Pressable onPress={() => totalCPDHoursDetails()}>
+                    <CustomText>
+                      Total CPD Hours:{' '}
+                      {!elem.historic
+                        ? Number(elem.nonVerifiable + elem.verifiable).toFixed(
+                            1
+                          ) +
+                          ' ' +
+                          '/' +
+                          ' ' +
+                          Number(currentYearNeedCPDHours).toFixed(1)
+                        : Number(elem.nonVerifiable + elem.verifiable).toFixed(
+                            1
+                          )}
+                      {userHours[0].year === showYear ? ' required' : null}
+                    </CustomText>
+                    {!elem.historic ? (
+                      <CustomProgressBar
+                        progress={elem.nonVerifiable + elem.verifiable}
+                        hoursRequired={hoursRequired}
+                        type="total-CPD"
+                      />
+                    ) : null}
+                  </Pressable>
+                </CustomStatsDivider>
+                <CustomStatsDivider>
+                  <Pressable onPress={() => nonVerHoursDetails()}>
+                    <CustomText>
+                      Non-Verifiable Hours:{' '}
+                      {Number(elem.nonVerifiable).toFixed(1)}
+                    </CustomText>
+                  </Pressable>
+                </CustomStatsDivider>
+                <CustomStatsDivider>
                   <CustomText>
-                    Verifiable Hours:{' '}
+                    Ethics Hours:{' '}
                     {!elem.historic
-                      ? Number(elem.verifiable).toFixed(1) +
+                      ? Number(elem.ethics).toFixed(1) +
                         ' ' +
                         '/' +
                         ' ' +
-                        Number(currentYearNeedVerHours).toFixed(1)
-                      : Number(elem.verifiable).toFixed(1)}
-                    {userHours[0].year === showYear ? ' required' : null}
+                        Number(currentYearNeedEthicsHours).toFixed(1)
+                      : Number(elem.ethics).toFixed(1)}
+                    {ethicsReqOrRec()}
                   </CustomText>
-                  {!elem.historic ? (
-                    <CustomProgressBar
-                      progress={elem.verifiable}
-                      hoursRequired={hoursRequired}
-                      type="verifiable"
-                    />
-                  ) : null}
-                </Pressable>
-              </CustomStatsDivider>
-              <CustomStatsDivider>
-                <Pressable onPress={() => totalCPDHoursDetails()}>
-                  <CustomText>
-                    Total CPD Hours:{' '}
-                    {!elem.historic
-                      ? Number(elem.nonVerifiable + elem.verifiable).toFixed(
-                          1
-                        ) +
-                        ' ' +
-                        '/' +
-                        ' ' +
-                        Number(currentYearNeedCPDHours).toFixed(1)
-                      : Number(elem.nonVerifiable + elem.verifiable).toFixed(1)}
-                    {userHours[0].year === showYear ? ' required' : null}
-                  </CustomText>
-                  {!elem.historic ? (
-                    <CustomProgressBar
-                      progress={elem.nonVerifiable + elem.verifiable}
-                      hoursRequired={hoursRequired}
-                      type="total-CPD"
-                    />
-                  ) : null}
-                </Pressable>
-              </CustomStatsDivider>
-              <CustomStatsDivider>
-                <Pressable onPress={() => nonVerHoursDetails()}>
-                  <CustomText>
-                    Non-Verifiable Hours:{' '}
-                    {Number(elem.nonVerifiable).toFixed(1)}
-                  </CustomText>
-                </Pressable>
-              </CustomStatsDivider>
-              <CustomStatsDivider>
-                <CustomText>
-                  Ethics Hours:{' '}
-                  {!elem.historic
-                    ? Number(elem.ethics).toFixed(1) +
-                      ' ' +
-                      '/' +
-                      ' ' +
-                      Number(currentYearNeedEthicsHours).toFixed(1)
-                    : Number(elem.ethics).toFixed(1)}
-                  {ethicsReqOrRec()}
-                </CustomText>
-              </CustomStatsDivider>
+                </CustomStatsDivider>
 
-              {!elem.historic ? (
-                <View style={styles.fullWidthCenter}>
-                  {reportReady ? null : generatingPDF ? (
+                {!elem.historic ? (
+                  <View style={styles.fullWidthCenter}>
+                    {reportReady ? null : generatingPDF ? (
+                      <View style={styles.fullWidthCenter}>
+                        <CustomButton style={{ marginTop: 15, width: '100%' }}>
+                          Generating Your PDF...
+                        </CustomButton>
+                      </View>
+                    ) : (
+                      <View style={styles.fullWidthCenter}>
+                        <CustomButton
+                          style={{ marginTop: 15, width: '100%' }}
+                          onSelect={() => generatePDFHandler(showYear)}
+                        >
+                          Generate PDF Report
+                        </CustomButton>
+                      </View>
+                    )}
+                  </View>
+                ) : null}
+
+                {reportReady ? (
+                  downloadingPDF ? (
                     <View style={styles.fullWidthCenter}>
-                      <CustomButton style={{ marginTop: 15, width: '100%' }}>
-                        Generating Your PDF...
+                      <CustomButton style={{ width: '100%' }}>
+                        Downloading Your Report...
                       </CustomButton>
+                      <CustomText style={{ alignSelf: 'center' }}>
+                        {downloadProgress}
+                      </CustomText>
                     </View>
                   ) : (
                     <View style={styles.fullWidthCenter}>
                       <CustomButton
-                        style={{ marginTop: 15, width: '100%' }}
-                        onSelect={() => generatePDFHandler(showYear)}
+                        onSelect={downloadPDFHandler}
+                        style={{ width: '100%' }}
                       >
-                        Generate PDF Report
+                        Click To Download Report
                       </CustomButton>
+                      <CustomText style={{ alignSelf: 'center' }}>
+                        {downloadProgress}
+                      </CustomText>
                     </View>
-                  )}
-                </View>
-              ) : null}
-
-              {reportReady ? (
-                downloadingPDF ? (
-                  <View style={styles.fullWidthCenter}>
-                    <CustomButton style={{ width: '100%' }}>
-                      Downloading Your Report...
-                    </CustomButton>
-                    <CustomText style={{ alignSelf: 'center' }}>
-                      {downloadProgress}
-                    </CustomText>
-                  </View>
-                ) : (
-                  <View style={styles.fullWidthCenter}>
-                    <CustomButton
-                      onSelect={downloadPDFHandler}
-                      style={{ width: '100%' }}
-                    >
-                      Click To Download Report
-                    </CustomButton>
-                    <CustomText style={{ alignSelf: 'center' }}>
-                      {downloadProgress}
-                    </CustomText>
-                  </View>
-                )
-              ) : null}
-            </CustomStatsInfoBox>
-          ) : null}
-        </CustomAccordionUnit>
-      ))}
-      {refreshingData ? (
-        <CustomButton onSelect={() => refreshUser()}>
-          Refreshing Your Data...
-        </CustomButton>
-      ) : (
-        <CustomButton onSelect={() => loadUser()}>Refresh Data</CustomButton>
-      )}
+                  )
+                ) : null}
+              </CustomStatsInfoBox>
+            ) : null}
+          </CustomAccordionUnit>
+        ))}
+        {refreshingData ? (
+          <CustomButton onSelect={() => refreshUser()}>
+            Refreshing Your Data...
+          </CustomButton>
+        ) : (
+          <CustomButton onSelect={() => loadUser()}>Refresh Data</CustomButton>
+        )}
+      </CustomScrollView>
       {error !== '' ? (
         <CustomErrorCard error={error} toShow={setError} />
       ) : null}

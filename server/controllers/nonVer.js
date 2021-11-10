@@ -24,7 +24,7 @@ exports.getNonVerObjById = asyncHandler(async (req, res, next) => {
 //route   POST /api/nonver
 //access  private
 exports.addNonVerEvent = asyncHandler(async (req, res, next) => {
-  const user = await User.findById(req.user.id);
+  let user = await User.findById(req.user.id).populate('nonver');
   const userId = req.user.id;
 
   if (!user) {
@@ -59,8 +59,9 @@ exports.addNonVerEvent = asyncHandler(async (req, res, next) => {
     },
   };
   await User.updateOne(query, update);
-
   await user.save();
+
+  user = await User.findById(req.user.id).populate('nonver');
 
   res.status(200).json({ success: true, data: user.nonver });
 });
@@ -88,8 +89,6 @@ exports.getAllNonVerObjsByYear = asyncHandler(async (req, res, next) => {
   const yearParam = req.params.year;
 
   const year = Number(yearParam);
-
-  console.log('year: ', year);
 
   if (!user) {
     return next(new ErrorResponse('There is no user logged on', 400));
