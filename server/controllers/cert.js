@@ -34,7 +34,7 @@ exports.getAllCertObjsByUser = asyncHandler(async (req, res, next) => {
 });
 
 //desc    GET All Certs Objects by current user by year
-//route   GET /api/cert/year
+//route   GET /api/cert/:year
 //access  private
 exports.getAllCertObjsByYear = asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.user.id).populate('cert');

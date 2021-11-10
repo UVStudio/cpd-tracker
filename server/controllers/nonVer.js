@@ -81,11 +81,15 @@ exports.getAllNonVerObjsByUser = asyncHandler(async (req, res, next) => {
 });
 
 //desc    GET All Non-Ver Session Objects by current user by year
-//route   GET /api/nonver/year
+//route   GET /api/nonver/:year
 //access  private
 exports.getAllNonVerObjsByYear = asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.user.id).populate('nonver');
-  const year = req.body.year;
+  const yearParam = req.params.year;
+
+  const year = Number(yearParam);
+
+  console.log('year: ', year);
 
   if (!user) {
     return next(new ErrorResponse('There is no user logged on', 400));

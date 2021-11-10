@@ -13,7 +13,7 @@ const { protect } = require('../middleware/auth');
 
 router.post('/', protect, addNonVerEvent);
 router.get('/', protect, getAllNonVerObjsByUser);
-router.get('/year', protect, getAllNonVerObjsByYear);
+router.get('/:year', protect, getAllNonVerObjsByYear);
 router.get('/:id', getNonVerObjById);
 router.delete('/:id', protect, deleteNonVerObjById);
 

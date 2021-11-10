@@ -1,21 +1,20 @@
-import { ADD_NONVER_SESSION, GET_NONVER_SESSION } from '../types';
+import { GET_USER_NONVER_YEAR, ADD_NONVER_SESSION } from '../types';
 
 const initialState = {
-  hours: [],
   nonver: [],
 };
 
 export default (state = initialState, action) => {
   switch (action.type) {
-    case GET_NONVER_SESSION:
+    case GET_USER_NONVER_YEAR:
       return {
         ...state,
-        nonver: action.sessions,
+        nonver: action.nonver,
       };
     case ADD_NONVER_SESSION:
       return {
         ...state,
-        nonver: action.sessions,
+        nonver: action.nonver,
       };
     default:
       return state;

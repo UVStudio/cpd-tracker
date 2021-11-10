@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 
@@ -8,32 +8,41 @@ import CustomTitle from '../../components/CustomTitle';
 import CustomText from '../../components/CustomText';
 import CustomGreyLine from '../../components/CustomGreyLine';
 import CustomThinGreyLine from '../../components/CustomThinGreyLine';
+import CustomErrorCard from '../../components/CustomErrorCard';
 import CustomStatsInfoBox from '../../components/CustomStatsInfoBox';
 import CustomOperationalContainer from '../../components/CustomOperationalContainer';
 import CustomScreenContainer from '../../components/CustomScreenContainer';
 
 const CertHoursDetails = (props) => {
   const { year } = props.route.params;
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const dispatch = useDispatch();
 
-  const authState = useSelector((state) => state.auth.user);
-  const userState = useSelector((state) => state.user.user);
   const certsYearState = useSelector((state) => state.cert.certsYear);
 
-  const user = userState ? userState : authState;
-
   const loadCerts = async () => {
+    setLoading(true);
     try {
       await dispatch(certsActions.getAllCertObjsByYear(year));
     } catch (error) {
       console.log(err.message);
+      setLoading(false);
+      setError(
+        'There is something wrong with our network. Please try again later.'
+      );
     }
+    setLoading(false);
   };
 
   useEffect(() => {
     loadCerts();
   }, []);
+
+  if (loading) {
+    return <CustomIndicator />;
+  }
 
   return (
     <CustomScreenContainer>
@@ -49,6 +58,9 @@ const CertHoursDetails = (props) => {
           <CustomThinGreyLine />
         </CustomOperationalContainer>
       ))}
+      {error !== '' ? (
+        <CustomErrorCard error={error} toShow={setError} />
+      ) : null}
     </CustomScreenContainer>
   );
 };
