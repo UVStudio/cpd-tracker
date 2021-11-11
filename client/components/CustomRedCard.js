@@ -5,6 +5,7 @@ import * as authActions from '../store/actions/auth';
 
 import CustomRedButton from './CustomRedButton';
 import Colors from '../constants/Colors';
+import CustomButton from './CustomButton';
 
 const CustomRedCard = (props) => {
   const { text, toShow, toPassError } = props;
@@ -26,6 +27,7 @@ const CustomRedCard = (props) => {
     <View style={styles.container}>
       <View style={styles.innerContainer}>
         <Text style={styles.text}>{text}</Text>
+        <CustomButton onSelect={() => toShow('')}>Nevermind!</CustomButton>
         <CustomRedButton
           style={{ marginTop: 15 }}
           onSelect={() => deleteUserHandler()}

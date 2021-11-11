@@ -27,7 +27,6 @@ import CustomProvinceSelectionCard from '../../components/CustomProvinceSelectio
 import currentYear from '../../utils/currentYear';
 import Colors from '../../constants/Colors';
 import { FORM_INPUT_UPDATE } from '../../store/types';
-import CustomMessageCard from '../../components/CustomMessageCard';
 
 const formReducer = (state, action) => {
   if (action.type === FORM_INPUT_UPDATE) {
@@ -54,7 +53,7 @@ const formReducer = (state, action) => {
 
 const Profile = () => {
   const [cardText, setCardText] = useState('');
-  const [error, setError] = useState('');
+  const [errorFromCard, setErrorFromCard] = useState(false);
   const [provinceCard, setProvinceCard] = useState(false);
   const [province, setProvince] = useState('');
 
@@ -106,9 +105,6 @@ const Profile = () => {
   const updateProfileHandler = async () => {
     console.log('formState: ', formState);
     if (user.province !== province) {
-      setCardText(
-        'You are about to change your provincial jurisdiction on the CPD Tracker. Please be sure that you have indeed changed the provincial CPA body that you report your CPD hours to.'
-      );
     }
   };
 
@@ -211,12 +207,14 @@ All data and certificates will be erased permanently. The app does not keep any 
           </CustomButton>
         </CustomOperationalContainer>
       </CustomScrollView>
-      {error !== '' ? (
-        <CustomErrorCard error={error} toShow={setError} />
+      {cardText ? (
+        <CustomRedCard
+          text={cardText}
+          toShow={setCardText}
+          toPassError={setErrorFromCard}
+        />
       ) : null}
-      {cardText !== '' ? (
-        <CustomMessageCard text={cardText} toShow={setCardText} />
-      ) : null}
+      {errorFromCard ? <CustomErrorCard /> : null}
       {provinceCard ? (
         <CustomProvinceSelectionCard
           toShow={setProvinceCard}
