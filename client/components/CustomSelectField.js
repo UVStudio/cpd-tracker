@@ -2,13 +2,13 @@ import React from 'react';
 import { View, Text, StyleSheet, Platform } from 'react-native';
 
 const CustomSelectField = (props) => {
-  const { value } = props;
+  const { value, initialValue } = props;
 
   return (
     <View style={styles.formControl}>
       <Text style={styles.label}>{props.label}</Text>
       <Text {...props} style={styles.input}>
-        {value}
+        {value === '' ? initialValue : value}
       </Text>
     </View>
   );

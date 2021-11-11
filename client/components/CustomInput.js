@@ -31,11 +31,10 @@ const CustomInput = (props) => {
   const { onInputChange, id } = props;
 
   useEffect(() => {
-    //onInputChange is only triggered when onBlur
-    if (inputState.touched) {
-      onInputChange(id, inputState.value, inputState.isValid);
-    }
-    // console.log('id: ', typeof id);
+    // if (inputState.touched) {
+    //   onInputChange(id, inputState.value, inputState.isValid);
+    // }
+    onInputChange(id, inputState.value, inputState.isValid);
   }, [inputState, onInputChange, id]);
 
   const textChangeHandler = (text) => {

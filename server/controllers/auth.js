@@ -52,7 +52,6 @@ exports.createUser = asyncHandler(async (req, res, next) => {
   }
 
   hours[0].historic = false;
-  //console.log('hours: ', hours);
 
   user = await User.create({
     name,
@@ -134,8 +133,8 @@ exports.getCurrentUser = asyncHandler(async (req, res, next) => {
 //desc    UPDATE current logged in user
 //route   PUT /api/auth/
 //access  private
-exports.updateProfile = asyncHandler(async (req, res, next) => {
-  const { name, email, province } = req.body;
+exports.updateUser = asyncHandler(async (req, res, next) => {
+  const { name, email, province, cpdYear, cpdMonth } = req.body;
 
   await User.updateOne(
     { _id: req.user.id },
@@ -144,6 +143,8 @@ exports.updateProfile = asyncHandler(async (req, res, next) => {
         name,
         email,
         province,
+        cpdYear,
+        cpdMonth,
         lastModifiedAt: Date.now(),
       },
     }

@@ -2,7 +2,7 @@ const express = require('express');
 const {
   createUser,
   getCurrentUser,
-  updateProfile,
+  updateUser,
   login,
   logOut,
   deleteCurrentUser,
@@ -13,7 +13,7 @@ const router = express.Router();
 const { protect } = require('../middleware/auth');
 
 router.post('/', createUser);
-router.put('/', protect, updateProfile);
+router.put('/', protect, updateUser);
 router.get('/current', protect, getCurrentUser);
 router.post('/login', login);
 router.post('/logout', logOut);
