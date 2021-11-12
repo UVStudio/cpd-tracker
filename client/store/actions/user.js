@@ -33,10 +33,42 @@ export const overrideHours = (year, certHours, nonVerHours, ethicsHours) => {
 export const getUser = () => {
   return async (dispatch) => {
     try {
-      const response = await axios.get(`${CURRENT_IP}/api/auth/current`);
+      const response = await axios.get(`${CURRENT_IP}/api/auth/`);
       const user = response.data.data;
 
       //console.log('get user action: ', user);
+
+      dispatch({
+        type: GET_USER,
+        user: user,
+      });
+    } catch (err) {
+      throw new Error(err.response.data.error);
+    }
+  };
+};
+
+export const updateUser = (formState) => {
+  return async (dispatch) => {
+    const { name, email, province, cpdYear, cpdMonth } = formState.inputValues;
+
+    try {
+      const config = {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      };
+
+      const body = JSON.stringify({
+        name,
+        email,
+        province,
+        cpdMonth,
+        cpdYear,
+      });
+
+      const response = await axios.put(`${CURRENT_IP}/api/auth/`, body, config);
+      const user = response.data.data;
 
       dispatch({
         type: GET_USER,

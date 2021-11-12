@@ -113,7 +113,7 @@ exports.login = asyncHandler(async (req, res, next) => {
 });
 
 //desc    GET current logged in user
-//route   GET /api/auth/current
+//route   GET /api/auth/
 //access  private
 exports.getCurrentUser = asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.user.id)
@@ -135,6 +135,8 @@ exports.getCurrentUser = asyncHandler(async (req, res, next) => {
 //access  private
 exports.updateUser = asyncHandler(async (req, res, next) => {
   const { name, email, province, cpdYear, cpdMonth } = req.body;
+
+  console.log('req.body: ', req.body);
 
   await User.updateOne(
     { _id: req.user.id },

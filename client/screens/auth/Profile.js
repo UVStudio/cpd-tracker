@@ -9,6 +9,7 @@ import {
 import { useSelector, useDispatch } from 'react-redux';
 
 import * as authActions from '../../store/actions/auth';
+import * as userActions from '../../store/actions/user';
 
 import CustomButton from '../../components/CustomButton';
 import CustomTitle from '../../components/CustomTitle';
@@ -94,8 +95,8 @@ const Profile = () => {
   useEffect(() => {
     dispatchFormState({
       type: FORM_INPUT_UPDATE,
-      value: province,
-      isValid: province !== '' ? true : false,
+      value: province === '' ? user.province : province,
+      isValid: true,
       input: 'province',
     });
   }, [province]);
@@ -103,8 +104,10 @@ const Profile = () => {
   const pwRegex = new RegExp(/^((?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,16})$/);
 
   const updateProfileHandler = async () => {
-    console.log('formState: ', formState);
-    if (user.province !== province) {
+    try {
+      await dispatch(userActions.updateUser(formState));
+    } catch (err) {
+      console.log(err.message);
     }
   };
 
@@ -113,7 +116,11 @@ const Profile = () => {
   };
 
   const logoutHandler = async () => {
-    await dispatch(authActions.logout());
+    try {
+      await dispatch(authActions.logout());
+    } catch (err) {
+      console.log(err.message);
+    }
   };
 
   const cardTextHandler = async () => {
