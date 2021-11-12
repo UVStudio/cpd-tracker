@@ -2,6 +2,7 @@ import React from 'react';
 import { Text, View, StyleSheet, Platform } from 'react-native';
 import CustomButton from './CustomButton';
 import Colors from '../constants/Colors';
+import delayButton from '../utils/delayButton';
 
 const CustomMessageCard = (props) => {
   const { text, toShow } = props;
@@ -10,7 +11,10 @@ const CustomMessageCard = (props) => {
     <View style={styles.container}>
       <View style={styles.innerContainer}>
         <Text style={styles.text}>{text}</Text>
-        <CustomButton style={{ marginTop: 15 }} onSelect={() => toShow('')}>
+        <CustomButton
+          style={{ marginTop: 15 }}
+          onSelect={() => delayButton(toShow, '', 400)}
+        >
           Okay
         </CustomButton>
       </View>

@@ -28,6 +28,7 @@ import CustomProvinceSelectionCard from '../../components/CustomProvinceSelectio
 import currentYear from '../../utils/currentYear';
 import Colors from '../../constants/Colors';
 import { FORM_INPUT_UPDATE } from '../../store/types';
+import CustomMessageCard from '../../components/CustomMessageCard';
 
 const formReducer = (state, action) => {
   if (action.type === FORM_INPUT_UPDATE) {
@@ -54,9 +55,12 @@ const formReducer = (state, action) => {
 
 const Profile = () => {
   const [cardText, setCardText] = useState('');
+  const [deleteText, setDeleteText] = useState('');
   const [errorFromCard, setErrorFromCard] = useState(false);
   const [provinceCard, setProvinceCard] = useState(false);
   const [province, setProvince] = useState('');
+  const [updating, setUpdating] = useState(false);
+  const [error, setError] = useState('');
 
   const user = useSelector((state) => state.user.user);
 
@@ -104,10 +108,17 @@ const Profile = () => {
   const pwRegex = new RegExp(/^((?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,16})$/);
 
   const updateProfileHandler = async () => {
+    setUpdating(true);
     try {
       await dispatch(userActions.updateUser(formState));
+      setUpdating(false);
+      setCardText('Your profile has been updated');
     } catch (err) {
+      setUpdating(false);
       console.log(err.message);
+      setError(
+        'There is something wrong with our network. Please try again later.'
+      );
     }
   };
 
@@ -124,7 +135,7 @@ const Profile = () => {
   };
 
   const cardTextHandler = async () => {
-    setCardText(
+    setDeleteText(
       `Are you sure you want to delete your account? 
 
 All data and certificates will be erased permanently. The app does not keep any backup data.`
@@ -205,9 +216,13 @@ All data and certificates will be erased permanently. The app does not keep any 
               </View>
             </View>
           </View>
-          <CustomButton onSelect={updateProfileHandler}>
-            Update Profile
-          </CustomButton>
+          {updating ? (
+            <CustomButton>Updating Profile...</CustomButton>
+          ) : (
+            <CustomButton onSelect={updateProfileHandler}>
+              Update Profile
+            </CustomButton>
+          )}
           <CustomButton onSelect={logoutHandler}>Logout</CustomButton>
           <CustomButton onSelect={cardTextHandler}>
             Delete Your Account
@@ -215,9 +230,12 @@ All data and certificates will be erased permanently. The app does not keep any 
         </CustomOperationalContainer>
       </CustomScrollView>
       {cardText ? (
+        <CustomMessageCard text={cardText} toShow={setCardText} />
+      ) : null}
+      {deleteText ? (
         <CustomRedCard
-          text={cardText}
-          toShow={setCardText}
+          text={deleteText}
+          toShow={setDeleteText}
           toPassError={setErrorFromCard}
         />
       ) : null}
@@ -228,6 +246,7 @@ All data and certificates will be erased permanently. The app does not keep any 
           toSet={setProvince}
         />
       ) : null}
+      {error !== '' ? <CustomErrorCard /> : null}
     </CustomScreenContainer>
   );
 };

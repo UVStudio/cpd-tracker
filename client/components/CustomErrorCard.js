@@ -3,6 +3,7 @@ import { Text, View, StyleSheet } from 'react-native';
 import CustomButton from './CustomButton';
 import CustomSubtitle from './CustomSubtitle';
 import Colors from '../constants/Colors';
+import delayButton from '../utils/delayButton';
 
 const CustomErrorCard = (props) => {
   const { error, toShow } = props;
@@ -14,7 +15,10 @@ const CustomErrorCard = (props) => {
           An error has occurred!
         </CustomSubtitle>
         <Text style={styles.text}>{error}</Text>
-        <CustomButton style={{ marginTop: 15 }} onSelect={() => toShow('')}>
+        <CustomButton
+          style={{ marginTop: 15 }}
+          onSelect={() => delayButton(toShow, '', 400)}
+        >
           Okay
         </CustomButton>
       </View>

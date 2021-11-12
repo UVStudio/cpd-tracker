@@ -13,8 +13,9 @@ const CustomRedCard = (props) => {
   const dispatch = useDispatch();
 
   const deleteUserHandler = async () => {
-    console.log('delete user');
-    toShow('');
+    setTimeout(() => {
+      toShow('');
+    }, 400);
     try {
       await dispatch(authActions.deleteCurrentUser());
     } catch (err) {
@@ -27,7 +28,9 @@ const CustomRedCard = (props) => {
     <View style={styles.container}>
       <View style={styles.innerContainer}>
         <Text style={styles.text}>{text}</Text>
-        <CustomButton onSelect={() => toShow('')}>Nevermind!</CustomButton>
+        <CustomButton onSelect={() => delayButton(toShow, '', 400)}>
+          Nevermind!
+        </CustomButton>
         <CustomRedButton
           style={{ marginTop: 15 }}
           onSelect={() => deleteUserHandler()}
