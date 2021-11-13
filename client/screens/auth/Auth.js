@@ -93,7 +93,10 @@ const Auth = () => {
 
       if (!pwRegex.test(formState.inputValues.password)) {
         setError(
-          'Please make sure your password has between 8 to 16 characters, including 1 uppercase letter, 1 lowercase letter, and 1 number.'
+          `Please make sure your password has between 8 to 16 characters, including: 
+1 uppercase letter, 
+1 lowercase letter,
+1 number.`
         );
         return;
       }

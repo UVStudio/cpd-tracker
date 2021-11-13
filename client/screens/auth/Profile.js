@@ -27,11 +27,14 @@ import CustomProvinceSelectionCard from '../../components/CustomProvinceSelectio
 
 import currentYear from '../../utils/currentYear';
 import Colors from '../../constants/Colors';
-import { FORM_INPUT_UPDATE } from '../../store/types';
+import { FORM_INPUT_UPDATE, PASSWORD_INPUT_UPDATE } from '../../store/types';
 import CustomMessageCard from '../../components/CustomMessageCard';
 
 const formReducer = (state, action) => {
-  if (action.type === FORM_INPUT_UPDATE) {
+  if (
+    action.type === FORM_INPUT_UPDATE ||
+    action.type === PASSWORD_INPUT_UPDATE
+  ) {
     const updatedValues = {
       ...state.inputValues,
       [action.input]: action.value,
@@ -55,12 +58,14 @@ const formReducer = (state, action) => {
 
 const Profile = () => {
   const [cardText, setCardText] = useState('');
+  const [error, setError] = useState('');
   const [deleteText, setDeleteText] = useState('');
   const [errorFromCard, setErrorFromCard] = useState(false);
   const [provinceCard, setProvinceCard] = useState(false);
   const [province, setProvince] = useState('');
-  const [updating, setUpdating] = useState(false);
-  const [error, setError] = useState('');
+  const [updatingProfile, setUpdatingProfile] = useState(false);
+  const [updatingPassword, setUpdatingPassword] = useState(false);
+  const [specialMessage, setSpecialMessage] = useState(false);
 
   const user = useSelector((state) => state.user.user);
 
@@ -84,6 +89,23 @@ const Profile = () => {
     formIsValid: false,
   });
 
+  const [passwordFormState, dispatchPasswordFormState] = useReducer(
+    formReducer,
+    {
+      inputValues: {
+        oldPassword: '',
+        newPassword: '',
+        confirmPassword: '',
+      },
+      inputValidities: {
+        oldPassword: false,
+        newPassword: false,
+        confirmPassword: false,
+      },
+      formIsValid: false,
+    }
+  );
+
   const inputChangeHandler = useCallback(
     (inputIdentifier, inputValue, inputValidity) => {
       dispatchFormState({
@@ -96,6 +118,20 @@ const Profile = () => {
     [dispatchFormState]
   );
 
+  const inputPasswordChangeHandler = useCallback(
+    (inputIdentifier, inputValue, inputValidity) => {
+      dispatchPasswordFormState({
+        type: PASSWORD_INPUT_UPDATE,
+        value: inputValue,
+        isValid: inputValidity,
+        input: inputIdentifier,
+      });
+    },
+    [dispatchPasswordFormState]
+  );
+
+  console.log('pw formState: ', passwordFormState);
+
   useEffect(() => {
     dispatchFormState({
       type: FORM_INPUT_UPDATE,
@@ -105,19 +141,67 @@ const Profile = () => {
     });
   }, [province]);
 
-  const pwRegex = new RegExp(/^((?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,16})$/);
-
   const updateProfileHandler = async () => {
-    setUpdating(true);
+    setUpdatingProfile(true);
+    const { cpdMonth, cpdYear } = formState.inputValues;
     try {
+      if (
+        province !== user.proovince ||
+        cpdMonth !== user.cpdMonth ||
+        cpdYear !== user.cpdYear
+      ) {
+        setSpecialMessage(true);
+      }
       await dispatch(userActions.updateUser(formState));
-      setUpdating(false);
-      setCardText('Your profile has been updated');
+      setUpdatingProfile(false);
+
+      setCardText(
+        specialMessage
+          ? `Your profile has been updated. 
+          
+Updating your Province or your CPD Membership Join Date might have material impact on your current CPD requirement. Please check your Statistics page.`
+          : 'Your profile has been updated'
+      );
+      setSpecialMessage(false);
     } catch (err) {
-      setUpdating(false);
+      setUpdatingProfile(false);
       console.log(err.message);
       setError(
-        'There is something wrong with our network. Please try again later.'
+        'There is something wrong with our network. We cannot update your profile at this momemt. Please try again later.'
+      );
+    }
+  };
+
+  const pwRegex = new RegExp(/^((?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,16})$/);
+
+  const updatePasswordHandler = async () => {
+    setUpdatingPassword(true);
+    const { newPassword, confirmPassword } = passwordFormState.inputValues;
+
+    if (newPassword !== confirmPassword) {
+      setUpdatingPassword(false);
+      setCardText('Please make sure your new password inputs are identical');
+      return;
+    }
+
+    if (!pwRegex.test(newPassword)) {
+      setUpdatingPassword(false);
+      setCardText(`Please make sure your password has between 8 to 16 characters, including: 
+1 uppercase letter, 
+1 lowercase letter,
+1 number.`);
+      return;
+    }
+
+    try {
+      await dispatch(userActions.updatePassword(passwordFormState));
+      setUpdatingPassword(false);
+      setCardText('Your password has been updated');
+    } catch (err) {
+      setUpdatingPassword(false);
+      console.log(err.message);
+      setError(
+        'There is something wrong with our network. We cannot update your password at this momemt. Please try again later.'
       );
     }
   };
@@ -216,13 +300,61 @@ All data and certificates will be erased permanently. The app does not keep any 
               </View>
             </View>
           </View>
-          {updating ? (
-            <CustomButton>Updating Profile...</CustomButton>
-          ) : (
-            <CustomButton onSelect={updateProfileHandler}>
-              Update Profile
-            </CustomButton>
-          )}
+          <View style={{ ...styles.fullWidthCenterItems, marginVertical: 10 }}>
+            {updatingProfile ? (
+              <CustomButton>Updating Profile...</CustomButton>
+            ) : (
+              <CustomButton onSelect={updateProfileHandler}>
+                Update Profile
+              </CustomButton>
+            )}
+          </View>
+          <CustomSubtitle style={{ alignSelf: 'flex-start', marginTop: 5 }}>
+            Password
+          </CustomSubtitle>
+          <CustomThinGreyLine style={{ marginBottom: 8 }} />
+          <CustomInput
+            id="oldPassword"
+            label="Old Password"
+            keyboardType="default"
+            secureTextEntry
+            autoCapitalize="none"
+            minLength={8}
+            onInputChange={inputPasswordChangeHandler}
+            initialValue=""
+            required
+          />
+          <CustomInput
+            id="newPassword"
+            label="New Password"
+            keyboardType="default"
+            secureTextEntry
+            autoCapitalize="none"
+            minLength={8}
+            onInputChange={inputPasswordChangeHandler}
+            initialValue=""
+            required
+          />
+          <CustomInput
+            id="confirmPassword"
+            label="Confirm New Password"
+            keyboardType="default"
+            secureTextEntry
+            autoCapitalize="none"
+            minLength={8}
+            onInputChange={inputPasswordChangeHandler}
+            initialValue=""
+            required
+          />
+          <View style={{ ...styles.fullWidthCenterItems, marginVertical: 10 }}>
+            {updatingPassword ? (
+              <CustomButton>Updating Password...</CustomButton>
+            ) : (
+              <CustomButton onSelect={updatePasswordHandler}>
+                Update Password
+              </CustomButton>
+            )}
+          </View>
           <CustomButton onSelect={logoutHandler}>Logout</CustomButton>
           <CustomButton onSelect={cardTextHandler}>
             Delete Your Account
@@ -239,14 +371,16 @@ All data and certificates will be erased permanently. The app does not keep any 
           toPassError={setErrorFromCard}
         />
       ) : null}
-      {errorFromCard ? <CustomErrorCard /> : null}
+      {errorFromCard ? (
+        <CustomErrorCard text={error} toShow={setError} />
+      ) : null}
       {provinceCard ? (
         <CustomProvinceSelectionCard
           toShow={setProvinceCard}
           toSet={setProvince}
         />
       ) : null}
-      {error !== '' ? <CustomErrorCard /> : null}
+      {error !== '' ? <CustomErrorCard text={error} toShow={setError} /> : null}
     </CustomScreenContainer>
   );
 };
@@ -263,6 +397,10 @@ const styles = StyleSheet.create({
   rowSpaceBetween: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+  },
+  fullWidthCenterItems: {
+    width: '100%',
+    alignItems: 'center',
   },
 });
 

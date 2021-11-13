@@ -79,3 +79,30 @@ export const updateUser = (formState) => {
     }
   };
 };
+
+export const updatePassword = (passwordFormState) => {
+  return async () => {
+    const { oldPassword, newPassword, confirmPassword } =
+      passwordFormState.inputValues;
+
+    if (newPassword !== confirmPassword) {
+      return new Error(
+        'Please check your new password fields to make sure they are the same.'
+      );
+    }
+
+    const body = JSON.stringify({ oldPassword, newPassword });
+
+    const config = {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    };
+
+    try {
+      await axios.put(`${CURRENT_IP}/api/auth/password`, body, config);
+    } catch (err) {
+      throw new Error('Cannot connect with server. Please try again.');
+    }
+  };
+};

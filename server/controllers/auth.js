@@ -1,6 +1,7 @@
 const User = require('../models/User');
 const Cert = require('../models/Cert');
 const NonVer = require('../models/NonVer');
+const bcrypt = require('bcryptjs');
 const mongoose = require('mongoose');
 const ObjectId = require('mongodb').ObjectId;
 const ErrorResponse = require('../utils/errorResponse');
@@ -136,8 +137,6 @@ exports.getCurrentUser = asyncHandler(async (req, res, next) => {
 exports.updateUser = asyncHandler(async (req, res, next) => {
   const { name, email, province, cpdYear, cpdMonth } = req.body;
 
-  console.log('req.body: ', req.body);
-
   await User.updateOne(
     { _id: req.user.id },
     {
@@ -154,6 +153,40 @@ exports.updateUser = asyncHandler(async (req, res, next) => {
   const userUpdated = await User.findById(req.user.id);
 
   res.status(200).json({ success: true, data: userUpdated });
+});
+
+//desc     update password
+//route    PUT /api/auth/password
+//access   Private
+exports.updatePassword = asyncHandler(async (req, res, next) => {
+  let user = await User.findById(req.user.id).select('+password');
+
+  const { oldPassword, newPassword } = req.body;
+
+  //Check if password matches
+  const isMatch = await user.matchPassword(oldPassword);
+
+  if (!isMatch) {
+    return next(new ErrorResponse('Invalid password', 401));
+  }
+
+  //mongoDB syntax requires bcrypting the password as Model pre save function doesn't apply
+  const salt = await bcrypt.genSalt(10);
+  const encrypted = await bcrypt.hash(newPassword, salt);
+
+  await User.updateOne(
+    { _id: req.user.id },
+    {
+      $set: {
+        password: encrypted,
+        lastModifiedAt: Date.now(),
+      },
+    }
+  );
+
+  user = await User.findById(req.user.id);
+
+  res.status(200).json({ success: true, data: user });
 });
 
 //desc    LOGOUT user / clear cookie

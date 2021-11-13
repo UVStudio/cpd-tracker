@@ -3,6 +3,7 @@ const {
   createUser,
   getCurrentUser,
   updateUser,
+  updatePassword,
   login,
   logOut,
   deleteCurrentUser,
@@ -15,6 +16,7 @@ const { protect } = require('../middleware/auth');
 router.post('/', createUser);
 router.put('/', protect, updateUser);
 router.get('/', protect, getCurrentUser);
+router.put('/password', protect, updatePassword);
 router.post('/login', login);
 router.post('/logout', logOut);
 router.delete('/', protect, deleteCurrentUser);
