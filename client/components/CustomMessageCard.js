@@ -13,7 +13,7 @@ const CustomMessageCard = (props) => {
         <Text style={styles.text}>{text}</Text>
         <CustomButton
           style={{ marginTop: 15 }}
-          onSelect={() => delayButton(toShow, '', 400)}
+          onSelect={() => delayButton(toShow, '', 200)}
         >
           Okay
         </CustomButton>

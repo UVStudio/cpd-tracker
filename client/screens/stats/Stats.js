@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { View, StyleSheet, Pressable } from 'react-native';
+import { View, StyleSheet, Platform, Pressable } from 'react-native';
 import { downloadToFolder } from 'expo-file-dl';
 
 import * as Notifications from 'expo-notifications';
@@ -174,7 +174,9 @@ const Stats = ({ navigation }) => {
   };
 
   useEffect(() => {
-    setNotificationChannel();
+    if (Platform.OS === 'android') {
+      setNotificationChannel();
+    }
   });
 
   const getMediaLibraryPermissions = async () => {
@@ -201,17 +203,20 @@ const Stats = ({ navigation }) => {
     } catch (err) {
       console.log(err.message);
       setError(
-        'There is something wrong with our network. Please try again later.'
+        'There is something wrong with our network. Your Report cannot be generated at the moment. Please try again later.'
       );
     }
     setGeneratingPDF(false);
   };
 
+  const userFirstName = user.name.split(' ')[0];
+
   //Download PDF Report
   const pdfUri = `https://cpdtracker.s3.us-east-2.amazonaws.com/reports/${
     user._id
   }-${showYear.toString()}-CPD-report.pdf`;
-  const fileName = `${user.name}-${showYear.toString()}-CPD-report.pdf`;
+
+  const fileName = `${userFirstName}-${showYear.toString()}-CPD-report.pdf`;
 
   const downloadPDFHandler = async () => {
     setDownloadingPDF(true);
@@ -230,7 +235,7 @@ For iOS users, the PDF is where you have chosen to save it.`
     } catch (err) {
       console.log(err.message);
       setError(
-        'There is something wrong with our network. Please try again later.'
+        'There is something wrong with our network. Your Report cannot be downloaded at the moment. Please try again later.'
       );
     }
     setDownloadingPDF(false);
