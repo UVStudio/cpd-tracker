@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
 import { useSelector } from 'react-redux';
+import newCPARules from '../../utils/newCPARulesText';
+import cpdWebsites from '../../constants/CPDWebsites';
 
 import CustomText from '../../components/CustomText';
 import CustomBoldText from '../../components/CustomBoldText';
@@ -39,13 +41,27 @@ const Rules = () => {
             obtain 40 hours per year. This will alleviate the pressure to
             fulfill your 3-year rolling requirement.
           </CustomText>
-          <CustomSubtitle style={{ alignSelf: 'flex-start' }}>
+          <CustomSubtitle style={{ alignSelf: 'flex-start', marginTop: 10 }}>
             3-Year Rolling CPD Hours Requirement
           </CustomSubtitle>
           <CustomThinGreyLine />
           <CustomText style={{ marginBottom: 10 }}>
             All provinces require their CPD members to fulfill 120 hours of CPD
-            over a period of 3 years.
+            over a period of 3 years, at least 60 hours need to be verifiable.
+          </CustomText>
+          <CustomText style={{ marginBottom: 10 }}>
+            4 verifiable hours need to be on the subject of Ethics.
+          </CustomText>
+          <CustomSubtitle style={{ alignSelf: 'flex-start', marginTop: 10 }}>
+            New CPA {user.province} Members
+          </CustomSubtitle>
+          <CustomThinGreyLine />
+          <CustomText style={{ marginBottom: 20 }}>
+            {newCPARules(user.province)}
+          </CustomText>
+          <CustomText>
+            For more information regarding CPD reporting rules, please visit
+            your provincial CPA website here: {cpdWebsites(user.province)}
           </CustomText>
         </CustomOperationalContainer>
       </CustomScrollView>
