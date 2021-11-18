@@ -1,12 +1,11 @@
 import React from 'react';
 import { View, Text, StyleSheet, Pressable, Platform } from 'react-native';
-import CustomText from './CustomText';
 import Colors from '../constants/Colors';
-import Provinces from '../constants/Provinces';
+import { provinces } from '../constants/Provinces';
 
 const CustomProvinceSelectionCard = (props) => {
   const { toShow, toSet } = props;
-  const provinces = Provinces;
+  const provincesArr = provinces();
 
   const provinceSelection = (prov) => {
     toShow(false);
@@ -16,7 +15,7 @@ const CustomProvinceSelectionCard = (props) => {
   return (
     <View style={styles.container}>
       <View style={styles.innerContainer}>
-        {provinces.map((elem, index) => (
+        {provincesArr.map((elem, index) => (
           <Pressable key={index} onPress={() => provinceSelection(elem)}>
             <Text style={styles.text}>{elem}</Text>
           </Pressable>

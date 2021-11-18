@@ -1,36 +1,22 @@
 import React from 'react';
 import { Text, Linking } from 'react-native';
-import CustomText from '../components/CustomText';
+import { provinceObjs } from './Provinces';
+
+const url = (province, website) => {
+  return (
+    <Text style={{ color: 'blue' }} onPress={() => Linking.openURL(website)}>
+      CPA {province} - CPD Reporting
+    </Text>
+  );
+};
 
 const cpdWebsites = (province) => {
-  switch (province) {
-    case 'Alberta':
-      return (
-        <Text
-          style={{ color: 'blue' }}
-          onPress={() =>
-            Linking.openURL('https://www.cpaalberta.ca/Members/CPD-Reporting')
-          }
-        >
-          CPA Alberta - CPD Reporting
-        </Text>
-      );
+  for (const key in provinceObjs) {
+    const prov = provinceObjs[key];
+    if (prov.name === province) {
+      return url(province, prov.url);
+    }
   }
 };
 
 export default cpdWebsites;
-
-const arr = [
-  'Alberta',
-  'British Columbia',
-  'Manitoba',
-  'New Brunswick',
-  'Newfoundland & Labrador',
-  'Northwest Territories / Nunavut',
-  'Nova Scotia',
-  'Ontario',
-  'Prince Edward Island',
-  'Quebec',
-  'Saskatchewan',
-  'Yukon',
-];

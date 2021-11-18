@@ -1,11 +1,5 @@
 import React, { useEffect, useState, useReducer, useCallback } from 'react';
-import {
-  View,
-  Text,
-  ActivityIndicator,
-  Pressable,
-  StyleSheet,
-} from 'react-native';
+import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 
 import * as authActions from '../../store/actions/auth';
@@ -130,7 +124,7 @@ const Profile = () => {
     [dispatchPasswordFormState]
   );
 
-  console.log('pw formState: ', passwordFormState);
+  //console.log('pw formState: ', passwordFormState);
 
   useEffect(() => {
     dispatchFormState({

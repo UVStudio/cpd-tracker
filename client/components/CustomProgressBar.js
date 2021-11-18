@@ -1,6 +1,5 @@
 import React from 'react';
 import { View, StyleSheet, useWindowDimensions } from 'react-native';
-import Provinces from '../constants/Provinces';
 import Colors from '../constants/Colors';
 
 const CustomProgressBar = (props) => {

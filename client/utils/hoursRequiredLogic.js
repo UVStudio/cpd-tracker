@@ -1,12 +1,11 @@
-import currentYear from './currentYear';
+import { provinceObjs } from '../constants/Provinces';
 
 const hoursRequiredLogic = (user) => {
   const { hours, province, cpdYear, cpdMonth } = user;
 
   const proration = () => {
-    //Math.round(((12 - (user.cpdMonth - 1)) / 12) * 20)
     const prorated = Math.round(((12 - (cpdMonth - 1)) / 12) * 20); //month of CPA joined counts for CPA requirement
-    console.log('prorated: ', prorated);
+    //console.log('prorated: ', prorated);
     return prorated;
   };
 
@@ -104,27 +103,29 @@ const hoursRequiredLogic = (user) => {
   //if CPD Year is 2 years ago, 3 year rolling requirement is province dependent
   if (cpdYear === lastYearDB) {
     switch (province) {
-      case 'Alberta':
-      case 'Northwest Territories / Nunavut':
+      case provinceObjs.alberta.name:
+      case provinceObjs.nwtNu.name:
         totalRollingCPDHoursRequired = 40; //3 year rolling requirement does not apply
         totalRollingEthicsRequired = 1;
         break;
-      case 'British Columbia':
-      case 'Manitoba':
-      case 'New Brunswick':
-      case 'Saskatchewan':
-      case 'Yukon':
+      case provinceObjs.britishColumbia.name:
+      case provinceObjs.manitoba.name:
+      case provinceObjs.newBrunswick.name:
+      case provinceObjs.newfoundlandLabrador.name:
+      case provinceObjs.saskatchewan.name:
+      case provinceObjs.yukon.name:
         totalRollingCPDHoursRequired = 120; //3 year rolling requirement fully applies
         totalRollingEthicsRequired = 4;
         break;
-      case 'Nova Scotia':
+      case provinceObjs.novaScotia.name:
         totalRollingCPDHoursRequired = novaScotiaLogic();
         totalRollingEthicsRequired = novaScotiaEthicsLogic();
-      case 'Ontario':
+      case provinceObjs.ontario.name:
         totalRollingCPDHoursRequired = ontarioProration();
         totalRollingEthicsRequired = ontarioEthicsProration();
         break;
-      case 'Prince Edward Island':
+      case provinceObjs.pei.name:
+      case provinceObjs.quebec.name:
         totalRollingCPDHoursRequired = proration() * 2 + 80;
         totalRollingEthicsRequired = 4;
         break;
@@ -200,25 +201,27 @@ const hoursRequiredLogic = (user) => {
   if (cpdYear === hours[0].year) {
     //3 year rolling requirement does not apply, but the app should recommend doing 20/40 hours,
     switch (province) {
-      case 'Alberta':
-      case 'Northwest Territories / Nunavut':
+      case provinceObjs.alberta.name:
+      case provinceObjs.nwtNu.name:
         totalRollingCPDHoursRequired = 0; //3 year rolling requirement does not apply
         totalRollingEthicsRequired = 0;
         break;
-      case 'British Columbia':
-      case 'Manitoba':
-      case 'New Brunswick':
-      case 'Saskatchewan':
-      case 'Nova Scotia': //new non-exempt rule started in 2021, so NS belongs to this category
-      case 'Yukon':
+      case provinceObjs.britishColumbia.name:
+      case provinceObjs.manitoba.name:
+      case provinceObjs.newBrunswick.name:
+      case provinceObjs.newfoundlandLabrador.name:
+      case provinceObjs.novaScotia.name:
+      case provinceObjs.saskatchewan.name:
+      case provinceObjs.yukon.name:
         totalRollingCPDHoursRequired = 20; //3 year rolling requirement fully applies
         totalRollingEthicsRequired = 1;
         break;
-      case 'Ontario':
+      case provinceObjs.ontario.name:
         totalRollingCPDHoursRequired = ontarioProration() === 120 ? 20 : 0;
         totalRollingEthicsRequired = 1;
         break;
-      case 'Prince Edward Island':
+      case provinceObjs.pei.name:
+      case provinceObjs.quebec.name:
         totalRollingCPDHoursRequired = proration();
         totalRollingEthicsRequired = 1;
         break;
