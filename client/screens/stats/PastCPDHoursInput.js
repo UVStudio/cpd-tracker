@@ -45,7 +45,6 @@ const formReducer = (state, action) => {
 
 const PastCPDHoursInput = (props) => {
   const { yearsToOverride } = props.route.params;
-  //console.log('yearsToOverride: ', yearsToOverride);
 
   const [error, setError] = useState('');
   const [savingCPD, setSavingCPD] = useState(false);
@@ -116,7 +115,7 @@ const PastCPDHoursInput = (props) => {
       setSavingCPD(false);
       console.log(err.message);
       setError(
-        'There is something wrong with our network. Please try again later.'
+        'There is something wrong with our network. We cannot save your past CPD data at the moment. Please try again later.'
       );
     }
   };

@@ -11,6 +11,7 @@ import CertHoursDetails from '../screens/stats/CertHoursDetails';
 import NonVerHoursDetails from '../screens/stats/NonVerHoursDetails';
 import TotalCPDHoursDetails from '../screens/stats/TotalCPDHoursDetails';
 import PastCPDHoursInput from '../screens/stats/PastCPDHoursInput';
+import OverwriteCPDHours from '../screens/stats/OverwriteCPDHours';
 import Timer from '../screens/timer/Timer';
 import UploadSession from '../screens/timer/UploadSession';
 import Rules from '../screens/rules/Rules';
@@ -69,6 +70,10 @@ const CPDNavigator = () => {
       <CPDStackNavigator.Screen
         name="CPD Hours Setup"
         component={PastCPDHoursInput}
+      />
+      <CPDStackNavigator.Screen
+        name="Overwrite CPD Hours"
+        component={OverwriteCPDHours}
       />
     </CPDStackNavigator.Navigator>
   );

@@ -5,7 +5,7 @@ import { provinceObjs } from './Provinces';
 const url = (province, website) => {
   return (
     <Text style={{ color: 'blue' }} onPress={() => Linking.openURL(website)}>
-      CPA {province} - CPD Reporting
+      CPA {province} - CPD Information
     </Text>
   );
 };

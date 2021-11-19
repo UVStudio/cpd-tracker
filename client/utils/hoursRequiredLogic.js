@@ -1,11 +1,14 @@
 import { provinceObjs } from '../constants/Provinces';
+//import currentYear from './currentYear';
 
-const hoursRequiredLogic = (user) => {
+//test current year
+const currentYear = 2023;
+
+const hoursRequiredLogic = (user, showYear) => {
   const { hours, province, cpdYear, cpdMonth } = user;
 
   const proration = () => {
     const prorated = Math.round(((12 - (cpdMonth - 1)) / 12) * 20); //month of CPA joined counts for CPA requirement
-    //console.log('prorated: ', prorated);
     return prorated;
   };
 
@@ -43,9 +46,6 @@ const hoursRequiredLogic = (user) => {
     }
   };
 
-  const lastYearDB = hours[hours.length - 1].year;
-  //const catchUpYears = currentYear - lastYearDB;
-
   let totalRollingCPDHoursRequired,
     totalRollingEthicsRequired,
     totalRollingVerRequired;
@@ -55,20 +55,60 @@ const hoursRequiredLogic = (user) => {
   let pastVerHours = 0;
   let pastNonVerHours = 0;
   let pastEthicsHours = 0;
+  let pastShowYearNeedCPDHours = 0;
+  let pastShowYearNeedVerHours = 0;
+  let pastShowYearNeedEthicsHours = 0;
   let NBVarCarriedOverPotential = 0;
   let NBNonVarCarriedOverPotential = 0;
 
+  const showYearReq = () => {
+    const index = hours.findIndex((hour) => hour.year === showYear);
+    let loopLength = 2;
+
+    if (hours.length - 1 - index < 2) {
+      loopLength = hours.length - 1 - index;
+    }
+
+    console.log('hours length: ', hours.length);
+    console.log('index: ', index);
+    console.log('looplength: ', loopLength);
+
+    for (let i = index + 1; i <= index + loopLength; i++) {
+      pastShowYearNeedCPDHours =
+        pastShowYearNeedCPDHours + hours[i].verifiable + hours[i].nonVerifiable;
+      pastShowYearNeedVerHours = pastShowYearNeedVerHours + hours[i].verifiable;
+      pastShowYearNeedEthicsHours =
+        pastShowYearNeedEthicsHours + hours[i].ethics;
+    }
+
+    console.log('pastShowYearNeedCPDHours: ', pastShowYearNeedCPDHours);
+  };
+
+  //const lastYearDB = hours[hours.length - 1].year;
+
   //if CPD Year is more than 2 years ago, 3 year rolling applies universally
-  if (cpdYear < lastYearDB) {
+  if (cpdYear < showYear - 2) {
     totalRollingCPDHoursRequired = 120;
     totalRollingVerRequired = totalRollingCPDHoursRequired / 2;
     totalRollingEthicsRequired = 4;
 
-    for (let i = 1; i < hours.length; i++) {
+    //currentYear Requirement
+    const index = hours.findIndex((hour) => hour.year === showYear);
+    let loopLength = 2;
+
+    if (hours.length - 1 - index < 2) {
+      loopLength = hours.length - 1 - index;
+    }
+
+    for (let i = index + 1; i <= index + loopLength; i++) {
       pastVerHours = pastVerHours + hours[i].verifiable;
       pastNonVerHours = pastNonVerHours + hours[i].nonVerifiable;
       pastEthicsHours = pastEthicsHours + hours[i].ethics;
     }
+
+    // console.log('hours length: ', hours.length);
+    // console.log('index: ', index);
+    // console.log('looplength: ', loopLength);
 
     currentYearNeedCPDHours =
       totalRollingCPDHoursRequired - (pastVerHours + pastNonVerHours);
@@ -84,6 +124,8 @@ const hoursRequiredLogic = (user) => {
     if (currentYearNeedEthicsHours < 0) {
       currentYearNeedEthicsHours = 0;
     }
+
+    //showYearReq();
 
     //New Brunswick carried over calculation
     if (province === 'New Brunswick') {
@@ -101,7 +143,7 @@ const hoursRequiredLogic = (user) => {
   }
 
   //if CPD Year is 2 years ago, 3 year rolling requirement is province dependent
-  if (cpdYear === lastYearDB) {
+  if (cpdYear === showYear - 2) {
     switch (province) {
       case provinceObjs.alberta.name:
       case provinceObjs.nwtNu.name:
@@ -133,7 +175,14 @@ const hoursRequiredLogic = (user) => {
 
     totalRollingVerRequired = totalRollingCPDHoursRequired / 2;
 
-    for (let i = 1; i < hours.length; i++) {
+    const index = hours.findIndex((hour) => hour.year === showYear);
+    let loopLength = 2;
+
+    if (hours.length - 1 - index < 2) {
+      loopLength = hours.length - 1 - index;
+    }
+
+    for (let i = index + 1; i <= index + loopLength; i++) {
       pastVerHours = pastVerHours + hours[i].verifiable;
       pastNonVerHours = pastNonVerHours + hours[i].nonVerifiable;
       pastEthicsHours = pastEthicsHours + hours[i].ethics;
@@ -238,6 +287,9 @@ const hoursRequiredLogic = (user) => {
     currentYearNeedVerHours,
     currentYearNeedCPDHours,
     currentYearNeedEthicsHours,
+    pastShowYearNeedCPDHours,
+    pastShowYearNeedVerHours,
+    pastShowYearNeedEthicsHours,
     totalRollingVerRequired,
     totalRollingCPDHoursRequired,
     totalRollingEthicsRequired,

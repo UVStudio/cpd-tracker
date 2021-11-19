@@ -25,7 +25,9 @@ import CustomProgressBar from '../../components/CustomProgressBar';
 import CustomScrollView from '../../components/CustomScrollView';
 import CustomScreenContainer from '../../components/CustomScreenContainer';
 
-import currentYear from '../../utils/currentYear';
+//import currentYear from '../../utils/currentYear';
+//test currentYear;
+const currentYear = 2023;
 import { hoursRequiredLogic } from '../../utils/hoursRequiredLogic';
 
 import {
@@ -86,14 +88,15 @@ const Stats = ({ navigation }) => {
     loadUser();
   }, []);
 
-  const hoursRequired = hoursRequiredLogic(user);
-  // console.log('hours required: ', hoursRequired);
-  // console.log('yearsOverride: ', yearsToOverride.length);
+  const hoursRequired = hoursRequiredLogic(user, showYear);
 
   const {
     currentYearNeedCPDHours,
     currentYearNeedVerHours,
     currentYearNeedEthicsHours,
+    pastShowYearNeedCPDHours,
+    pastShowYearNeedVerHours,
+    pastShowYearNeedEthicsHours,
   } = hoursRequired;
 
   useEffect(() => {
@@ -107,9 +110,6 @@ const Stats = ({ navigation }) => {
       );
     }
   }, [userState]);
-
-  //CPD Month proration calculation helper
-  //console.log(Math.round(((12 - (user.cpdMonth - 1)) / 12) * 20));
 
   const refreshUser = async () => {
     setRefreshingData(true);
@@ -148,6 +148,11 @@ const Stats = ({ navigation }) => {
         userHours.length < 3
       ? ' recommended'
       : null;
+  };
+
+  //OverwriteCPD
+  const overwriteCPDHandler = () => {
+    navigation.navigate('Overwrite CPD Hours', { showYear });
   };
 
   //PDF report begins
@@ -209,9 +214,9 @@ const Stats = ({ navigation }) => {
     setGeneratingPDF(false);
   };
 
+  //Download PDF Report
   const userFirstName = user.name.split(' ')[0];
 
-  //Download PDF Report
   const pdfUri = `https://cpdtracker.s3.us-east-2.amazonaws.com/reports/${
     user._id
   }-${showYear.toString()}-CPD-report.pdf`;
@@ -269,125 +274,150 @@ For iOS users, the PDF is where you have chosen to save it.`
             <CustomThinGreyLine />
             {showYear === elem.year ? (
               <CustomStatsInfoBox>
-                {elem.historic ? (
-                  <CustomBoldText style={{ marginBottom: 10 }}>
-                    Past CPD Hours Data
-                  </CustomBoldText>
-                ) : null}
-                <CustomStatsDivider>
-                  <Pressable onPress={() => verifiableHoursDetails()}>
-                    <CustomText>
-                      Verifiable Hours:{' '}
-                      {!elem.historic
-                        ? Number(elem.verifiable).toFixed(1) +
-                          ' ' +
-                          '/' +
-                          ' ' +
-                          Number(currentYearNeedVerHours).toFixed(1)
-                        : Number(elem.verifiable).toFixed(1)}
-                      {userHours[0].year === showYear ? ' required' : null}
-                    </CustomText>
-                    {!elem.historic ? (
-                      <CustomProgressBar
-                        progress={elem.verifiable}
-                        hoursRequired={hoursRequired}
-                        type="verifiable"
-                      />
-                    ) : null}
-                  </Pressable>
-                </CustomStatsDivider>
-                <CustomStatsDivider>
-                  <Pressable onPress={() => totalCPDHoursDetails()}>
-                    <CustomText>
-                      Total CPD Hours:{' '}
-                      {!elem.historic
-                        ? Number(elem.nonVerifiable + elem.verifiable).toFixed(
-                            1
-                          ) +
-                          ' ' +
-                          '/' +
-                          ' ' +
-                          Number(currentYearNeedCPDHours).toFixed(1)
-                        : Number(elem.nonVerifiable + elem.verifiable).toFixed(
-                            1
-                          )}
-                      {userHours[0].year === showYear ? ' required' : null}
-                    </CustomText>
-                    {!elem.historic ? (
-                      <CustomProgressBar
-                        progress={elem.nonVerifiable + elem.verifiable}
-                        hoursRequired={hoursRequired}
-                        type="total-CPD"
-                      />
-                    ) : null}
-                  </Pressable>
-                </CustomStatsDivider>
-                <CustomStatsDivider>
-                  <Pressable onPress={() => nonVerHoursDetails()}>
-                    <CustomText>
-                      Non-Verifiable Hours:{' '}
-                      {Number(elem.nonVerifiable).toFixed(1)}
-                    </CustomText>
-                  </Pressable>
-                </CustomStatsDivider>
-                <CustomStatsDivider>
+                {currentYear !== showYear &&
+                elem.verifiable + elem.nonVerifiable === 0 ? (
                   <CustomText>
-                    Ethics Hours:{' '}
-                    {!elem.historic
-                      ? Number(elem.ethics).toFixed(1) +
-                        ' ' +
-                        '/' +
-                        ' ' +
-                        Number(currentYearNeedEthicsHours).toFixed(1)
-                      : Number(elem.ethics).toFixed(1)}
-                    {ethicsReqOrRec()}
+                    Looks like you did not use the CPD Tracker App for the year
+                    of {showYear}. In order for the app to calculate how many
+                    hours you need for {currentYear} properly, please click on
+                    the 'Overwrite CPD Data' button to manually input your CPD
+                    hours for {showYear}.
                   </CustomText>
-                </CustomStatsDivider>
-
-                {!elem.historic ? (
+                ) : (
                   <View style={styles.fullWidthCenter}>
-                    {reportReady ? null : generatingPDF ? (
-                      <View style={styles.fullWidthCenter}>
-                        <CustomButton style={{ marginTop: 15, width: '100%' }}>
-                          Generating Your PDF...
-                        </CustomButton>
-                      </View>
-                    ) : (
-                      <View style={styles.fullWidthCenter}>
-                        <CustomButton
-                          style={{ marginTop: 15, width: '100%' }}
-                          onSelect={() => generatePDFHandler(showYear)}
-                        >
-                          Generate PDF Report
-                        </CustomButton>
-                      </View>
-                    )}
-                  </View>
-                ) : null}
+                    {elem.historic ? (
+                      <CustomBoldText style={{ marginBottom: 10 }}>
+                        Past CPD Hours Data
+                      </CustomBoldText>
+                    ) : null}
+                    <CustomStatsDivider>
+                      <Pressable onPress={() => verifiableHoursDetails()}>
+                        <CustomText>
+                          Verifiable Hours:{' '}
+                          {!elem.historic
+                            ? Number(elem.verifiable).toFixed(1) +
+                              ' ' +
+                              '/' +
+                              ' ' +
+                              Number(currentYearNeedVerHours).toFixed(1)
+                            : Number(elem.verifiable).toFixed(1)}
+                          {userHours[0].year === showYear ? ' required' : null}
+                        </CustomText>
+                        {!elem.historic ? (
+                          <CustomProgressBar
+                            progress={elem.verifiable}
+                            hoursRequired={hoursRequired}
+                            type="verifiable"
+                          />
+                        ) : null}
+                      </Pressable>
+                    </CustomStatsDivider>
+                    <CustomStatsDivider>
+                      <Pressable onPress={() => totalCPDHoursDetails()}>
+                        <CustomText>
+                          Total CPD Hours:{' '}
+                          {!elem.historic
+                            ? Number(
+                                elem.nonVerifiable + elem.verifiable
+                              ).toFixed(1) +
+                              ' ' +
+                              '/' +
+                              ' ' +
+                              Number(currentYearNeedCPDHours).toFixed(1)
+                            : Number(
+                                elem.nonVerifiable + elem.verifiable
+                              ).toFixed(1)}
+                          {userHours[0].year === showYear ? ' required' : null}
+                        </CustomText>
+                        {!elem.historic ? (
+                          <CustomProgressBar
+                            progress={elem.nonVerifiable + elem.verifiable}
+                            hoursRequired={hoursRequired}
+                            type="total-CPD"
+                          />
+                        ) : null}
+                      </Pressable>
+                    </CustomStatsDivider>
+                    <CustomStatsDivider>
+                      <Pressable onPress={() => nonVerHoursDetails()}>
+                        <CustomText>
+                          Non-Verifiable Hours:{' '}
+                          {Number(elem.nonVerifiable).toFixed(1)}
+                        </CustomText>
+                      </Pressable>
+                    </CustomStatsDivider>
+                    <CustomStatsDivider>
+                      <CustomText>
+                        Ethics Hours:{' '}
+                        {!elem.historic
+                          ? Number(elem.ethics).toFixed(1) +
+                            ' ' +
+                            '/' +
+                            ' ' +
+                            Number(currentYearNeedEthicsHours).toFixed(1)
+                          : Number(elem.ethics).toFixed(1)}
+                        {ethicsReqOrRec()}
+                      </CustomText>
+                    </CustomStatsDivider>
 
-                {reportReady ? (
-                  downloadingPDF ? (
-                    <View style={styles.fullWidthCenter}>
-                      <CustomButton style={{ width: '100%' }}>
-                        Downloading Your Report...
-                      </CustomButton>
-                      <CustomText style={{ alignSelf: 'center' }}>
-                        {downloadProgress}
-                      </CustomText>
-                    </View>
-                  ) : (
-                    <View style={styles.fullWidthCenter}>
-                      <CustomButton
-                        onSelect={downloadPDFHandler}
-                        style={{ width: '100%' }}
-                      >
-                        Click To Download Report
-                      </CustomButton>
-                      <CustomText style={{ alignSelf: 'center' }}>
-                        {downloadProgress}
-                      </CustomText>
-                    </View>
-                  )
+                    {!elem.historic ? (
+                      <View style={styles.fullWidthCenter}>
+                        {reportReady ? null : generatingPDF ? (
+                          <View style={styles.fullWidthCenter}>
+                            <CustomButton
+                              style={{ marginTop: 15, width: '100%' }}
+                            >
+                              Generating Your PDF...
+                            </CustomButton>
+                          </View>
+                        ) : (
+                          <View style={styles.fullWidthCenter}>
+                            <CustomButton
+                              style={{ marginTop: 15, width: '100%' }}
+                              onSelect={() => generatePDFHandler(showYear)}
+                            >
+                              Generate PDF Report
+                            </CustomButton>
+                          </View>
+                        )}
+                      </View>
+                    ) : null}
+
+                    {reportReady ? (
+                      downloadingPDF ? (
+                        <View style={styles.fullWidthCenter}>
+                          <CustomButton style={{ width: '100%' }}>
+                            Downloading Your Report...
+                          </CustomButton>
+                          <CustomText style={{ alignSelf: 'center' }}>
+                            {downloadProgress}
+                          </CustomText>
+                        </View>
+                      ) : (
+                        <View style={styles.fullWidthCenter}>
+                          <CustomButton
+                            onSelect={downloadPDFHandler}
+                            style={{ width: '100%' }}
+                          >
+                            Click To Download Report
+                          </CustomButton>
+                          <CustomText style={{ alignSelf: 'center' }}>
+                            {downloadProgress}
+                          </CustomText>
+                        </View>
+                      )
+                    ) : null}
+                  </View>
+                )}
+                {currentYear !== showYear ? (
+                  <View style={styles.fullWidthCenter}>
+                    <CustomButton
+                      onSelect={overwriteCPDHandler}
+                      style={{ alignSelf: 'center', width: '100%' }}
+                    >
+                      Overwrite CPD Data
+                    </CustomButton>
+                  </View>
                 ) : null}
               </CustomStatsInfoBox>
             ) : null}

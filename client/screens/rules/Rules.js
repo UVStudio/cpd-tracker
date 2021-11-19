@@ -3,6 +3,7 @@ import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
 import { useSelector } from 'react-redux';
 import newCPARules from '../../utils/newCPARulesText';
 import cpdWebsites from '../../constants/CPDWebsites';
+import { provinceObjs } from '../../constants/Provinces';
 
 import CustomText from '../../components/CustomText';
 import CustomBoldText from '../../components/CustomBoldText';
@@ -52,6 +53,14 @@ const Rules = () => {
           <CustomText style={{ marginBottom: 10 }}>
             4 verifiable hours need to be on the subject of Ethics.
           </CustomText>
+          {user.province === provinceObjs.newBrunswick.name ? (
+            <CustomText style={{ marginBottom: 10 }}>
+              The jurisdiction of {user.province} allows CPA's to carry over a
+              maximum of 40 verifiable CPD hours in excess of the minimum
+              requirement in one year to the next. Please see their website for
+              details: {cpdWebsites(user.province)}
+            </CustomText>
+          ) : null}
           <CustomSubtitle style={{ alignSelf: 'flex-start', marginTop: 10 }}>
             New CPA {user.province} Members
           </CustomSubtitle>

@@ -8,12 +8,7 @@ const CustomProgressBar = (props) => {
   //set total bar width at 75% of screen width
   const barWidth = 0.75 * width;
 
-  //industry rules; default 20 hours
-  // const verifiableHours = 20;
-  // const totalCPDHours = 40;
-
   const { progress, type, hoursRequired } = props;
-  //console.log('hours required obj: ', hoursRequired);
   const { currentYearNeedCPDHours, currentYearNeedVerHours } = hoursRequired;
 
   const barProgress = () => {
