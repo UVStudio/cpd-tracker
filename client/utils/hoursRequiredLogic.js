@@ -1,8 +1,4 @@
 import { provinceObjs } from '../constants/Provinces';
-//import currentYear from './currentYear';
-
-//test current year
-const currentYear = 2023;
 
 const hoursRequiredLogic = (user, showYear) => {
   const { hours, province, cpdYear, cpdMonth } = user;
@@ -55,36 +51,8 @@ const hoursRequiredLogic = (user, showYear) => {
   let pastVerHours = 0;
   let pastNonVerHours = 0;
   let pastEthicsHours = 0;
-  let pastShowYearNeedCPDHours = 0;
-  let pastShowYearNeedVerHours = 0;
-  let pastShowYearNeedEthicsHours = 0;
   let NBVarCarriedOverPotential = 0;
   let NBNonVarCarriedOverPotential = 0;
-
-  const showYearReq = () => {
-    const index = hours.findIndex((hour) => hour.year === showYear);
-    let loopLength = 2;
-
-    if (hours.length - 1 - index < 2) {
-      loopLength = hours.length - 1 - index;
-    }
-
-    console.log('hours length: ', hours.length);
-    console.log('index: ', index);
-    console.log('looplength: ', loopLength);
-
-    for (let i = index + 1; i <= index + loopLength; i++) {
-      pastShowYearNeedCPDHours =
-        pastShowYearNeedCPDHours + hours[i].verifiable + hours[i].nonVerifiable;
-      pastShowYearNeedVerHours = pastShowYearNeedVerHours + hours[i].verifiable;
-      pastShowYearNeedEthicsHours =
-        pastShowYearNeedEthicsHours + hours[i].ethics;
-    }
-
-    console.log('pastShowYearNeedCPDHours: ', pastShowYearNeedCPDHours);
-  };
-
-  //const lastYearDB = hours[hours.length - 1].year;
 
   //if CPD Year is more than 2 years ago, 3 year rolling applies universally
   if (cpdYear < showYear - 2) {
@@ -287,9 +255,6 @@ const hoursRequiredLogic = (user, showYear) => {
     currentYearNeedVerHours,
     currentYearNeedCPDHours,
     currentYearNeedEthicsHours,
-    pastShowYearNeedCPDHours,
-    pastShowYearNeedVerHours,
-    pastShowYearNeedEthicsHours,
     totalRollingVerRequired,
     totalRollingCPDHoursRequired,
     totalRollingEthicsRequired,

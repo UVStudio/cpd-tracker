@@ -279,9 +279,9 @@ For iOS users, the PDF is where you have chosen to save it.`
                   <CustomText>
                     Looks like you did not use the CPD Tracker App for the year
                     of {showYear}. In order for the app to calculate how many
-                    hours you need for {currentYear} properly, please click on
-                    the 'Overwrite CPD Data' button to manually input your CPD
-                    hours for {showYear}.
+                    hours you need for {currentYear}, and beyond, properly,
+                    please click on the 'Overwrite CPD Data' button to manually
+                    input your CPD hours for {showYear}.
                   </CustomText>
                 ) : (
                   <View style={styles.fullWidthCenter}>

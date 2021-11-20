@@ -20,32 +20,10 @@ import CustomOperationalContainer from '../../components/CustomOperationalContai
 import * as userActions from '../../store/actions/user';
 import * as nonVerActions from '../../store/actions/nonVer';
 import { secondsToHms, secondsToTime } from '../../utils/timeConversions';
+import { formReducer } from '../../utils/formReducer';
 import currentYear from '../../utils/currentYear';
 import Colors from '../../constants/Colors';
 import { FORM_INPUT_UPDATE } from '../../store/types';
-
-const formReducer = (state, action) => {
-  if (action.type === FORM_INPUT_UPDATE) {
-    const updatedValues = {
-      ...state.inputValues,
-      [action.input]: action.value,
-    };
-    const updatedValidities = {
-      ...state.inputValidities,
-      [action.input]: action.isValid,
-    };
-    let updatedFormIsValid = true;
-    for (const key in updatedValidities) {
-      updatedFormIsValid = updatedFormIsValid && updatedValidities[key];
-    }
-    return {
-      formIsValid: updatedFormIsValid,
-      inputValues: updatedValues,
-      inputValidities: updatedValidities,
-    };
-  }
-  return state;
-};
 
 const Timer = () => {
   const [seconds, setSeconds] = useState(0);

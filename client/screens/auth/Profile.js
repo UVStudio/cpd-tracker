@@ -14,41 +14,14 @@ import CustomGreyLine from '../../components/CustomGreyLine';
 import CustomThinGreyLine from '../../components/CustomThinGreyLine';
 import CustomRedCard from '../../components/CustomRedCard';
 import CustomErrorCard from '../../components/CustomErrorCard';
+import CustomMessageCard from '../../components/CustomMessageCard';
 import CustomScrollView from '../../components/CustomScrollView';
 import CustomScreenContainer from '../../components/CustomScreenContainer';
 import CustomOperationalContainer from '../../components/CustomOperationalContainer';
 import CustomProvinceSelectionCard from '../../components/CustomProvinceSelectionCard';
 
-import currentYear from '../../utils/currentYear';
-import Colors from '../../constants/Colors';
+import { formReducer } from '../../utils/formReducer';
 import { FORM_INPUT_UPDATE, PASSWORD_INPUT_UPDATE } from '../../store/types';
-import CustomMessageCard from '../../components/CustomMessageCard';
-
-const formReducer = (state, action) => {
-  if (
-    action.type === FORM_INPUT_UPDATE ||
-    action.type === PASSWORD_INPUT_UPDATE
-  ) {
-    const updatedValues = {
-      ...state.inputValues,
-      [action.input]: action.value,
-    };
-    const updatedValidities = {
-      ...state.inputValidities,
-      [action.input]: action.isValid,
-    };
-    let updatedFormIsValid = true;
-    for (const key in updatedValidities) {
-      updatedFormIsValid = updatedFormIsValid && updatedValidities[key];
-    }
-    return {
-      formIsValid: updatedFormIsValid,
-      inputValues: updatedValues,
-      inputValidities: updatedValidities,
-    };
-  }
-  return state;
-};
 
 const Profile = () => {
   const [cardText, setCardText] = useState('');
