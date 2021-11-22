@@ -26,6 +26,7 @@ import Colors from '../../constants/Colors';
 import { FORM_INPUT_UPDATE } from '../../store/types';
 
 const Timer = () => {
+  const [showInputType, setShowInputType] = useState(null);
   const [seconds, setSeconds] = useState(0);
   const [isActive, setIsActive] = useState(false);
   const [startButton, setStartButton] = useState('Start');
@@ -187,114 +188,131 @@ const Timer = () => {
   return (
     <CustomScreenContainer>
       <CustomScrollView>
-        <CustomTitle>Time Your Session</CustomTitle>
+        <Pressable
+          style={{ alignSelf: 'flex-start' }}
+          onPress={() => setShowInputType('timer')}
+        >
+          <CustomTitle>Time Your Session</CustomTitle>
+        </Pressable>
         <CustomGreyLine />
-        <CustomOperationalContainer>
-          <View style={styles.timerContainer}>
-            <Text style={styles.timeText}>{secondsToHms(seconds)}</Text>
-          </View>
-          <CustomButton onSelect={() => toggle()}>{startButton}</CustomButton>
-          <CustomButton onSelect={() => finish()}>Finish Session</CustomButton>
-          {seconds > 0 && !isActive && sessionLength === '' ? (
-            <CustomButton onSelect={() => cancel()}>
-              Cancel Session
-            </CustomButton>
-          ) : null}
-          <CustomThinGreyLine style={{ marginVertical: 20 }} />
-          {sessionLength !== '' ? (
-            <View style={styles.passFromOperationalContainer}>
-              <Text style={styles.sessionLengthText}>
-                Session Length: {sessionLength}
-              </Text>
-              <CustomInput
-                id="sessionName"
-                label="Session Name"
-                keyboardType="default"
-                autoCapitalize="characters"
-                errorText="Please enter session name"
-                initialValue=""
-                required
-                onInputChange={inputChangeHandler}
-              />
-              {savingTimed ? (
-                <CustomButton style={{ marginVertical: 20 }}>
-                  Saving Session...
-                </CustomButton>
-              ) : (
-                <CustomButton
-                  onSelect={saveTimedSession}
-                  style={{ marginVertical: 20 }}
-                >
-                  Save Timed Session
-                </CustomButton>
-              )}
+        {showInputType === 'timer' ? (
+          <CustomOperationalContainer>
+            <View style={styles.timerContainer}>
+              <Text style={styles.timeText}>{secondsToHms(seconds)}</Text>
             </View>
-          ) : null}
-        </CustomOperationalContainer>
-        <CustomTitle>Direct Session Input</CustomTitle>
+            <CustomButton onSelect={() => toggle()}>{startButton}</CustomButton>
+            <CustomButton onSelect={() => finish()}>
+              Finish Session
+            </CustomButton>
+            {seconds > 0 && !isActive && sessionLength === '' ? (
+              <CustomButton onSelect={() => cancel()}>
+                Cancel Session
+              </CustomButton>
+            ) : null}
+            <CustomThinGreyLine style={{ marginVertical: 20 }} />
+            {sessionLength !== '' ? (
+              <View style={styles.passFromOperationalContainer}>
+                <Text style={styles.sessionLengthText}>
+                  Session Length: {sessionLength}
+                </Text>
+                <CustomInput
+                  id="sessionName"
+                  label="Session Name"
+                  keyboardType="default"
+                  autoCapitalize="characters"
+                  errorText="Please enter session name"
+                  initialValue=""
+                  required
+                  onInputChange={inputChangeHandler}
+                />
+                {savingTimed ? (
+                  <CustomButton style={{ marginVertical: 20 }}>
+                    Saving Session...
+                  </CustomButton>
+                ) : (
+                  <CustomButton
+                    onSelect={saveTimedSession}
+                    style={{ marginVertical: 20 }}
+                  >
+                    Save Timed Session
+                  </CustomButton>
+                )}
+              </View>
+            ) : null}
+          </CustomOperationalContainer>
+        ) : null}
+
+        <Pressable
+          style={{ alignSelf: 'flex-start' }}
+          onPress={() => setShowInputType('direct')}
+        >
+          <CustomTitle>Direct Session Input</CustomTitle>
+        </Pressable>
         <CustomGreyLine />
-        <CustomOperationalContainer>
-          <View style={{ width: '100%' }}>
-            <Pressable onPress={() => setShow(true)}>
-              <CustomSelectField
-                id="directDate"
-                label="Session Date"
-                keyboardType="numeric"
-                autoCapitalize="none"
-                errorText="Please enter session year"
-                placeholderColor={Colors.darkGrey}
-                value={formattedDate}
-                required
+        {showInputType === 'direct' ? (
+          <CustomOperationalContainer>
+            <View style={{ width: '100%' }}>
+              <Pressable onPress={() => setShow(true)}>
+                <CustomSelectField
+                  id="directDate"
+                  label="Session Date"
+                  keyboardType="numeric"
+                  autoCapitalize="none"
+                  errorText="Please enter session year"
+                  placeholderColor={Colors.darkGrey}
+                  value={formattedDate}
+                  required
+                />
+              </Pressable>
+            </View>
+            {show && (
+              <DateTimePicker
+                testID="dateTimePicker"
+                value={date}
+                mode={'date'}
+                is24Hour={true}
+                display="default"
+                onChange={onChange}
               />
-            </Pressable>
-          </View>
-          {show && (
-            <DateTimePicker
-              testID="dateTimePicker"
-              value={date}
-              mode={'date'}
-              is24Hour={true}
-              display="default"
-              onChange={onChange}
+            )}
+            <CustomInput
+              id="sessionName"
+              label="Session Name"
+              keyboardType="default"
+              autoCapitalize="characters"
+              errorText="Please enter verifiable course name"
+              placeholder="ie: ACCOUNTING MAGAZINE READING"
+              placeholderColor={Colors.lightGrey}
+              onInputChange={inputChangeHandler}
+              initialValue=""
+              required
             />
-          )}
-          <CustomInput
-            id="sessionName"
-            label="Session Name"
-            keyboardType="default"
-            autoCapitalize="characters"
-            errorText="Please enter verifiable course name"
-            placeholder="ie: ACCOUNTING MAGAZINE READING"
-            placeholderColor={Colors.lightGrey}
-            onInputChange={inputChangeHandler}
-            initialValue=""
-            required
-          />
-          <CustomInput
-            id="directHours"
-            label="Session Duration (hours)"
-            keyboardType="numeric"
-            autoCapitalize="none"
-            errorText="Please enter session duration"
-            placeholder="ie: 2"
-            placeholderColor={Colors.lightGrey}
-            onInputChange={inputChangeHandler}
-            initialValue=""
-            required
-          />
-          {savingDirect ? (
-            <CustomButton style={{ marginVertical: 20 }}>
-              Saving Direct Session...
-            </CustomButton>
-          ) : (
-            <CustomButton
-              onSelect={saveDirectSession}
-              style={{ marginVertical: 20 }}
-            >
-              Save Direct Session
-            </CustomButton>
-          )}
-        </CustomOperationalContainer>
+            <CustomInput
+              id="directHours"
+              label="Session Duration (hours)"
+              keyboardType="numeric"
+              autoCapitalize="none"
+              errorText="Please enter session duration"
+              placeholder="ie: 2"
+              placeholderColor={Colors.lightGrey}
+              onInputChange={inputChangeHandler}
+              initialValue=""
+              required
+            />
+            {savingDirect ? (
+              <CustomButton style={{ marginVertical: 20 }}>
+                Saving Direct Session...
+              </CustomButton>
+            ) : (
+              <CustomButton
+                onSelect={saveDirectSession}
+                style={{ marginVertical: 20 }}
+              >
+                Save Direct Session
+              </CustomButton>
+            )}
+          </CustomOperationalContainer>
+        ) : null}
       </CustomScrollView>
       {cardText !== '' ? (
         <CustomMessageCard text={cardText} toShow={setCardText} />

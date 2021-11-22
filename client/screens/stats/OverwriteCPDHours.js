@@ -13,6 +13,7 @@ import CustomErrorCard from '../../components/CustomErrorCard';
 import CustomGreyLine from '../../components/CustomGreyLine';
 import CustomThinGreyLine from '../../components/CustomThinGreyLine';
 import CustomStatsInfoBox from '../../components/CustomStatsInfoBox';
+import CustomConfirmActionCard from '../../components/CustomConfirmActionCard';
 import CustomScreenContainer from '../../components/CustomScreenContainer';
 
 import * as userActions from '../../store/actions/user';
@@ -25,6 +26,7 @@ const OverwriteCPDHours = (props) => {
 
   const [error, setError] = useState('');
   const [savingCPD, setSavingCPD] = useState(false);
+  const [confirmCardText, setConfirmCardText] = useState('');
 
   const navigation = useNavigation();
   const dispatch = useDispatch();
@@ -35,15 +37,13 @@ const OverwriteCPDHours = (props) => {
   const user = userState ? userState : authState;
 
   const userHoursArr = user.hours;
-
   const thisYearHours = userHoursArr.find((elem) => elem.year === showYear);
-  //console.log('this Year ', thisYearHours);
 
   const [formState, dispatchFormState] = useReducer(formReducer, {
     inputValues: {
-      CertHours: thisYearHours.verifiable,
-      NonVerHours: thisYearHours.nonVerifiable,
-      EthicsHours: thisYearHours.ethics,
+      CertHours: thisYearHours.verifiable.toString(),
+      NonVerHours: thisYearHours.nonVerifiable.toString(),
+      EthicsHours: thisYearHours.ethics.toString(),
     },
     inputValidities: {
       CertHours: false,
@@ -52,8 +52,6 @@ const OverwriteCPDHours = (props) => {
     },
     formIsValid: false,
   });
-
-  //console.log('formState: ', formState);
 
   const inputChangeHandler = useCallback(
     (inputIdentifier, inputValue, inputValidity) => {
@@ -67,13 +65,18 @@ const OverwriteCPDHours = (props) => {
     [dispatchFormState]
   );
 
+  const overwriteHandler = () => {
+    setConfirmCardText(
+      `Are you sure you want to overwrite your CPD hours for ${showYear}?`
+    );
+  };
+
   const saveDataHandler = async () => {
-    setError('');
     setSavingCPD(true);
     try {
       await dispatch(
         userActions.overrideHours(
-          yearsToOverride[0].year,
+          showYear,
           formState.inputValues.CertHours,
           formState.inputValues.NonVerHours,
           formState.inputValues.EthicsHours
@@ -81,7 +84,6 @@ const OverwriteCPDHours = (props) => {
       );
 
       setSavingCPD(false);
-      //await dispatch(userActions.getUser());
       navigation.navigate('Your CPD Statistics');
     } catch (err) {
       setSavingCPD(false);
@@ -94,11 +96,94 @@ const OverwriteCPDHours = (props) => {
 
   return (
     <CustomScreenContainer>
-      <CustomTitle>Past CPD Hours Input</CustomTitle>
+      <CustomTitle>Overwrite CPD Hours for {showYear}</CustomTitle>
       <CustomGreyLine />
-      <Text>{showYear}</Text>
+      <CustomText>
+        You can overwrite your CPD Hours for {showYear} here. Please be careful,
+        as once overwritten, your CPD Hours in Statistics will no longer match
+        the data from your Verifiable and Non-Verifiable sessions. If you have
+        entered session data incorrectly, we advise that you update those
+        session records instead.
+      </CustomText>
+      <CustomStatsInfoBox>
+        <View style={{ width: '100%' }}>
+          <CustomRowSpace>
+            <View style={{ width: '50%' }}>
+              <CustomText style={{ top: 5 }}>Verifiable Hours:</CustomText>
+            </View>
+            <View style={{ width: '40%' }}>
+              <CustomInput
+                id="CertHours"
+                keyboardType="numeric"
+                autoCapitalize="none"
+                onInputChange={inputChangeHandler}
+                initialValue={thisYearHours.verifiable.toFixed(1).toString()}
+                initiallyValid="true"
+                required
+                style={styles.textInput}
+              />
+            </View>
+          </CustomRowSpace>
+          <CustomRowSpace>
+            <View style={{ width: '50%' }}>
+              <CustomText style={{ top: 5 }}>Non-Verifiable Hours:</CustomText>
+            </View>
+            <View style={{ width: '40%' }}>
+              <CustomInput
+                id="NonVerHours"
+                keyboardType="numeric"
+                autoCapitalize="none"
+                onInputChange={inputChangeHandler}
+                initialValue={thisYearHours.nonVerifiable.toFixed(1).toString()}
+                initiallyValid="true"
+                required
+                style={styles.textInput}
+              />
+            </View>
+          </CustomRowSpace>
+          <CustomRowSpace>
+            <View style={{ width: '50%' }}>
+              <CustomText style={{ top: 5 }}>Ethics Hours:</CustomText>
+            </View>
+            <View style={{ width: '40%' }}>
+              <CustomInput
+                id="EthicsHours"
+                keyboardType="numeric"
+                autoCapitalize="none"
+                onInputChange={inputChangeHandler}
+                initialValue={thisYearHours.ethics.toFixed(1).toString()}
+                initiallyValid="true"
+                required
+                style={styles.textInput}
+              />
+            </View>
+          </CustomRowSpace>
+        </View>
+      </CustomStatsInfoBox>
+
+      <CustomButton onSelect={overwriteHandler}>Overwrite</CustomButton>
+      {confirmCardText !== '' ? (
+        <CustomConfirmActionCard
+          text={confirmCardText}
+          actionLoading={savingCPD}
+          toShow={setConfirmCardText}
+          confirmAction={saveDataHandler}
+        />
+      ) : null}
+      {error !== '' ? (
+        <CustomErrorCard error={error} toShow={setError} />
+      ) : null}
     </CustomScreenContainer>
   );
 };
+
+const styles = StyleSheet.create({
+  textInput: {
+    height: 22,
+    borderBottomColor: '#ccc',
+    borderBottomWidth: 1,
+    fontSize: 16,
+  },
+});
 
 export default OverwriteCPDHours;
