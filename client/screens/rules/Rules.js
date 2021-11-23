@@ -39,8 +39,8 @@ const Rules = () => {
           <CustomText style={{ marginBottom: 10 }}>
             While 20 hours is the minimum required, the CPD Tracker by Sheriff
             Consulting highly recommends that CPA's in Canada should strive to
-            obtain 40 hours per year. This will alleviate the pressure to
-            fulfill your 3-year rolling requirement.
+            obtain a minimum of 40 hours per year. This will alleviate the
+            pressure to fulfill your 3-year rolling requirement.
           </CustomText>
           <CustomSubtitle style={{ alignSelf: 'flex-start', marginTop: 10 }}>
             3-Year Rolling CPD Hours Requirement
@@ -51,7 +51,7 @@ const Rules = () => {
             over a period of 3 years, at least 60 hours need to be verifiable.
           </CustomText>
           <CustomText style={{ marginBottom: 10 }}>
-            4 verifiable hours need to be on the subject of Ethics.
+            4 verifiable hours need to be on the subject of Professional Ethics.
           </CustomText>
           {user.province === provinceObjs.newBrunswick.name ? (
             <CustomText style={{ marginBottom: 10 }}>

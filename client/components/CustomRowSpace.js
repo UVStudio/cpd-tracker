@@ -2,7 +2,11 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
 const CustomRowSpace = (props) => {
-  return <View style={styles.rowSpaceBetween}>{props.children}</View>;
+  return (
+    <View style={{ ...styles.rowSpaceBetween, ...props.style }}>
+      {props.children}
+    </View>
+  );
 };
 
 const styles = StyleSheet.create({

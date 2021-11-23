@@ -11,7 +11,7 @@ import CustomErrorCard from '../../components/CustomErrorCard';
 import CustomIndicator from '../../components/CustomIndicator';
 import CustomStatsInfoBox from '../../components/CustomStatsInfoBox';
 import CustomScrollView from '../../components/CustomScrollView';
-import CustomOperationalContainer from '../../components/CustomOperationalContainer';
+import CustomFullWidthContainer from '../../components/CustomFullWidthContainer';
 import CustomScreenContainer from '../../components/CustomScreenContainer';
 
 const NonVerHoursDetails = (props) => {
@@ -51,14 +51,15 @@ const NonVerHoursDetails = (props) => {
         <CustomTitle>Non-Verifiable Hours for {year}</CustomTitle>
         <CustomGreyLine />
         {nonVerYearState.map((nonver, index) => (
-          <CustomOperationalContainer key={index} style={{ marginVertical: 0 }}>
+          <CustomFullWidthContainer key={index}>
             <CustomStatsInfoBox style={{ marginVertical: 5 }}>
               <CustomText>Session Name: {nonver.sessionName}</CustomText>
               <CustomText>Date: {nonver.date}</CustomText>
               <CustomText>Hours: {nonver.hours}</CustomText>
             </CustomStatsInfoBox>
+
             <CustomFaintThinGreyLine />
-          </CustomOperationalContainer>
+          </CustomFullWidthContainer>
         ))}
       </CustomScrollView>
       {error !== '' ? (

@@ -11,7 +11,7 @@ import CustomErrorCard from '../../components/CustomErrorCard';
 import CustomStatsInfoBox from '../../components/CustomStatsInfoBox';
 import CustomIndicator from '../../components/CustomIndicator';
 import CustomScrollView from '../../components/CustomScrollView';
-import CustomOperationalContainer from '../../components/CustomOperationalContainer';
+import CustomFullWidthContainer from '../../components/CustomFullWidthContainer';
 import CustomScreenContainer from '../../components/CustomScreenContainer';
 
 const CertHoursDetails = (props) => {
@@ -51,14 +51,14 @@ const CertHoursDetails = (props) => {
         <CustomTitle>Verifiable Hours for {year}</CustomTitle>
         <CustomGreyLine />
         {certsYearState.map((cert, index) => (
-          <CustomOperationalContainer key={index} style={{ marginVertical: 0 }}>
+          <CustomCustomContainer key={index}>
             <CustomStatsInfoBox style={{ marginVertical: 5 }}>
               <CustomText>Course Name: {cert.courseName}</CustomText>
               <CustomText>Hours: {cert.hours}</CustomText>
               <CustomText>Ethics Hours: {cert.ethicsHours}</CustomText>
             </CustomStatsInfoBox>
             <CustomFaintThinGreyLine />
-          </CustomOperationalContainer>
+          </CustomCustomContainer>
         ))}
       </CustomScrollView>
       {error !== '' ? (

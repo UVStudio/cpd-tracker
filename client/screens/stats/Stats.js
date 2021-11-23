@@ -25,6 +25,8 @@ import CustomProgressBar from '../../components/CustomProgressBar';
 import CustomScrollView from '../../components/CustomScrollView';
 import CustomScreenContainer from '../../components/CustomScreenContainer';
 
+import { provinceObjs } from '../../constants/Provinces';
+
 //import currentYear from '../../utils/currentYear';
 //test currentYear;
 const currentYear = 2023;
@@ -139,15 +141,13 @@ const Stats = ({ navigation }) => {
 
   //Ethics Required vs Recommended
   const ethicsReqOrRec = () => {
-    return userHours[0].year === currentYear &&
-      showYear === currentYear &&
-      userHours.length === 3
-      ? ' required'
-      : userHours[0].year === currentYear &&
-        showYear === currentYear &&
-        userHours.length < 3
-      ? ' recommended'
-      : null;
+    if (
+      user.province === provinceObjs.alberta.name ||
+      user.province === provinceObjs.nwtNu.name
+    ) {
+      return showYear - user.cpdYear > 2 ? ' required' : ' recommended';
+    }
+    return showYear - user.cpdYear > 1 ? ' required' : ' recommended';
   };
 
   //OverwriteCPD
@@ -356,7 +356,7 @@ For iOS users, the PDF is where you have chosen to save it.`
                             ' ' +
                             Number(currentYearNeedEthicsHours).toFixed(1)
                           : Number(elem.ethics).toFixed(1)}
-                        {ethicsReqOrRec()}
+                        {showYear === currentYear ? ethicsReqOrRec() : null}
                       </CustomText>
                     </CustomStatsDivider>
 

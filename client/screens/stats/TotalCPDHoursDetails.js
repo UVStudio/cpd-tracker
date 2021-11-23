@@ -16,7 +16,7 @@ import CustomIndicator from '../../components/CustomIndicator';
 import CustomAccordionUnit from '../../components/CustomAccordionUnit';
 import CustomStatsInfoBox from '../../components/CustomStatsInfoBox';
 import CustomScrollView from '../../components/CustomScrollView';
-import CustomOperationalContainer from '../../components/CustomOperationalContainer';
+import CustomFullWidthContainer from '../../components/CustomFullWidthContainer';
 import CustomScreenContainer from '../../components/CustomScreenContainer';
 
 const TotalCPDHoursDetails = (props) => {
@@ -65,17 +65,14 @@ const TotalCPDHoursDetails = (props) => {
           <CustomThinGreyLine />
           {showHours === 'cert'
             ? certsYearState.map((cert, index) => (
-                <CustomOperationalContainer
-                  key={index}
-                  style={{ alignSelf: 'center', marginVertical: 0 }}
-                >
+                <CustomFullWidthContainer key={index}>
                   <CustomStatsInfoBox style={{ marginVertical: 5 }}>
                     <CustomText>Course Name: {cert.courseName}</CustomText>
                     <CustomText>Hours: {cert.hours}</CustomText>
                     <CustomText>Ethics Hours: {cert.ethicsHours}</CustomText>
                   </CustomStatsInfoBox>
                   <CustomFaintThinGreyLine />
-                </CustomOperationalContainer>
+                </CustomFullWidthContainer>
               ))
             : null}
         </CustomAccordionUnit>
@@ -86,17 +83,14 @@ const TotalCPDHoursDetails = (props) => {
           <CustomThinGreyLine />
           {showHours === 'nonVer'
             ? nonVerYearState.map((nonver, index) => (
-                <CustomOperationalContainer
-                  key={index}
-                  style={{ alignSelf: 'center', marginVertical: 0 }}
-                >
+                <CustomFullWidthContainer key={index}>
                   <CustomStatsInfoBox style={{ marginVertical: 5 }}>
                     <CustomText>Session Name: {nonver.sessionName}</CustomText>
                     <CustomText>Date: {nonver.date}</CustomText>
                     <CustomText>Hours: {nonver.hours}</CustomText>
                   </CustomStatsInfoBox>
                   <CustomFaintThinGreyLine />
-                </CustomOperationalContainer>
+                </CustomFullWidthContainer>
               ))
             : null}
         </CustomAccordionUnit>
