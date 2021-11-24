@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { Pressable } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
+import { useNavigation } from '@react-navigation/native';
 
 import * as nonVerActions from '../../store/actions/nonVer';
 
@@ -20,6 +22,7 @@ const NonVerHoursDetails = (props) => {
   const [loading, setLoading] = useState(false);
 
   const dispatch = useDispatch();
+  const navigation = useNavigation();
 
   const nonVerYearState = useSelector((state) => state.nonVer.nonver);
 
@@ -41,6 +44,10 @@ const NonVerHoursDetails = (props) => {
     loadNonVer();
   }, []);
 
+  const editSessionHandler = (nonver) => {
+    navigation.navigate('Edit Non-Verifiable Session', { nonver });
+  };
+
   if (loading) {
     <CustomIndicator />;
   }
@@ -53,9 +60,11 @@ const NonVerHoursDetails = (props) => {
         {nonVerYearState.map((nonver, index) => (
           <CustomFullWidthContainer key={index}>
             <CustomStatsInfoBox style={{ marginVertical: 5 }}>
-              <CustomText>Session Name: {nonver.sessionName}</CustomText>
-              <CustomText>Date: {nonver.date}</CustomText>
-              <CustomText>Hours: {nonver.hours}</CustomText>
+              <Pressable onLongPress={() => editSessionHandler(nonver)}>
+                <CustomText>Session Name: {nonver.sessionName}</CustomText>
+                <CustomText>Date: {nonver.date}</CustomText>
+                <CustomText>Hours: {nonver.hours}</CustomText>
+              </Pressable>
             </CustomStatsInfoBox>
 
             <CustomFaintThinGreyLine />

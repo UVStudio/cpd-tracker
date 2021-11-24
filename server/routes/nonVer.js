@@ -4,6 +4,7 @@ const {
   addNonVerEvent,
   getAllNonVerObjsByUser,
   getAllNonVerObjsByYear,
+  updateNonVerObjById,
   deleteNonVerObjById,
 } = require('../controllers/nonVer');
 
@@ -15,6 +16,7 @@ router.post('/', protect, addNonVerEvent);
 router.get('/', protect, getAllNonVerObjsByUser);
 router.get('/:year', protect, getAllNonVerObjsByYear);
 router.get('/:id', getNonVerObjById);
+router.put('/:id', protect, updateNonVerObjById);
 router.delete('/:id', protect, deleteNonVerObjById);
 
 module.exports = router;

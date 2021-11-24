@@ -1,5 +1,5 @@
 import React, { useState, useReducer, useEffect, useCallback } from 'react';
-import { View, Text, Button, Pressable, StyleSheet } from 'react-native';
+import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 import { activateKeepAwake, deactivateKeepAwake } from 'expo-keep-awake';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -71,7 +71,7 @@ const Timer = () => {
     [dispatchFormState]
   );
 
-  const today = new Date(Date.now()).toDateString();
+  const today = new Date(Date.now()).toDateString(); //watch this line in production
   const hours = Number((seconds / 3600).toFixed(2));
 
   const saveTimedSession = async () => {

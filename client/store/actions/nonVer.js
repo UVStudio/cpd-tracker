@@ -3,6 +3,7 @@ import {
   GET_USER_NONVER_YEAR,
   GET_USER_NONVER,
   ADD_NONVER_SESSION,
+  EDIT_NONVER_SESSION,
 } from '../types';
 import { CURRENT_IP } from '../../serverConfig';
 
@@ -48,6 +49,24 @@ export const addNonVerSession = (year, date, hours, sessionName) => {
 
       dispatch({
         type: ADD_NONVER_SESSION,
+        nonver: data,
+      });
+    } catch (err) {
+      throw new Error('Cannot connect with server. Please try again.');
+    }
+  };
+};
+
+export const editNonVerSession = (sessionName, id) => {
+  return async (dispatch) => {
+    try {
+      const body = { sessionName };
+      const response = await axios.put(`${CURRENT_IP}/api/nonver/${id}`, body);
+
+      const data = response.data.data;
+
+      dispatch({
+        type: EDIT_NONVER_SESSION,
         nonver: data,
       });
     } catch (err) {

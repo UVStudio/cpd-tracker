@@ -51,14 +51,14 @@ const CertHoursDetails = (props) => {
         <CustomTitle>Verifiable Hours for {year}</CustomTitle>
         <CustomGreyLine />
         {certsYearState.map((cert, index) => (
-          <CustomCustomContainer key={index}>
+          <CustomFullWidthContainer key={index}>
             <CustomStatsInfoBox style={{ marginVertical: 5 }}>
               <CustomText>Course Name: {cert.courseName}</CustomText>
               <CustomText>Hours: {cert.hours}</CustomText>
               <CustomText>Ethics Hours: {cert.ethicsHours}</CustomText>
             </CustomStatsInfoBox>
             <CustomFaintThinGreyLine />
-          </CustomCustomContainer>
+          </CustomFullWidthContainer>
         ))}
       </CustomScrollView>
       {error !== '' ? (
