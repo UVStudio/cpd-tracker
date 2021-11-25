@@ -2,6 +2,7 @@ import {
   GET_USER_NONVER_YEAR,
   ADD_NONVER_SESSION,
   EDIT_NONVER_SESSION,
+  DELETE_NONVER_SESSION,
 } from '../types';
 
 const initialState = {
@@ -21,6 +22,11 @@ export default (state = initialState, action) => {
         nonver: action.nonver,
       };
     case EDIT_NONVER_SESSION:
+      return {
+        ...state,
+        nonver: action.nonver,
+      };
+    case DELETE_NONVER_SESSION:
       return {
         ...state,
         nonver: action.nonver,

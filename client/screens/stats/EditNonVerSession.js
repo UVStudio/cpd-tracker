@@ -24,7 +24,6 @@ import { FORM_INPUT_UPDATE } from '../../store/types';
 
 const EditNonVerSession = (props) => {
   const { nonver } = props.route.params;
-  console.log('nonver: ', nonver);
   const [cardText, setCardText] = useState('');
   const [error, setError] = useState('');
   const [savingDirect, setSavingDirect] = useState(false);

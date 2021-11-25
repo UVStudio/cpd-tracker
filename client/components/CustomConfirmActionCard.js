@@ -9,7 +9,14 @@ import CustomButton from './CustomButton';
 import delayButton from '../utils/delayButton';
 
 const CustomConfirmActionCard = (props) => {
-  const { text, toShow, confirmAction, actionLoading } = props;
+  const {
+    text,
+    toShow,
+    buttonText,
+    savingButtonText,
+    confirmAction,
+    actionLoading,
+  } = props;
 
   return (
     <View style={styles.container}>
@@ -20,14 +27,14 @@ const CustomConfirmActionCard = (props) => {
         </CustomButton>
         {actionLoading ? (
           <CustomButton style={{ marginTop: 15 }}>
-            Overwriting data...
+            {savingButtonText}
           </CustomButton>
         ) : (
           <CustomButton
             style={{ marginTop: 15 }}
             onSelect={() => confirmAction()}
           >
-            Yes! Overwrite data
+            {buttonText}
           </CustomButton>
         )}
       </View>

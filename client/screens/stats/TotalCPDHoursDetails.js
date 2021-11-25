@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Pressable } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import { useSelector, useDispatch } from 'react-redux';
+import { Ionicons } from '@expo/vector-icons';
 
 import * as certsActions from '../../store/actions/cert';
 import * as nonVerActions from '../../store/actions/nonVer';
@@ -18,6 +20,9 @@ import CustomStatsInfoBox from '../../components/CustomStatsInfoBox';
 import CustomScrollView from '../../components/CustomScrollView';
 import CustomFullWidthContainer from '../../components/CustomFullWidthContainer';
 import CustomScreenContainer from '../../components/CustomScreenContainer';
+import CustomRowSpace from '../../components/CustomRowSpace';
+
+import Colors from '../../constants/Colors';
 
 const TotalCPDHoursDetails = (props) => {
   const { year } = props.route.params;
@@ -26,6 +31,7 @@ const TotalCPDHoursDetails = (props) => {
   const [showHours, setShowHours] = useState(null);
 
   const dispatch = useDispatch();
+  const navigation = useNavigation();
 
   const certsYearState = useSelector((state) => state.cert.certsYear);
   const nonVerYearState = useSelector((state) => state.nonVer.nonver);
@@ -49,6 +55,10 @@ const TotalCPDHoursDetails = (props) => {
     loadData();
   }, []);
 
+  const editSessionHandler = (nonver) => {
+    navigation.navigate('Edit Non-Verifiable Session', { nonver });
+  };
+
   if (loading) {
     return <CustomIndicator />;
   }
@@ -66,11 +76,20 @@ const TotalCPDHoursDetails = (props) => {
           {showHours === 'cert'
             ? certsYearState.map((cert, index) => (
                 <CustomFullWidthContainer key={index}>
-                  <CustomStatsInfoBox style={{ marginVertical: 5 }}>
-                    <CustomText>Course Name: {cert.courseName}</CustomText>
-                    <CustomText>Hours: {cert.hours}</CustomText>
-                    <CustomText>Ethics Hours: {cert.ethicsHours}</CustomText>
-                  </CustomStatsInfoBox>
+                  <CustomRowSpace>
+                    <CustomStatsInfoBox style={{ marginVertical: 5 }}>
+                      <CustomText>Course Name: {cert.courseName}</CustomText>
+                      <CustomText>Hours: {cert.hours}</CustomText>
+                      <CustomText>Ethics Hours: {cert.ethicsHours}</CustomText>
+                    </CustomStatsInfoBox>
+
+                    <Ionicons
+                      name="trash-outline"
+                      size={24}
+                      color={Colors.darkGrey}
+                      style={{ alignSelf: 'center' }}
+                    />
+                  </CustomRowSpace>
                   <CustomFaintThinGreyLine />
                 </CustomFullWidthContainer>
               ))
@@ -84,11 +103,23 @@ const TotalCPDHoursDetails = (props) => {
           {showHours === 'nonVer'
             ? nonVerYearState.map((nonver, index) => (
                 <CustomFullWidthContainer key={index}>
-                  <CustomStatsInfoBox style={{ marginVertical: 5 }}>
-                    <CustomText>Session Name: {nonver.sessionName}</CustomText>
-                    <CustomText>Date: {nonver.date}</CustomText>
-                    <CustomText>Hours: {nonver.hours}</CustomText>
-                  </CustomStatsInfoBox>
+                  <CustomRowSpace>
+                    <CustomStatsInfoBox style={{ marginVertical: 5 }}>
+                      <Pressable onLongPress={() => editSessionHandler(nonver)}>
+                        <CustomText>
+                          Session Name: {nonver.sessionName}
+                        </CustomText>
+                        <CustomText>Date: {nonver.date}</CustomText>
+                        <CustomText>Hours: {nonver.hours}</CustomText>
+                      </Pressable>
+                    </CustomStatsInfoBox>
+                    <Ionicons
+                      name="trash-outline"
+                      size={24}
+                      color={Colors.darkGrey}
+                      style={{ alignSelf: 'center' }}
+                    />
+                  </CustomRowSpace>
                   <CustomFaintThinGreyLine />
                 </CustomFullWidthContainer>
               ))

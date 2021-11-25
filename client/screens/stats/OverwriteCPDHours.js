@@ -82,11 +82,12 @@ const OverwriteCPDHours = (props) => {
           formState.inputValues.EthicsHours
         )
       );
-
       setSavingCPD(false);
+      setConfirmCardText('');
       navigation.navigate('Your CPD Statistics');
     } catch (err) {
       setSavingCPD(false);
+      setConfirmCardText('');
       console.log(err.message);
       setError(
         'There is something wrong with our network. We cannot overwrite your past CPD data at the moment. Please try again later.'
@@ -168,6 +169,8 @@ const OverwriteCPDHours = (props) => {
           actionLoading={savingCPD}
           toShow={setConfirmCardText}
           confirmAction={saveDataHandler}
+          buttonText="Yes! Overwrite data"
+          savingButtonText="Overwriting data..."
         />
       ) : null}
       {error !== '' ? (
