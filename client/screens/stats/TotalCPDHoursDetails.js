@@ -6,6 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 
 import * as certsActions from '../../store/actions/cert';
 import * as nonVerActions from '../../store/actions/nonVer';
+import * as userActions from '../../store/actions/user';
 
 import CustomTitle from '../../components/CustomTitle';
 import CustomText from '../../components/CustomText';
@@ -18,6 +19,7 @@ import CustomIndicator from '../../components/CustomIndicator';
 import CustomAccordionUnit from '../../components/CustomAccordionUnit';
 import CustomStatsInfoBox from '../../components/CustomStatsInfoBox';
 import CustomScrollView from '../../components/CustomScrollView';
+import CustomConfirmActionCard from '../../components/CustomConfirmActionCard';
 import CustomFullWidthContainer from '../../components/CustomFullWidthContainer';
 import CustomScreenContainer from '../../components/CustomScreenContainer';
 import CustomRowSpace from '../../components/CustomRowSpace';
@@ -29,6 +31,11 @@ const TotalCPDHoursDetails = (props) => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [showHours, setShowHours] = useState(null);
+  const [confirmCardText, setConfirmCardText] = useState('');
+  const [deletingSession, setDeletingSession] = useState(false);
+  const [verObjToDelete, setVerObjToDelete] = useState(null);
+  const [nonVerToDeleteID, setNonVerToDeleteID] = useState('');
+  const [verOrNonVer, setVerOrNonVer] = useState(null);
 
   const dispatch = useDispatch();
   const navigation = useNavigation();
@@ -59,6 +66,52 @@ const TotalCPDHoursDetails = (props) => {
     navigation.navigate('Edit Non-Verifiable Session', { nonver });
   };
 
+  const deleteCardHandler = (item) => {
+    if (item.sessionName) {
+      setVerOrNonVer('nonVer');
+      setNonVerToDeleteID(item._id);
+      setConfirmCardText(
+        `Are you sure you want to delete this ${item.sessionName} session?`
+      );
+    } else {
+      setVerOrNonVer('ver');
+      setVerObjToDelete(item);
+      setConfirmCardText(
+        `Are you sure you want to delete this ${item.courseName} session?`
+      );
+    }
+  };
+
+  const deleteSessionHandler = async () => {
+    setDeletingSession(true);
+    try {
+      if (verOrNonVer === 'nonVer') {
+        await dispatch(nonVerActions.deleteNonVerSession(nonVerToDeleteID));
+        await dispatch(nonVerActions.getAllNonVerObjsByYear(year));
+        setNonVerToDeleteID('');
+      }
+      if (verOrNonVer === 'ver') {
+        const imageId = verObjToDelete.img;
+        await dispatch(certsActions.deleteCertObjById(verObjToDelete._id));
+        await dispatch(certsActions.deleteUploadByCertImgId(imageId));
+        await dispatch(certsActions.getAllCertObjsByYear(year));
+        setVerObjToDelete(null);
+      }
+      await dispatch(userActions.getUser());
+      setDeletingSession(false);
+      setConfirmCardText('');
+    } catch (err) {
+      setDeletingSession(false);
+      setConfirmCardText('');
+      setNonVerToDeleteID('');
+      setVerObjToDelete(null);
+      console.log(err.message);
+      setError(
+        'There is something wrong with our network. We cannot delete your session at the moment. Please try again later.'
+      );
+    }
+  };
+
   if (loading) {
     return <CustomIndicator />;
   }
@@ -82,13 +135,17 @@ const TotalCPDHoursDetails = (props) => {
                       <CustomText>Hours: {cert.hours}</CustomText>
                       <CustomText>Ethics Hours: {cert.ethicsHours}</CustomText>
                     </CustomStatsInfoBox>
-
-                    <Ionicons
-                      name="trash-outline"
-                      size={24}
-                      color={Colors.darkGrey}
+                    <Pressable
                       style={{ alignSelf: 'center' }}
-                    />
+                      onPress={() => deleteCardHandler(cert)}
+                    >
+                      <Ionicons
+                        name="trash-outline"
+                        size={24}
+                        color={Colors.darkGrey}
+                        style={{ alignSelf: 'center' }}
+                      />
+                    </Pressable>
                   </CustomRowSpace>
                   <CustomFaintThinGreyLine />
                 </CustomFullWidthContainer>
@@ -113,12 +170,17 @@ const TotalCPDHoursDetails = (props) => {
                         <CustomText>Hours: {nonver.hours}</CustomText>
                       </Pressable>
                     </CustomStatsInfoBox>
-                    <Ionicons
-                      name="trash-outline"
-                      size={24}
-                      color={Colors.darkGrey}
+                    <Pressable
                       style={{ alignSelf: 'center' }}
-                    />
+                      onPress={() => deleteCardHandler(nonver)}
+                    >
+                      <Ionicons
+                        name="trash-outline"
+                        size={24}
+                        color={Colors.darkGrey}
+                        style={{ alignSelf: 'center' }}
+                      />
+                    </Pressable>
                   </CustomRowSpace>
                   <CustomFaintThinGreyLine />
                 </CustomFullWidthContainer>
@@ -128,6 +190,16 @@ const TotalCPDHoursDetails = (props) => {
       </CustomScrollView>
       {error !== '' ? (
         <CustomErrorCard error={error} toShow={setError} />
+      ) : null}
+      {confirmCardText !== '' ? (
+        <CustomConfirmActionCard
+          text={confirmCardText}
+          actionLoading={deletingSession}
+          toShow={setConfirmCardText}
+          confirmAction={deleteSessionHandler}
+          buttonText="Yes! Delete session"
+          savingButtonText="Deleting session..."
+        />
       ) : null}
     </CustomScreenContainer>
   );

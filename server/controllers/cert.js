@@ -61,7 +61,7 @@ exports.deleteCertObjById = asyncHandler(async (req, res, next) => {
   const cert = await Cert.findById(certId);
 
   if (!cert) {
-    return next(new ErrorResponse('Cert is not found', 400));
+    return next(new ErrorResponse('Certificate is not found', 400));
   }
 
   const certYear = cert.year;

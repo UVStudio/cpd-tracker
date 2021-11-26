@@ -172,12 +172,12 @@ const Timer = () => {
         )
       );
       await dispatch(userActions.getUser());
-      setCardText('Non-Verifiable session successfully saved');
       setSavingDirect(false);
+      setCardText('Non-Verifiable session successfully saved');
     } catch (err) {
+      setSavingDirect(false);
       console.log(err.message);
       setError(err.message);
-      setSavingDirect(false);
     }
   };
 

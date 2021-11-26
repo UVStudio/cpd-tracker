@@ -31,7 +31,7 @@ export const saveVerCourse = (year, hours, ethicsHours, courseName, cert) => {
 
       await axios.post(`${CURRENT_IP}/api/upload`, formData, config);
     } catch (err) {
-      console.log(err.message);
+      throw new Error(err.response.data.error);
     }
   };
 };
@@ -46,7 +46,7 @@ export const getAllCertObjsByUser = () => {
         certs: data,
       });
     } catch (err) {
-      console.log(err.message);
+      throw new Error(err.response.data.error);
     }
   };
 };
@@ -62,7 +62,27 @@ export const getAllCertObjsByYear = (year) => {
         certs: data,
       });
     } catch (err) {
-      console.log(err.message);
+      throw new Error(err.response.data.error);
+    }
+  };
+};
+
+export const deleteCertObjById = (id) => {
+  return async () => {
+    try {
+      await axios.delete(`${CURRENT_IP}/api/cert/${id}`);
+    } catch (err) {
+      throw new Error(err.response.data.error);
+    }
+  };
+};
+
+export const deleteUploadByCertImgId = (id) => {
+  return async () => {
+    try {
+      await axios.delete(`${CURRENT_IP}/api/upload/${id}`);
+    } catch (err) {
+      throw new Error(err.response.data.error);
     }
   };
 };

@@ -36,8 +36,6 @@ export const getUser = () => {
       const response = await axios.get(`${CURRENT_IP}/api/auth/`);
       const user = response.data.data;
 
-      //console.log('get user action: ', user);
-
       dispatch({
         type: GET_USER,
         user: user,
@@ -102,7 +100,7 @@ export const updatePassword = (passwordFormState) => {
     try {
       await axios.put(`${CURRENT_IP}/api/auth/password`, body, config);
     } catch (err) {
-      throw new Error('Cannot connect with server. Please try again.');
+      throw new Error(err.response.data.error);
     }
   };
 };

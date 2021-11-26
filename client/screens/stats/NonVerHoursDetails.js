@@ -26,7 +26,6 @@ const NonVerHoursDetails = (props) => {
   const { year } = props.route.params;
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [refreshingData, setRefreshingData] = useState(false);
   const [confirmCardText, setConfirmCardText] = useState('');
   const [deletingSession, setDeletingSession] = useState(false);
   const [nonVerToDeleteID, setNonVerToDeleteID] = useState('');
@@ -35,7 +34,6 @@ const NonVerHoursDetails = (props) => {
   const navigation = useNavigation();
 
   const nonVerYearState = useSelector((state) => state.nonVer.nonver);
-  console.log('nonVerYearState: ', nonVerYearState);
 
   const loadNonVer = async () => {
     setLoading(true);
@@ -67,11 +65,11 @@ const NonVerHoursDetails = (props) => {
   };
 
   const deleteSessionHandler = async () => {
-    console.log('delete ID: ', nonVerToDeleteID);
     setDeletingSession(true);
     try {
       await dispatch(nonVerActions.deleteNonVerSession(nonVerToDeleteID));
       await dispatch(nonVerActions.getAllNonVerObjsByYear(year));
+      await dispatch(userActions.getUser());
       setDeletingSession(false);
       setConfirmCardText('');
     } catch (err) {
@@ -84,7 +82,7 @@ const NonVerHoursDetails = (props) => {
     }
   };
 
-  if (loading || refreshingData) {
+  if (loading) {
     <CustomIndicator />;
   }
 
