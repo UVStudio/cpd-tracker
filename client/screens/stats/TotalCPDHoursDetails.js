@@ -91,14 +91,14 @@ const TotalCPDHoursDetails = (props) => {
     try {
       if (verOrNonVer === 'nonVer') {
         await dispatch(nonVerActions.deleteNonVerSession(nonVerToDeleteID));
-        await dispatch(nonVerActions.getAllNonVerObjsByYear(year));
+        //await dispatch(nonVerActions.getAllNonVerObjsByYear(year));
         setNonVerToDeleteID('');
       }
       if (verOrNonVer === 'ver') {
         const imageId = verObjToDelete.img;
         await dispatch(certsActions.deleteCertObjById(verObjToDelete._id));
         await dispatch(certsActions.deleteUploadByCertImgId(imageId));
-        await dispatch(certsActions.getAllCertObjsByYear(year));
+        //await dispatch(certsActions.getAllCertObjsByYear(year));
         setVerObjToDelete(null);
       }
       await dispatch(userActions.getUser());
