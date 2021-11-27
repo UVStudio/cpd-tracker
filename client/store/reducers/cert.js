@@ -1,12 +1,13 @@
 import {
   GET_USER_CERTS,
   GET_USER_CERTS_YEAR,
+  ADD_USER_CERT,
   EDIT_CERT_COURSE,
+  DELETE_CERT_COURSE,
 } from '../types';
 
 const initialState = {
   certs: [],
-  certsYear: [],
 };
 
 export default (state = initialState, action) => {
@@ -21,7 +22,17 @@ export default (state = initialState, action) => {
         ...state,
         certs: action.certs,
       };
+    case ADD_USER_CERT:
+      return {
+        ...state,
+        certs: action.certs,
+      };
     case EDIT_CERT_COURSE:
+      return {
+        ...state,
+        certs: action.certs,
+      };
+    case DELETE_CERT_COURSE:
       return {
         ...state,
         certs: action.certs,

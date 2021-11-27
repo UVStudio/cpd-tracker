@@ -63,7 +63,11 @@ exports.addNonVerEvent = asyncHandler(async (req, res, next) => {
 
   user = await User.findById(req.user.id).populate('nonver');
 
-  res.status(200).json({ success: true, data: user.nonver });
+  //returns all non-ver sessions under the same year as the non-ver session being added
+  const nonVers = user.nonver;
+  const nonVersYear = nonVers.filter((nonVer) => nonVer.year === Number(year));
+
+  res.status(200).json({ success: true, data: nonVersYear });
 });
 
 //desc    GET All Non-Ver Session Objects by current user
@@ -156,7 +160,11 @@ exports.deleteNonVerObjById = asyncHandler(async (req, res, next) => {
   await User.updateOne({ _id: userId }, { $pull: { nonver: nonVerId } });
   await NonVer.deleteOne({ _id: nonVerId });
 
-  const user = await User.findById(userId);
+  const user = await User.findById(userId).populate('nonver');
 
-  res.status(200).json({ success: true, data: user });
+  //returns all non-ver sessions under the same year as the non-ver session being deleted
+  const nonVers = user.nonver;
+  const nonVersYear = nonVers.filter((nonVer) => nonVer.year === nonVerYear);
+
+  res.status(200).json({ success: true, data: nonVersYear });
 });

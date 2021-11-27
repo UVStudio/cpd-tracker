@@ -77,6 +77,7 @@ exports.updateCertObjById = asyncHandler(async (req, res, next) => {
   const certs = user.cert;
   const certsYear = certs.filter((cert) => cert.year === certYear);
 
+  //returns all cert courses under the same year as the cert course being updated
   res.status(200).json({ success: true, data: certsYear });
 });
 
@@ -109,5 +110,9 @@ exports.deleteCertObjById = asyncHandler(async (req, res, next) => {
 
   const user = await User.findById(req.user.id);
 
-  res.status(200).json({ success: true, data: user });
+  const certs = user.cert;
+  const certsYear = certs.filter((cert) => cert.year === certYear);
+
+  //returns all cert courses under the same year as the cert course being deleted
+  res.status(200).json({ success: true, data: certsYear });
 });

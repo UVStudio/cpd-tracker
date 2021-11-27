@@ -1,13 +1,15 @@
 import axios from 'axios';
 import {
   GET_USER_CERTS,
+  ADD_USER_CERT,
   GET_USER_CERTS_YEAR,
   EDIT_CERT_COURSE,
+  DELETE_CERT_COURSE,
 } from '../types';
 import { CURRENT_IP } from '../../serverConfig';
 
 export const saveVerCourse = (year, hours, ethicsHours, courseName, cert) => {
-  return async () => {
+  return async (dispatch) => {
     try {
       const certName = cert.name;
       const uri = cert.uri;
@@ -31,9 +33,17 @@ export const saveVerCourse = (year, hours, ethicsHours, courseName, cert) => {
         },
       };
 
-      //console.log('formData: ', formData);
+      const response = await axios.post(
+        `${CURRENT_IP}/api/upload`,
+        formData,
+        config
+      );
+      const data = response.data.data;
 
-      await axios.post(`${CURRENT_IP}/api/upload`, formData, config);
+      dispatch({
+        type: ADD_USER_CERT,
+        certs: data,
+      });
     } catch (err) {
       throw new Error(err.response.data.error);
     }
@@ -79,8 +89,6 @@ export const editCertCourseById = (courseName, id) => {
       const response = await axios.put(`${CURRENT_IP}/api/cert/${id}`, body);
       const data = response.data.data;
 
-      console.log('data: ', data);
-
       dispatch({
         type: EDIT_CERT_COURSE,
         certs: data,
@@ -92,9 +100,15 @@ export const editCertCourseById = (courseName, id) => {
 };
 
 export const deleteCertObjById = (id) => {
-  return async () => {
+  return async (dispatch) => {
     try {
-      await axios.delete(`${CURRENT_IP}/api/cert/${id}`);
+      const response = await axios.delete(`${CURRENT_IP}/api/cert/${id}`);
+      const data = response.data.data;
+
+      dispatch({
+        type: DELETE_CERT_COURSE,
+        certs: data,
+      });
     } catch (err) {
       throw new Error(err.response.data.error);
     }

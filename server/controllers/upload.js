@@ -138,14 +138,20 @@ exports.uploadCert = asyncHandler(async (req, res, next) => {
   };
 
   await User.updateOne(query, update);
-
   await user.save();
 
-  user = await User.findById(req.user.id);
+  user = await User.findById(req.user.id).populate('cert');
+
+  const certs = user.cert;
+  const certsYear = certs.filter((cert) => cert.year === Number(year));
 
   res
     .status(200)
-    .json({ success: 'true', data: { file, cert: certObj, user } });
+    .json({
+      success: 'true',
+      info: { file, cert: certObj, user },
+      data: certsYear,
+    });
 });
 
 //@route   DELETE /api/upload/:id

@@ -68,7 +68,7 @@ const NonVerHoursDetails = (props) => {
     setDeletingSession(true);
     try {
       await dispatch(nonVerActions.deleteNonVerSession(nonVerToDeleteID));
-      await dispatch(nonVerActions.getAllNonVerObjsByYear(year));
+      //await dispatch(nonVerActions.getAllNonVerObjsByYear(year));
       await dispatch(userActions.getUser());
       setDeletingSession(false);
       setConfirmCardText('');
