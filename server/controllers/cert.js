@@ -52,6 +52,34 @@ exports.getAllCertObjsByYear = asyncHandler(async (req, res, next) => {
   res.status(200).json({ success: true, data: certsYear });
 });
 
+//desc    UPDATE cert object by ID
+//route   UPDATE /api/cert/:id
+//access  private
+exports.updateCertObjById = asyncHandler(async (req, res, next) => {
+  const certId = req.params.id;
+  const { courseName } = req.body;
+  const cert = await Cert.findOneAndUpdate(
+    { _id: certId },
+    { courseName },
+    { new: true }
+  );
+
+  const certYear = cert.year;
+
+  if (!cert) {
+    return next(
+      new ErrorResponse('This Non-Verifiable Session is not found', 400)
+    );
+  }
+
+  const user = await User.findById(req.user.id).populate('cert');
+
+  const certs = user.cert;
+  const certsYear = certs.filter((cert) => cert.year === certYear);
+
+  res.status(200).json({ success: true, data: certsYear });
+});
+
 //desc    DELETE cert Obj by ID, and cascade delete user cert Array and update hours array
 //route   DELETE /api/cert/:id
 //access  private

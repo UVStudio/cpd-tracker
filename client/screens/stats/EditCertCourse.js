@@ -14,16 +14,16 @@ import CustomScreenContainer from '../../components/CustomScreenContainer';
 import CustomOperationalContainer from '../../components/CustomOperationalContainer';
 
 import * as userActions from '../../store/actions/user';
-import * as nonVerActions from '../../store/actions/nonVer';
+import * as certActions from '../../store/actions/cert';
 import { formReducer } from '../../utils/formReducer';
 import Colors from '../../constants/Colors';
 import { FORM_INPUT_UPDATE } from '../../store/types';
 
-const EditNonVerSession = (props) => {
-  const { nonver } = props.route.params;
+const EditCertCourse = (props) => {
+  const { cert } = props.route.params;
   const [cardText, setCardText] = useState('');
   const [error, setError] = useState('');
-  const [updateCourse, setUpdatingSession] = useState(false);
+  const [updatingCourse, setUpdatingCourse] = useState(false);
 
   const authState = useSelector((state) => state.auth.user);
   const userState = useSelector((state) => state.user.user);
@@ -34,10 +34,10 @@ const EditNonVerSession = (props) => {
 
   const [formState, dispatchFormState] = useReducer(formReducer, {
     inputValues: {
-      sessionName: '',
+      courseName: '',
     },
     inputValidities: {
-      sessionName: false,
+      courseName: false,
     },
     formIsValid: false,
   });
@@ -54,18 +54,18 @@ const EditNonVerSession = (props) => {
     [dispatchFormState]
   );
 
-  const editSession = async (id) => {
-    setUpdatingSession(true);
-    const sessionName = formState.inputValues.sessionName;
+  const editCourse = async (id) => {
+    setUpdatingCourse(true);
+    const courseName = formState.inputValues.courseName;
     try {
-      await dispatch(nonVerActions.editNonVerSession(sessionName, id));
+      await dispatch(certActions.editCertCourseById(courseName, id));
       await dispatch(userActions.getUser());
-      setCardText('Non-Verifiable session name successfully updated');
-      setUpdatingSession(false);
+      setCardText('Verifiable course name successfully updated');
+      setUpdatingCourse(false);
     } catch (err) {
       console.log(err.message);
       setError(err.message);
-      setUpdatingSession(false);
+      setUpdatingCourse(false);
     }
   };
 
@@ -76,31 +76,31 @@ const EditNonVerSession = (props) => {
   return (
     <CustomScreenContainer>
       <CustomScrollView>
-        <CustomTitle>Edit Your Session Name</CustomTitle>
+        <CustomTitle>Edit Verifiable Course Name</CustomTitle>
         <CustomGreyLine />
         <CustomOperationalContainer>
           <CustomInput
-            id="sessionName"
-            label="Edit Session Name"
+            id="courseName"
+            label="Edit Course Name"
             keyboardType="default"
             autoCapitalize="characters"
-            errorText="Please enter non-verifiable session name"
-            placeholder={nonver.sessionName}
+            errorText="Please enter verifiable course name"
+            placeholder={cert.courseName}
             placeholderColor={Colors.lightGrey}
             onInputChange={inputChangeHandler}
             initialValue=""
             required
           />
-          {updateCourse ? (
+          {updatingCourse ? (
             <CustomButton style={{ marginVertical: 20 }}>
-              Updating Session...
+              Updating Course...
             </CustomButton>
           ) : (
             <CustomButton
-              onSelect={() => editSession(nonver._id)}
+              onSelect={() => editCourse(cert._id)}
               style={{ marginVertical: 20 }}
             >
-              Update Non-Verifiable Session
+              Update Verifiable Course
             </CustomButton>
           )}
         </CustomOperationalContainer>
@@ -115,4 +115,4 @@ const EditNonVerSession = (props) => {
   );
 };
 
-export default EditNonVerSession;
+export default EditCertCourse;

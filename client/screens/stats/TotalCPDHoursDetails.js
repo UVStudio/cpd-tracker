@@ -40,7 +40,7 @@ const TotalCPDHoursDetails = (props) => {
   const dispatch = useDispatch();
   const navigation = useNavigation();
 
-  const certsYearState = useSelector((state) => state.cert.certsYear);
+  const certsYearState = useSelector((state) => state.cert.certs);
   const nonVerYearState = useSelector((state) => state.nonVer.nonver);
 
   const loadData = async () => {
@@ -62,8 +62,12 @@ const TotalCPDHoursDetails = (props) => {
     loadData();
   }, []);
 
-  const editSessionHandler = (nonver) => {
-    navigation.navigate('Edit Non-Verifiable Session', { nonver });
+  const editSessionHandler = (item) => {
+    if (item.sessionName) {
+      navigation.navigate('Edit Non-Verifiable Session', { item });
+    } else {
+      navigation.navigate('Edit Verifiable Course', { item });
+    }
   };
 
   const deleteCardHandler = (item) => {
@@ -131,9 +135,13 @@ const TotalCPDHoursDetails = (props) => {
                 <CustomFullWidthContainer key={index}>
                   <CustomRowSpace>
                     <CustomStatsInfoBox style={{ marginVertical: 5 }}>
-                      <CustomText>Course Name: {cert.courseName}</CustomText>
-                      <CustomText>Hours: {cert.hours}</CustomText>
-                      <CustomText>Ethics Hours: {cert.ethicsHours}</CustomText>
+                      <Pressable onLongPress={() => editSessionHandler(cert)}>
+                        <CustomText>Course Name: {cert.courseName}</CustomText>
+                        <CustomText>Hours: {cert.hours}</CustomText>
+                        <CustomText>
+                          Ethics Hours: {cert.ethicsHours}
+                        </CustomText>
+                      </Pressable>
                     </CustomStatsInfoBox>
                     <Pressable
                       style={{ alignSelf: 'center' }}

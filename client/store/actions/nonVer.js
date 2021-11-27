@@ -4,6 +4,7 @@ import {
   GET_USER_NONVER,
   ADD_NONVER_SESSION,
   EDIT_NONVER_SESSION,
+  DELETE_NONVER_SESSION,
 } from '../types';
 import { CURRENT_IP } from '../../serverConfig';
 
@@ -76,9 +77,15 @@ export const editNonVerSession = (sessionName, id) => {
 };
 
 export const deleteNonVerSession = (id) => {
-  return async () => {
+  return async (dispatch) => {
     try {
-      await axios.delete(`${CURRENT_IP}/api/nonver/${id}`);
+      const response = await axios.delete(`${CURRENT_IP}/api/nonver/${id}`);
+      const data = response.data.data;
+
+      dispatch({
+        type: DELETE_NONVER_SESSION,
+        nonver: data,
+      });
     } catch (err) {
       throw new Error(err.response.data.error);
     }

@@ -1,5 +1,9 @@
 import axios from 'axios';
-import { GET_USER_CERTS, GET_USER_CERTS_YEAR } from '../types';
+import {
+  GET_USER_CERTS,
+  GET_USER_CERTS_YEAR,
+  EDIT_CERT_COURSE,
+} from '../types';
 import { CURRENT_IP } from '../../serverConfig';
 
 export const saveVerCourse = (year, hours, ethicsHours, courseName, cert) => {
@@ -59,6 +63,26 @@ export const getAllCertObjsByYear = (year) => {
 
       dispatch({
         type: GET_USER_CERTS_YEAR,
+        certs: data,
+      });
+    } catch (err) {
+      throw new Error(err.response.data.error);
+    }
+  };
+};
+
+export const editCertCourseById = (courseName, id) => {
+  return async (dispatch) => {
+    try {
+      const body = { courseName };
+
+      const response = await axios.put(`${CURRENT_IP}/api/cert/${id}`, body);
+      const data = response.data.data;
+
+      console.log('data: ', data);
+
+      dispatch({
+        type: EDIT_CERT_COURSE,
         certs: data,
       });
     } catch (err) {

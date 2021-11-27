@@ -1,4 +1,8 @@
-import { GET_USER_CERTS, GET_USER_CERTS_YEAR } from '../types';
+import {
+  GET_USER_CERTS,
+  GET_USER_CERTS_YEAR,
+  EDIT_CERT_COURSE,
+} from '../types';
 
 const initialState = {
   certs: [],
@@ -15,7 +19,12 @@ export default (state = initialState, action) => {
     case GET_USER_CERTS_YEAR:
       return {
         ...state,
-        certsYear: action.certs,
+        certs: action.certs,
+      };
+    case EDIT_CERT_COURSE:
+      return {
+        ...state,
+        certs: action.certs,
       };
     default:
       return state;

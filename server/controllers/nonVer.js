@@ -100,7 +100,7 @@ exports.getAllNonVerObjsByYear = asyncHandler(async (req, res, next) => {
   res.status(200).json({ success: true, data: nonVersYear });
 });
 
-//desc    UPDATE Non-Ver Session Objects by ID and Cascade to User's Non-Ver Array
+//desc    UPDATE Non-Ver Session Objects by ID
 //route   UPDATE /api/nonver/:id
 //access  private
 exports.updateNonVerObjById = asyncHandler(async (req, res, next) => {
@@ -112,6 +112,8 @@ exports.updateNonVerObjById = asyncHandler(async (req, res, next) => {
     { new: true }
   );
 
+  const nonVerYear = nonVer.year;
+
   if (!nonVer) {
     return next(
       new ErrorResponse('This Non-Verifiable Session is not found', 400)
@@ -120,7 +122,11 @@ exports.updateNonVerObjById = asyncHandler(async (req, res, next) => {
 
   const user = await User.findById(req.user.id).populate('nonver');
 
-  res.status(200).json({ success: true, data: user.nonver });
+  //returns all non-ver sessions under the same year as the non-ver session being updated
+  const nonVers = user.nonver;
+  const nonVersYear = nonVers.filter((nonVer) => nonVer.year === nonVerYear);
+
+  res.status(200).json({ success: true, data: nonVersYear });
 });
 
 //desc    DELETE Non-Ver Session Objects by ID and Cascade to User's Non-Ver Array

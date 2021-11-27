@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Pressable } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import { useSelector, useDispatch } from 'react-redux';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -30,8 +31,9 @@ const CertHoursDetails = (props) => {
   const [verObjToDelete, setVerObjToDelete] = useState(null);
 
   const dispatch = useDispatch();
+  const navigation = useNavigation();
 
-  const certsYearState = useSelector((state) => state.cert.certsYear);
+  const certsYearState = useSelector((state) => state.cert.certs);
 
   const loadCerts = async () => {
     setLoading(true);
@@ -51,10 +53,14 @@ const CertHoursDetails = (props) => {
     loadCerts();
   }, []);
 
-  const deleteCardHandler = (item) => {
-    setVerObjToDelete(item);
+  const editCourseHandler = (cert) => {
+    navigation.navigate('Edit Verifiable Course', { cert });
+  };
+
+  const deleteCardHandler = (cert) => {
+    setVerObjToDelete(cert);
     setConfirmCardText(
-      `Are you sure you want to delete this ${item.courseName} session?`
+      `Are you sure you want to delete this ${cert.courseName} session?`
     );
   };
 
@@ -93,9 +99,11 @@ const CertHoursDetails = (props) => {
           <CustomFullWidthContainer key={index}>
             <CustomRowSpace>
               <CustomStatsInfoBox style={{ marginVertical: 5 }}>
-                <CustomText>Course Name: {cert.courseName}</CustomText>
-                <CustomText>Hours: {cert.hours}</CustomText>
-                <CustomText>Ethics Hours: {cert.ethicsHours}</CustomText>
+                <Pressable onLongPress={() => editCourseHandler(cert)}>
+                  <CustomText>Course Name: {cert.courseName}</CustomText>
+                  <CustomText>Hours: {cert.hours}</CustomText>
+                  <CustomText>Ethics Hours: {cert.ethicsHours}</CustomText>
+                </Pressable>
               </CustomStatsInfoBox>
               <Pressable
                 style={{ alignSelf: 'center' }}

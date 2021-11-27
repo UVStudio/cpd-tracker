@@ -13,6 +13,7 @@ import TotalCPDHoursDetails from '../screens/stats/TotalCPDHoursDetails';
 import PastCPDHoursInput from '../screens/stats/PastCPDHoursInput';
 import OverwriteCPDHours from '../screens/stats/OverwriteCPDHours';
 import EditNonVerSession from '../screens/stats/EditNonVerSession';
+import EditCertCourse from '../screens/stats/EditCertCourse';
 import Timer from '../screens/timer/Timer';
 import UploadSession from '../screens/timer/UploadSession';
 import Rules from '../screens/rules/Rules';
@@ -79,6 +80,10 @@ const CPDNavigator = () => {
       <CPDStackNavigator.Screen
         name="Edit Non-Verifiable Session"
         component={EditNonVerSession}
+      />
+      <CPDStackNavigator.Screen
+        name="Edit Verifiable Course"
+        component={EditCertCourse}
       />
     </CPDStackNavigator.Navigator>
   );
