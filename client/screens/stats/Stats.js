@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { View, StyleSheet, Platform, Pressable } from 'react-native';
+import { Text, View, StyleSheet, Platform, Pressable } from 'react-native';
 import { downloadToFolder } from 'expo-file-dl';
 
 import * as Notifications from 'expo-notifications';
@@ -26,6 +26,7 @@ import CustomScrollView from '../../components/CustomScrollView';
 import CustomScreenContainer from '../../components/CustomScreenContainer';
 
 import { provinceObjs } from '../../constants/Provinces';
+import Colors from '../../constants/Colors';
 
 //import currentYear from '../../utils/currentYear';
 //test currentYear;
@@ -254,6 +255,18 @@ For iOS users, the PDF is where you have chosen to save it.`
     getNotificationPermissions();
   });
 
+  const statsFraction = (num, denom, ...other) => {
+    return (
+      <Text>
+        <Text style={{ color: Colors.dark }}>
+          {Number(num + other).toFixed(1)}
+        </Text>
+        <Text> / </Text>
+        <Text>{Number(denom).toFixed(1)}</Text>
+      </Text>
+    );
+  };
+
   if (loading) {
     return <CustomIndicator />;
   }
@@ -294,15 +307,19 @@ For iOS users, the PDF is where you have chosen to save it.`
                       <Pressable onPress={() => verifiableHoursDetails()}>
                         <CustomText>
                           Verifiable Hours:{' '}
-                          {!elem.historic
-                            ? Number(elem.verifiable).toFixed(1) +
-                              ' ' +
-                              '/' +
-                              ' ' +
-                              Number(currentYearNeedVerHours).toFixed(1)
-                            : Number(elem.verifiable).toFixed(1)}
+                          {!elem.historic ? (
+                            statsFraction(
+                              elem.verifiable,
+                              currentYearNeedVerHours
+                            )
+                          ) : (
+                            <Text style={{ color: Colors.dark }}>
+                              {Number(elem.verifiable).toFixed(1)}
+                            </Text>
+                          )}
                           {userHours[0].year === showYear ? ' required' : null}
                         </CustomText>
+
                         {!elem.historic ? (
                           <CustomProgressBar
                             progress={elem.verifiable}
@@ -316,17 +333,19 @@ For iOS users, the PDF is where you have chosen to save it.`
                       <Pressable onPress={() => totalCPDHoursDetails()}>
                         <CustomText>
                           Total CPD Hours:{' '}
-                          {!elem.historic
-                            ? Number(
-                                elem.nonVerifiable + elem.verifiable
-                              ).toFixed(1) +
-                              ' ' +
-                              '/' +
-                              ' ' +
-                              Number(currentYearNeedCPDHours).toFixed(1)
-                            : Number(
+                          {!elem.historic ? (
+                            statsFraction(
+                              elem.nonVerifiable,
+                              currentYearNeedCPDHours,
+                              elem.verifiable
+                            )
+                          ) : (
+                            <Text style={{ color: 'black' }}>
+                              {Number(
                                 elem.nonVerifiable + elem.verifiable
                               ).toFixed(1)}
+                            </Text>
+                          )}
                           {userHours[0].year === showYear ? ' required' : null}
                         </CustomText>
                         {!elem.historic ? (
@@ -342,20 +361,22 @@ For iOS users, the PDF is where you have chosen to save it.`
                       <Pressable onPress={() => nonVerHoursDetails()}>
                         <CustomText>
                           Non-Verifiable Hours:{' '}
-                          {Number(elem.nonVerifiable).toFixed(1)}
+                          <Text style={{ color: 'black' }}>
+                            {Number(elem.nonVerifiable).toFixed(1)}
+                          </Text>
                         </CustomText>
                       </Pressable>
                     </CustomStatsDivider>
                     <CustomStatsDivider>
                       <CustomText>
                         Ethics Hours:{' '}
-                        {!elem.historic
-                          ? Number(elem.ethics).toFixed(1) +
-                            ' ' +
-                            '/' +
-                            ' ' +
-                            Number(currentYearNeedEthicsHours).toFixed(1)
-                          : Number(elem.ethics).toFixed(1)}
+                        {!elem.historic ? (
+                          statsFraction(elem.ethics, currentYearNeedEthicsHours)
+                        ) : (
+                          <Text style={{ color: 'black' }}>
+                            {Number(elem.ethics).toFixed(1)}
+                          </Text>
+                        )}
                         {showYear === currentYear ? ethicsReqOrRec() : null}
                       </CustomText>
                     </CustomStatsDivider>
@@ -456,6 +477,9 @@ const styles = StyleSheet.create({
     marginTop: 5,
     width: '100%',
     alignSelf: 'center',
+  },
+  color: {
+    color: 'black',
   },
 });
 

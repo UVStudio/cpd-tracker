@@ -65,7 +65,7 @@ exports.producePDF = asyncHandler(async (req, res, next) => {
   const year = req.body.year;
   const searchTerm = `${userId}-${year}.jpg`;
 
-  const user = await User.findById(userId);
+  const user = await User.findById(userId).populate('nonver');
 
   // write report to PDF
   const CPDFileName = `${userId}-${year}-CPD-report.pdf`;

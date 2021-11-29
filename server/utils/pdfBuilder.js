@@ -42,13 +42,19 @@ const buildPDF = async (
 ) => {
   const doc = new PDFDocument();
 
+  const titleSize = 20;
+  const subTitleSize = 16;
+  const textSize = 12;
+
+  const userHours = user.hours;
+  const chosenYear = userHours.find((userHour) => userHour.year === year);
+  const nonVerSessions = user.nonver;
+  const nonVerSessionsYear = nonVerSessions.filter(
+    (nonVerSession) => nonVerSession.year === year
+  );
+
   let writeStream = fs.createWriteStream(`./uploads/${CPDFileName}`);
   doc.pipe(writeStream);
-
-  //pipe to Mongo - no longer needed
-  // const pdfObj = doc.pipe(
-  //   gfsReports.openUploadStream(`${userId}-${year}-CPD-report.pdf`)
-  // );
 
   doc
     .image('./assets/accounting-icon.png', {
@@ -56,9 +62,36 @@ const buildPDF = async (
     })
     .moveDown(1);
 
-  doc.fontSize(18).text('CPD Tracker').moveDown(0);
-  doc.fontSize(10).text('By Sheriff Consulting').moveDown(1);
-  doc.fontSize(12).text(`Student Name: ${user.name}`).moveDown(1);
+  doc.fontSize(titleSize).text('CPD Tracker').moveDown(0);
+  doc.fontSize(textSize).text('By Sheriff Consulting').moveDown(2);
+  doc.fontSize(subTitleSize).text(`CPA Name: ${user.name}`);
+  doc.fontSize(textSize).text(`CPD Report for ${year}`).moveDown(2);
+
+  doc.fontSize(subTitleSize).text(`Summary:`).moveDown(0.5);
+  doc.fontSize(textSize).text(`Verifiable Hours: ${chosenYear.verifiable}`);
+  doc
+    .fontSize(textSize)
+    .text(`Non-Verifiable Hours: ${chosenYear.nonVerifiable}`);
+
+  doc.fontSize(textSize).text(`Ethics Hours: ${chosenYear.ethics}`).moveDown(1);
+  doc
+    .fontSize(textSize)
+    .text(
+      `Total CPD Hours: ${chosenYear.verifiable + chosenYear.nonVerifiable}`
+    )
+    .moveDown(2);
+  doc.fontSize(subTitleSize).text(`Non-Verifiable Sessions:`).moveDown(0.5);
+  for (const i of nonVerSessionsYear) {
+    doc
+      .fontSize(textSize)
+      .text(
+        `Name: ${i.sessionName} - Date: ${i.date} - Duration: ${i.hours} Hour(s)`
+      );
+  }
+
+  doc.addPage();
+
+  doc.fontSize(subTitleSize).text(`Verifiable Sessions:`).moveDown(0.5);
 
   conn.db
     .collection('uploads.files')
@@ -67,8 +100,10 @@ const buildPDF = async (
     })
     .toArray(async (err, files) => {
       for (let i = 0; i < files.length; i++) {
-        doc.fontSize(10).text(`Certificate #${i + 1}`);
-        doc.fontSize(10).text(files[i].metadata.courseName);
+        doc
+          .fontSize(textSize)
+          .text(`Course Name: ${files[i].metadata.courseName}`);
+        doc.fontSize(textSize).text(`Year: ${files[i].metadata.year}`);
         let tempCertFile = await downloadFile(files[i]._id, gfsCerts);
 
         doc
@@ -126,11 +161,3 @@ const buildPDF = async (
 };
 
 module.exports = { buildPDF };
-
-//create Report document on mongo after PDF is created and saved on mongo
-// await Report.create({
-//   user: userId,
-//   report: pdfObj.id,
-//   url: reportFileUrl,
-//   year,
-// });
