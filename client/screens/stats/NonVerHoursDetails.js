@@ -1,26 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { Pressable } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigation } from '@react-navigation/native';
-import { Ionicons } from '@expo/vector-icons';
 
 import * as nonVerActions from '../../store/actions/nonVer';
 import * as userActions from '../../store/actions/user';
 
 import CustomTitle from '../../components/CustomTitle';
-import CustomText from '../../components/CustomText';
 import CustomGreyLine from '../../components/CustomGreyLine';
-import CustomFaintThinGreyLine from '../../components/CustomFaintThinGreyLine';
 import CustomErrorCard from '../../components/CustomErrorCard';
 import CustomIndicator from '../../components/CustomIndicator';
-import CustomStatsInfoBox from '../../components/CustomStatsInfoBox';
 import CustomScrollView from '../../components/CustomScrollView';
 import CustomConfirmActionCard from '../../components/CustomConfirmActionCard';
-import CustomFullWidthContainer from '../../components/CustomFullWidthContainer';
 import CustomScreenContainer from '../../components/CustomScreenContainer';
-
-import Colors from '../../constants/Colors';
-import CustomRowSpace from '../../components/CustomRowSpace';
+import CustomNonVerHoursDetails from '../../components/CustomNonVerHoursDetails';
 
 const NonVerHoursDetails = (props) => {
   const { year } = props.route.params;
@@ -92,28 +84,12 @@ const NonVerHoursDetails = (props) => {
         <CustomTitle>Non-Verifiable Hours for {year}</CustomTitle>
         <CustomGreyLine />
         {nonVerYearState.map((nonver, index) => (
-          <CustomFullWidthContainer key={index}>
-            <CustomRowSpace>
-              <CustomStatsInfoBox style={{ marginVertical: 5 }}>
-                <Pressable onLongPress={() => editSessionHandler(nonver)}>
-                  <CustomText>Session Name: {nonver.sessionName}</CustomText>
-                  <CustomText>Date: {nonver.date}</CustomText>
-                  <CustomText>Hours: {nonver.hours}</CustomText>
-                </Pressable>
-              </CustomStatsInfoBox>
-              <Pressable
-                style={{ alignSelf: 'center' }}
-                onPress={() => deleteCardHandler(nonver)}
-              >
-                <Ionicons
-                  name="trash-outline"
-                  size={24}
-                  color={Colors.darkGrey}
-                />
-              </Pressable>
-            </CustomRowSpace>
-            <CustomFaintThinGreyLine />
-          </CustomFullWidthContainer>
+          <CustomNonVerHoursDetails
+            key={index}
+            nonver={nonver}
+            editSessionHandler={editSessionHandler}
+            deleteCardHandler={deleteCardHandler}
+          />
         ))}
       </CustomScrollView>
       {error !== '' ? (

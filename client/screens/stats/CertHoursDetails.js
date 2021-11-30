@@ -19,6 +19,7 @@ import CustomConfirmActionCard from '../../components/CustomConfirmActionCard';
 import CustomFullWidthContainer from '../../components/CustomFullWidthContainer';
 import CustomScreenContainer from '../../components/CustomScreenContainer';
 import CustomRowSpace from '../../components/CustomRowSpace';
+import CustomCertHoursDetails from '../../components/CustomCertHoursDetails';
 
 import Colors from '../../constants/Colors';
 
@@ -96,29 +97,12 @@ const CertHoursDetails = (props) => {
         <CustomTitle>Verifiable Hours for {year}</CustomTitle>
         <CustomGreyLine />
         {certsYearState.map((cert, index) => (
-          <CustomFullWidthContainer key={index}>
-            <CustomRowSpace>
-              <CustomStatsInfoBox style={{ marginVertical: 5 }}>
-                <Pressable onLongPress={() => editCourseHandler(cert)}>
-                  <CustomText>Course Name: {cert.courseName}</CustomText>
-                  <CustomText>Hours: {cert.hours}</CustomText>
-                  <CustomText>Ethics Hours: {cert.ethicsHours}</CustomText>
-                </Pressable>
-              </CustomStatsInfoBox>
-              <Pressable
-                style={{ alignSelf: 'center' }}
-                onPress={() => deleteCardHandler(cert)}
-              >
-                <Ionicons
-                  name="trash-outline"
-                  size={24}
-                  color={Colors.darkGrey}
-                  style={{ alignSelf: 'center' }}
-                />
-              </Pressable>
-            </CustomRowSpace>
-            <CustomFaintThinGreyLine />
-          </CustomFullWidthContainer>
+          <CustomCertHoursDetails
+            key={index}
+            cert={cert}
+            editSessionHandler={editCourseHandler}
+            deleteCardHandler={deleteCardHandler}
+          />
         ))}
       </CustomScrollView>
       {error !== '' ? (
