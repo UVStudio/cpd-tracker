@@ -68,16 +68,26 @@ const buildPDF = async (
   doc.fontSize(textSize).text(`CPD Report for ${year}`).moveDown(2);
 
   doc.fontSize(subTitleSize).text(`Summary:`).moveDown(0.5);
-  doc.fontSize(textSize).text(`Verifiable Hours: ${chosenYear.verifiable}`);
   doc
     .fontSize(textSize)
-    .text(`Non-Verifiable Hours: ${chosenYear.nonVerifiable}`);
-
-  doc.fontSize(textSize).text(`Ethics Hours: ${chosenYear.ethics}`).moveDown(1);
+    .text(`Verifiable Hours: ${Number(chosenYear.verifiable).toFixed(1)}`);
   doc
     .fontSize(textSize)
     .text(
-      `Total CPD Hours: ${chosenYear.verifiable + chosenYear.nonVerifiable}`
+      `Non-Verifiable Hours: ${Number(chosenYear.nonVerifiable).toFixed(1)}`
+    );
+
+  doc
+    .fontSize(textSize)
+    .text(`Ethics Hours: ${Number(chosenYear.ethics).toFixed(1)}`)
+    .moveDown(1);
+  doc
+    .fontSize(textSize)
+    .text(
+      `Total CPD Hours: ${
+        Number(chosenYear.verifiable).toFixed(1) +
+        Number(chosenYear.nonVerifiable).toFixed(1)
+      }`
     )
     .moveDown(2);
   doc.fontSize(subTitleSize).text(`Non-Verifiable Sessions:`).moveDown(0.5);

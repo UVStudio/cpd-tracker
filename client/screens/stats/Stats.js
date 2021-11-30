@@ -256,11 +256,11 @@ For iOS users, the PDF is where you have chosen to save it.`
     getNotificationPermissions();
   });
 
-  const statsFraction = (num, denom, ...other) => {
+  const statsFraction = (num, denom, num2) => {
     return (
       <Text>
         <Text style={{ color: Colors.dark }}>
-          {Number(num + other).toFixed(1)}
+          {Number(num + num2).toFixed(1)}
         </Text>
         <Text> / </Text>
         <Text>{Number(denom).toFixed(1)}</Text>
@@ -311,7 +311,8 @@ For iOS users, the PDF is where you have chosen to save it.`
                           {!elem.historic ? (
                             statsFraction(
                               elem.verifiable,
-                              currentYearNeedVerHours
+                              currentYearNeedVerHours,
+                              null
                             )
                           ) : (
                             <Text style={{ color: Colors.dark }}>
@@ -372,7 +373,11 @@ For iOS users, the PDF is where you have chosen to save it.`
                       <CustomText>
                         Ethics Hours:{' '}
                         {!elem.historic ? (
-                          statsFraction(elem.ethics, currentYearNeedEthicsHours)
+                          statsFraction(
+                            elem.ethics,
+                            currentYearNeedEthicsHours,
+                            null
+                          )
                         ) : (
                           <Text style={{ color: 'black' }}>
                             {Number(elem.ethics).toFixed(1)}
