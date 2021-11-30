@@ -206,6 +206,7 @@ const Stats = ({ navigation }) => {
     try {
       setGeneratingPDF(true);
       await dispatch(reportActions.buildReport(year));
+      await downloadPDFHandler();
     } catch (err) {
       console.log(err.message);
       setError(
@@ -397,7 +398,7 @@ For iOS users, the PDF is where you have chosen to save it.`
                               style={{ marginTop: 15, width: '100%' }}
                               onSelect={() => generatePDFHandler(showYear)}
                             >
-                              Generate PDF Report
+                              Generate & Download PDF Report
                             </CustomButton>
                           </View>
                         )}
@@ -420,7 +421,7 @@ For iOS users, the PDF is where you have chosen to save it.`
                             onSelect={downloadPDFHandler}
                             style={{ width: '100%' }}
                           >
-                            Click To Download Report
+                            Download Report
                           </CustomButton>
                           <CustomText style={{ alignSelf: 'center' }}>
                             {downloadProgress}
@@ -433,7 +434,11 @@ For iOS users, the PDF is where you have chosen to save it.`
                 {currentYear !== showYear ? (
                   <View style={styles.fullWidthCenter}>
                     <CustomButton
-                      onSelect={overwriteCPDHandler}
+                      onSelect={
+                        downloadingPDF || generatingPDF
+                          ? null
+                          : overwriteCPDHandler
+                      }
                       style={{ alignSelf: 'center', width: '100%' }}
                     >
                       Overwrite CPD Data
