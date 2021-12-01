@@ -1,15 +1,20 @@
-const fs = require('fs');
 const NonVer = require('../models/NonVer');
 const User = require('../models/User');
 const ErrorResponse = require('../utils/errorResponse');
 const asyncHandler = require('../middleware/async');
-const ObjectId = require('mongodb').ObjectId;
 
 //desc    GET nonVer session by ID
-//route   GET /api/nonver/:id
+//route   GET /api/nonver/id/:id
 //access  public
 exports.getNonVerObjById = asyncHandler(async (req, res, next) => {
   const nonVer = await NonVer.findById(req.params.id);
+  const userId = req.user.id;
+
+  if (userId !== nonVer.user) {
+    return next(
+      new ErrorResponse('User not authorized to access this resource.', 400)
+    );
+  }
 
   if (!nonVer) {
     return next(
@@ -109,20 +114,29 @@ exports.getAllNonVerObjsByYear = asyncHandler(async (req, res, next) => {
 //access  private
 exports.updateNonVerObjById = asyncHandler(async (req, res, next) => {
   const nonVerId = req.params.id;
-  const { sessionName } = req.body;
-  const nonVer = await NonVer.findOneAndUpdate(
-    { _id: nonVerId },
-    { sessionName },
-    { new: true }
-  );
-
-  const nonVerYear = nonVer.year;
+  const userId = req.user.id;
+  let nonVer = await NonVer.findById(nonVerId);
 
   if (!nonVer) {
     return next(
       new ErrorResponse('This Non-Verifiable Session is not found', 400)
     );
   }
+
+  if (userId !== nonVer.user) {
+    return next(
+      new ErrorResponse('User not authorized to access this resource.', 400)
+    );
+  }
+
+  const { sessionName } = req.body;
+  nonVer = await NonVer.findOneAndUpdate(
+    { _id: nonVerId },
+    { sessionName },
+    { new: true }
+  );
+
+  const nonVerYear = nonVer.year;
 
   const user = await User.findById(req.user.id).populate('nonver');
 
@@ -144,6 +158,12 @@ exports.deleteNonVerObjById = asyncHandler(async (req, res, next) => {
   if (!nonVer) {
     return next(
       new ErrorResponse('This Non-Verifiable Session is not found', 400)
+    );
+  }
+
+  if (userId !== nonVer.user) {
+    return next(
+      new ErrorResponse('User not authorized to access this resource.', 400)
     );
   }
 

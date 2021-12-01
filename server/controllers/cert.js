@@ -1,20 +1,23 @@
-const fs = require('fs');
 const Cert = require('../models/Cert');
 const User = require('../models/User');
-const aws = require('aws-sdk');
-const { fromPath } = require('pdf2pic');
 const ErrorResponse = require('../utils/errorResponse');
 const asyncHandler = require('../middleware/async');
-const { deleteOne } = require('../models/Cert');
 
 //desc    GET Cert by ID
-//route   GET /api/cert/:id
+//route   GET /api/cert/id/:id
 //access  public
 exports.getCertObjById = asyncHandler(async (req, res, next) => {
   const cert = await Cert.findById(req.params.id);
+  const userId = req.user.id;
 
   if (!cert) {
     return next(new ErrorResponse('This certificate does not exist.', 400));
+  }
+
+  if (userId !== cert.user) {
+    return next(
+      new ErrorResponse('User not authorized to access this resource.', 400)
+    );
   }
 
   res.status(200).json({ success: true, data: cert });
@@ -57,8 +60,17 @@ exports.getAllCertObjsByYear = asyncHandler(async (req, res, next) => {
 //access  private
 exports.updateCertObjById = asyncHandler(async (req, res, next) => {
   const certId = req.params.id;
+  let cert = await Cert.findById(certId);
+  const userId = req.user.id;
+
+  if (userId !== cert.user) {
+    return next(
+      new ErrorResponse('User not authorized to access this resource.', 400)
+    );
+  }
+
   const { courseName } = req.body;
-  const cert = await Cert.findOneAndUpdate(
+  cert = await Cert.findOneAndUpdate(
     { _id: certId },
     { courseName },
     { new: true }
@@ -91,6 +103,12 @@ exports.deleteCertObjById = asyncHandler(async (req, res, next) => {
 
   if (!cert) {
     return next(new ErrorResponse('Certificate is not found', 400));
+  }
+
+  if (userId !== cert.user) {
+    return next(
+      new ErrorResponse('User not authorized to access this resource.', 400)
+    );
   }
 
   const certYear = cert.year;

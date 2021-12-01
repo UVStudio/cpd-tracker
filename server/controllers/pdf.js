@@ -1,15 +1,8 @@
-const fs = require('fs');
 const mongoose = require('mongoose');
-const Report = require('../models/Report');
 const User = require('../models/User');
-const PDFDocument = require('pdfkit');
-const { GridFsStorage } = require('multer-gridfs-storage');
-const Grid = require('gridfs-stream');
 const aws = require('aws-sdk');
-const ErrorResponse = require('../utils/errorResponse');
 const asyncHandler = require('../middleware/async');
 const { buildPDF } = require('../utils/pdfBuilder');
-const ObjectId = require('mongodb').ObjectId;
 
 //create mongo connection
 const conn = mongoose.createConnection(process.env.MONGO_URI, {
@@ -18,7 +11,7 @@ const conn = mongoose.createConnection(process.env.MONGO_URI, {
 });
 
 let gfsCerts;
-let gfsReports;
+//let gfsReports;
 
 conn.once('open', (req, res) => {
   //Init stream
@@ -28,13 +21,13 @@ conn.once('open', (req, res) => {
   });
 });
 
-conn.once('open', (req, res) => {
-  //Init stream
-  //"mongoose": "^5.13.7",
-  gfsReports = new mongoose.mongo.GridFSBucket(conn.db, {
-    bucketName: 'reports',
-  });
-});
+// conn.once('open', (req, res) => {
+//   //Init stream
+//   //"mongoose": "^5.13.7",
+//   gfsReports = new mongoose.mongo.GridFSBucket(conn.db, {
+//     bucketName: 'reports',
+//   });
+// });
 
 const downloadFile = (file_id, gfs) => {
   return new Promise((resolve, reject) => {
@@ -114,17 +107,17 @@ exports.deletePDF = asyncHandler(async (req, res, next) => {
 //desc    GET pdf Object by PDF ID
 //route   GET /api/pdf/:id
 //access  public
-exports.getPDFByPDFId = asyncHandler(async (req, res, next) => {
-  //const clientId = req.params.id;
-  const pdfId = req.params.id;
+// exports.getPDFByPDFId = asyncHandler(async (req, res, next) => {
+//   //const clientId = req.params.id;
+//   const pdfId = req.params.id;
 
-  conn.db
-    .collection('reports.files')
-    .find({
-      //filename: `${clientId}-2021-CPD-report.pdf`,
-      _id: ObjectId(pdfId),
-    })
-    .toArray(async (err, files) => {
-      res.status(200).json({ success: true, data: files });
-    });
-});
+//   conn.db
+//     .collection('reports.files')
+//     .find({
+//       //filename: `${clientId}-2021-CPD-report.pdf`,
+//       _id: ObjectId(pdfId),
+//     })
+//     .toArray(async (err, files) => {
+//       res.status(200).json({ success: true, data: files });
+//     });
+// });

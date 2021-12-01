@@ -1,7 +1,5 @@
 const User = require('../models/User');
-const ErrorResponse = require('../utils/errorResponse');
 const asyncHandler = require('../middleware/async');
-const { currentYear } = require('../utils/currentYear');
 
 //desc    OVERRIDE past years stats of current logged in user
 //route   PUT /api/user/override/

@@ -1,5 +1,4 @@
 const fs = require('fs');
-const axios = require('axios');
 const path = require('path');
 const User = require('../models/User');
 const Cert = require('../models/Cert');
@@ -9,7 +8,6 @@ const ErrorResponse = require('../utils/errorResponse');
 const asyncHandler = require('../middleware/async');
 const mongoose = require('mongoose');
 const { GridFsStorage } = require('multer-gridfs-storage');
-const Grid = require('gridfs-stream');
 const ObjectId = require('mongodb').ObjectId;
 
 const conn = mongoose.createConnection(process.env.MONGO_URI, {
@@ -145,13 +143,11 @@ exports.uploadCert = asyncHandler(async (req, res, next) => {
   const certs = user.cert;
   const certsYear = certs.filter((cert) => cert.year === Number(year));
 
-  res
-    .status(200)
-    .json({
-      success: 'true',
-      info: { file, cert: certObj, user },
-      data: certsYear,
-    });
+  res.status(200).json({
+    success: 'true',
+    info: { file, cert: certObj, user },
+    data: certsYear,
+  });
 });
 
 //@route   DELETE /api/upload/:id
