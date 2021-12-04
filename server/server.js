@@ -23,6 +23,7 @@ const pdf = require('./routes/pdf');
 const auth = require('./routes/auth');
 const user = require('./routes/user');
 const upload = require('./routes/upload');
+const admin = require('./routes/admin');
 
 //Mount routes
 app.use('/api/cert', cert);
@@ -31,6 +32,7 @@ app.use('/api/pdf', pdf);
 app.use('/api/auth', auth);
 app.use('/api/user', user);
 app.use('/api/upload', upload);
+app.use('/api/admin', admin);
 
 //Error Handling
 app.use(errorHandler);
