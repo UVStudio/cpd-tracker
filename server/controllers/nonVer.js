@@ -10,7 +10,7 @@ exports.getNonVerObjById = asyncHandler(async (req, res, next) => {
   const nonVer = await NonVer.findById(req.params.id);
   const userId = req.user.id;
 
-  if (userId !== nonVer.user) {
+  if (userId !== nonVer.user.toString()) {
     return next(
       new ErrorResponse('User not authorized to access this resource.', 400)
     );
@@ -70,7 +70,7 @@ exports.addNonVerEvent = asyncHandler(async (req, res, next) => {
 
   //returns all non-ver sessions under the same year as the non-ver session being added
   const nonVers = user.nonver;
-  const nonVersYear = nonVers.filter((nonVer) => nonVer.year === Number(year));
+  const nonVersYear = nonVers.filter((nonVer) => nonVer.year === year);
 
   res.status(200).json({ success: true, data: nonVersYear });
 });
@@ -123,7 +123,7 @@ exports.updateNonVerObjById = asyncHandler(async (req, res, next) => {
     );
   }
 
-  if (userId !== nonVer.user) {
+  if (userId !== nonVer.user.toString()) {
     return next(
       new ErrorResponse('User not authorized to access this resource.', 400)
     );
@@ -161,7 +161,7 @@ exports.deleteNonVerObjById = asyncHandler(async (req, res, next) => {
     );
   }
 
-  if (userId !== nonVer.user) {
+  if (userId !== nonVer.user.toString()) {
     return next(
       new ErrorResponse('User not authorized to access this resource.', 400)
     );

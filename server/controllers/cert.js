@@ -14,7 +14,7 @@ exports.getCertObjById = asyncHandler(async (req, res, next) => {
     return next(new ErrorResponse('This certificate does not exist.', 400));
   }
 
-  if (userId !== cert.user) {
+  if (userId !== cert.user.toString()) {
     return next(
       new ErrorResponse('User not authorized to access this resource.', 400)
     );
@@ -63,7 +63,7 @@ exports.updateCertObjById = asyncHandler(async (req, res, next) => {
   let cert = await Cert.findById(certId);
   const userId = req.user.id;
 
-  if (userId !== cert.user) {
+  if (userId !== cert.user.toString()) {
     return next(
       new ErrorResponse('User not authorized to access this resource.', 400)
     );
@@ -105,7 +105,7 @@ exports.deleteCertObjById = asyncHandler(async (req, res, next) => {
     return next(new ErrorResponse('Certificate is not found', 400));
   }
 
-  if (userId !== cert.user) {
+  if (userId !== cert.user.toString()) {
     return next(
       new ErrorResponse('User not authorized to access this resource.', 400)
     );
@@ -126,7 +126,7 @@ exports.deleteCertObjById = asyncHandler(async (req, res, next) => {
   await Cert.deleteOne({ _id: certId });
   await User.updateOne({ _id: userId }, { $pull: { cert: certId } });
 
-  const user = await User.findById(req.user.id);
+  const user = await User.findById(req.user.id).populate('cert');
 
   const certs = user.cert;
   const certsYear = certs.filter((cert) => cert.year === certYear);
