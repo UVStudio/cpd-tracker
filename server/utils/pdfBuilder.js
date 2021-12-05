@@ -52,6 +52,9 @@ const buildPDF = async (
   const nonVerSessionsYear = nonVerSessions.filter(
     (nonVerSession) => nonVerSession.year === year
   );
+  const totalCPDHours =
+    Number(chosenYear.verifiable).toFixed(1) +
+    Number(chosenYear.nonVerifiable).toFixed(1);
 
   let writeStream = fs.createWriteStream(`./uploads/${CPDFileName}`);
   doc.pipe(writeStream);
@@ -81,15 +84,7 @@ const buildPDF = async (
     .fontSize(textSize)
     .text(`Ethics Hours: ${Number(chosenYear.ethics).toFixed(1)}`)
     .moveDown(1);
-  doc
-    .fontSize(textSize)
-    .text(
-      `Total CPD Hours: ${
-        Number(chosenYear.verifiable).toFixed(1) +
-        Number(chosenYear.nonVerifiable).toFixed(1)
-      }`
-    )
-    .moveDown(2);
+  doc.fontSize(textSize).text(`Total CPD Hours: ${totalCPDHours}`).moveDown(2);
   doc.fontSize(subTitleSize).text(`Non-Verifiable Sessions:`).moveDown(0.5);
   for (const i of nonVerSessionsYear) {
     doc

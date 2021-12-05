@@ -28,9 +28,9 @@ import CustomScreenContainer from '../../components/CustomScreenContainer';
 import { provinceObjs } from '../../constants/Provinces';
 import Colors from '../../constants/Colors';
 
-//import currentYear from '../../utils/currentYear';
+import currentYear from '../../utils/currentYear';
 //test currentYear;
-const currentYear = 2023;
+//const currentYear = 2023;
 import { hoursRequiredLogic } from '../../utils/hoursRequiredLogic';
 
 import {
