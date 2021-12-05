@@ -91,14 +91,14 @@ exports.login = asyncHandler(async (req, res, next) => {
 
   //create hours objects in case user has skipped logging on for years
   //fakeCurrentYear replaces currentYear in test
-  const fakeCurrentYear = 2023;
+  //const fakeCurrentYear = 2023;
   const userHours = user.hours;
   const lastYearDB = userHours[0].year;
-  const catchUpYears = fakeCurrentYear - lastYearDB;
+  const catchUpYears = currentYear - lastYearDB;
 
   for (let i = catchUpYears - 1; i > -1; i--) {
     userHours.unshift({
-      year: fakeCurrentYear - i,
+      year: currentYear - i,
       verifiable: 0,
       nonVerifiable: 0,
       ethics: 0,
