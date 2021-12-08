@@ -226,9 +226,18 @@ const Stats = ({ navigation }) => {
   const fileName = `${userFirstName}-${showYear.toString()}-CPD-report.pdf`;
 
   const downloadPDFHandler = async () => {
-    setDownloadingPDF(true);
+    await getMediaLibraryPermissions();
+    const permResult = await MediaLibrary.getPermissionsAsync();
+    if (permResult.status !== 'granted') {
+      setError(
+        'We cannot proceed with downloading your report without your permission to access your media libary.'
+      );
+      return;
+    }
+
     const AWSFileName = `${user._id}-${showYear.toString()}-CPD-report.pdf`;
     try {
+      setDownloadingPDF(true);
       await downloadToFolder(pdfUri, fileName, 'Download', channelId, {
         downloadProgressCallback: downloadProgressUpdater,
       });
@@ -248,9 +257,9 @@ For iOS users, the PDF is where you have chosen to save it.`
     setDownloadingPDF(false);
   };
 
-  useEffect(() => {
-    getMediaLibraryPermissions();
-  });
+  // useEffect(() => {
+  //   getMediaLibraryPermissions();
+  // });
 
   useEffect(() => {
     getNotificationPermissions();
