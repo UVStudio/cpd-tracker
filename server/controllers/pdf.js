@@ -103,21 +103,3 @@ exports.deletePDF = asyncHandler(async (req, res, next) => {
 
   res.status(200).json({ success: true, data: 'Report deleted.' });
 });
-
-//desc    GET pdf Object by PDF ID
-//route   GET /api/pdf/:id
-//access  public
-// exports.getPDFByPDFId = asyncHandler(async (req, res, next) => {
-//   //const clientId = req.params.id;
-//   const pdfId = req.params.id;
-
-//   conn.db
-//     .collection('reports.files')
-//     .find({
-//       //filename: `${clientId}-2021-CPD-report.pdf`,
-//       _id: ObjectId(pdfId),
-//     })
-//     .toArray(async (err, files) => {
-//       res.status(200).json({ success: true, data: files });
-//     });
-// });

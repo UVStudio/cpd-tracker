@@ -4,6 +4,7 @@ const {
   getCertsByUserIdAndYear,
   getNonVerByUserIdAndYear,
   deleteUserById,
+  getReportByUserIdYear,
 } = require('../controllers/admin');
 
 const router = express.Router();
@@ -24,5 +25,11 @@ router.get(
   getNonVerByUserIdAndYear
 );
 router.delete('/:id', protect, authorize('admin'), deleteUserById);
+router.get(
+  '/user/report/:id/:year',
+  protect,
+  authorize('admin'),
+  getReportByUserIdYear
+);
 
 module.exports = router;

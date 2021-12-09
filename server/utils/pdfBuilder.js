@@ -12,15 +12,6 @@ const conn = mongoose.createConnection(process.env.MONGO_URI, {
 });
 
 let gfsCerts;
-let gfsReports;
-
-conn.once('open', (req, res) => {
-  //Init stream
-  //"mongoose": "^5.13.7",
-  gfsReports = new mongoose.mongo.GridFSBucket(conn.db, {
-    bucketName: 'reports',
-  });
-});
 
 conn.once('open', (req, res) => {
   //Init stream
@@ -29,6 +20,15 @@ conn.once('open', (req, res) => {
     bucketName: 'uploads',
   });
 });
+
+// let gfsReports;
+// conn.once('open', (req, res) => {
+//   //Init stream
+//   //"mongoose": "^5.13.7",
+//   gfsReports = new mongoose.mongo.GridFSBucket(conn.db, {
+//     bucketName: 'reports',
+//   });
+// });
 
 const buildPDF = async (
   res,
