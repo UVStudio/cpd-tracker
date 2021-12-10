@@ -151,3 +151,16 @@ exports.getReportByUserIdYear = asyncHandler(async (req, res, next) => {
     downloadFile
   );
 });
+
+//desc    GET Users Count
+//route   GET /api/admin/user/
+//access  admin
+exports.getUsersCount = asyncHandler(async (req, res, next) => {
+  const usersCount = await User.count();
+
+  if (!usersCount) {
+    return new ErrorResponse("We don't have any users on this platform");
+  }
+
+  res.status(200).json({ success: true, data: usersCount });
+});

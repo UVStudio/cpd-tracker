@@ -4,6 +4,7 @@ const {
   getCertsByUserIdAndYear,
   getNonVerByUserIdAndYear,
   deleteUserById,
+  getUsersCount,
   getReportByUserIdYear,
 } = require('../controllers/admin');
 
@@ -12,6 +13,7 @@ const router = express.Router();
 const { protect, authorize } = require('../middleware/auth');
 
 router.get('/user/:id', protect, authorize('admin'), getUserById);
+router.get('/user', protect, authorize('admin'), getUsersCount);
 router.get(
   '/user/certs/:id/:year',
   protect,

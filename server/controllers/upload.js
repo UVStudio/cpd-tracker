@@ -9,6 +9,7 @@ const asyncHandler = require('../middleware/async');
 const mongoose = require('mongoose');
 const { GridFsStorage } = require('multer-gridfs-storage');
 const ObjectId = require('mongodb').ObjectId;
+const { certUploadHelper } = require('../utils/certUpload');
 
 const conn = mongoose.createConnection(process.env.MONGO_URI, {
   useNewUrlParser: true,
@@ -24,77 +25,16 @@ exports.uploadCert = asyncHandler(async (req, res, next) => {
   let user = await User.findById(userId);
   const { year, hours, ethicsHours, courseName } = req.body;
 
-  let uploadFile;
-
   if (!year || !hours || !ethicsHours || !courseName || !file) {
     return next(
       new ErrorResponse('Please make sure all fields are filled out', 400)
     );
   }
 
-  //clean file name
-  const cleanFileName = file.originalname.replace(/ /g, '-');
-  const midName = cleanFileName.split('.').shift();
-  const newFileName =
-    userId +
-    '-' +
-    year +
-    '-' +
-    midName +
-    '-' +
-    Date.now() +
-    path.extname(cleanFileName);
-
-  //setup GFS storage function for certificate
-  const storage = new GridFsStorage({
-    url: process.env.MONGO_URI,
-    file: () => {
-      return {
-        filename: userId + '-' + year + '.jpg',
-        metadata: {
-          userId,
-          courseName,
-          year,
-        },
-        bucketName: 'uploads',
-      };
-    },
-  });
-
-  const ext = path.extname(newFileName);
-
-  //setup pdf2pic options
-  const options = {
-    density: 100,
-    quality: 60,
-    saveFilename: `${newFileName}`,
-    savePath: `./uploads`,
-    format: 'jpg',
-  };
-
-  //if PDF, convert and compress file
-  if (ext === '.pdf') {
-    const storeAsImage = fromPath(file.path, options);
-    const pageToConvertAsImage = 1;
-
-    await storeAsImage(pageToConvertAsImage).then((resolve) => {
-      uploadFile = resolve;
-      return uploadFile;
-    });
-  }
-
-  //if png, jpeg or jpg, convert to jpg and compress
-  if (ext === '.png' || ext === '.jpeg' || ext === '.jpg') {
-    await Jimp.read(file.path)
-      .then((image) => {
-        image
-          .resize(Jimp.AUTO, 512)
-          .quality(60)
-          .write(`./uploads/${newFileName}.jpg`);
-        uploadFile = image;
-      })
-      .catch((err) => console.log(err));
-  }
+  const certData = await certUploadHelper(userId, year, courseName, file);
+  const uploadFile = certData.uploadFile;
+  const storage = certData.storage;
+  const newFileName = certData.newFileName;
 
   //Jimp object does not have path. Must pass path string directly
   const stream = fs.createReadStream(
@@ -147,6 +87,87 @@ exports.uploadCert = asyncHandler(async (req, res, next) => {
     success: 'true',
     info: { file, cert: certObj, user },
     data: certsYear,
+  });
+});
+
+//@route   PUT /api/upload/:id
+//@desc    PUT Update FILE and CHUNKS by Cert Obj ID, Replace existing img ObjectID
+//@access  Private
+exports.updateCertImgByObjId = asyncHandler(async (req, res, next) => {
+  const newFile = req.file;
+  const certId = req.params.id;
+  const userId = req.user.id;
+  let cert = await Cert.findById(certId);
+  const existingCertImgId = cert.img;
+  const { year, courseName } = cert;
+
+  if (!newFile) {
+    return next(new ErrorResponse('Please upload new certificate', 400));
+  }
+
+  if (userId !== cert.user.toString()) {
+    return next(
+      new ErrorResponse('User not authorized to access this resource.', 400)
+    );
+  }
+
+  const certData = await certUploadHelper(userId, year, courseName, newFile);
+  const uploadFile = certData.uploadFile;
+  const storage = certData.storage;
+  const newFileName = certData.newFileName;
+
+  //Jimp object does not have path. Must pass path string directly
+  const stream = fs.createReadStream(
+    uploadFile.path ? uploadFile.path : `./uploads/${newFileName}.jpg`
+  );
+
+  //upload file to MongoDB, uploadFile is the file object to upload
+  const response = await storage.fromStream(stream, req, uploadFile);
+
+  fs.unlinkSync(newFile.path);
+  fs.unlinkSync(
+    uploadFile.path ? uploadFile.path : `./uploads/${newFileName}.jpg`
+  );
+
+  cert = await Cert.findOneAndUpdate(
+    { _id: certId },
+    { img: response.id },
+    { new: true }
+  );
+
+  //delete existing FILE and CHUNKS by FILE mongo ID
+  const file = await conn.db
+    .collection('uploads.files')
+    .findOne({ _id: ObjectId(existingCertImgId) });
+  const chunks = await conn.db
+    .collection('uploads.chunks')
+    .find({ files_id: ObjectId(existingCertImgId) })
+    .toArray();
+
+  if (!file || chunks.length == 0) {
+    return next(new ErrorResponse('File not found', 400));
+  }
+
+  const fileResult = await conn.db
+    .collection('uploads.files')
+    .deleteOne({ _id: ObjectId(existingCertImgId) });
+
+  const chunksResult = await conn.db
+    .collection('uploads.chunks')
+    .deleteMany({ files_id: ObjectId(existingCertImgId) });
+
+  if (fileResult.deletedCount === 0 || chunksResult.deletedCount === 0) {
+    return next(new ErrorResponse('File did not get deleted', 400));
+  }
+
+  res.status(200).json({
+    success: true,
+    data: cert,
+    delete: {
+      existingCertImgId,
+      file: fileResult.deletedCount,
+      chunks: chunksResult.deletedCount,
+    },
   });
 });
 
