@@ -100,7 +100,7 @@ const CertHoursDetails = (props) => {
           <CustomCertHoursDetails
             key={index}
             cert={cert}
-            editSessionHandler={editCourseHandler}
+            editCourseHandler={editCourseHandler}
             deleteCardHandler={deleteCardHandler}
           />
         ))}

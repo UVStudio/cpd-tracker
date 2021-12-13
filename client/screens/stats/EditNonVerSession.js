@@ -20,7 +20,7 @@ import Colors from '../../constants/Colors';
 import { FORM_INPUT_UPDATE } from '../../store/types';
 
 const EditNonVerSession = (props) => {
-  const { nonver } = props.route.params;
+  const nonver = props.route.params.item;
   const [cardText, setCardText] = useState('');
   const [error, setError] = useState('');
   const [updateCourse, setUpdatingSession] = useState(false);

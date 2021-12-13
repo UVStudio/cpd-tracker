@@ -20,7 +20,7 @@ import Colors from '../../constants/Colors';
 import { FORM_INPUT_UPDATE } from '../../store/types';
 
 const EditCertCourse = (props) => {
-  const { cert } = props.route.params;
+  const cert = props.route.params.item;
   const [cardText, setCardText] = useState('');
   const [error, setError] = useState('');
   const [updatingCourse, setUpdatingCourse] = useState(false);

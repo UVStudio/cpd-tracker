@@ -137,7 +137,7 @@ const TotalCPDHoursDetails = (props) => {
                 <CustomCertHoursDetails
                   key={index}
                   cert={cert}
-                  editSessionHandler={editSessionHandler}
+                  editCourseHandler={editSessionHandler}
                   deleteCardHandler={deleteCardHandler}
                 />
               ))
