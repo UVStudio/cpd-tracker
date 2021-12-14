@@ -127,7 +127,7 @@ const Records = () => {
       console.log(err.message);
       setSavingCourse(false);
       setError(
-        'There is something wrong with our network. Please try again later.'
+        'There is something wrong with our network. Please try saving course again later.'
       );
     }
   };
@@ -195,20 +195,18 @@ const Records = () => {
             Select Course Certificate
           </CustomButton>
           <CustomText>{cert !== null ? 'file: ' + cert.name : null}</CustomText>
-          {cert ? (
-            savingCourse ? (
-              <CustomButton style={{ marginTop: 10 }}>
-                Saving Course...
-              </CustomButton>
-            ) : (
-              <CustomButton
-                style={{ marginTop: 10 }}
-                onSelect={() => saveVerfiableCourse(year)}
-              >
-                Save Verifiable Course
-              </CustomButton>
-            )
-          ) : null}
+          {savingCourse ? (
+            <CustomButton style={{ marginTop: 10 }}>
+              Saving Course...
+            </CustomButton>
+          ) : (
+            <CustomButton
+              style={{ marginTop: 10 }}
+              onSelect={() => saveVerfiableCourse(year)}
+            >
+              Save Verifiable Course
+            </CustomButton>
+          )}
         </CustomOperationalContainer>
       </CustomScrollView>
       {cardText !== '' ? (

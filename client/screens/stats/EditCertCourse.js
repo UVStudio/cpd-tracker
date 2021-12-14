@@ -3,6 +3,7 @@ import { StyleSheet } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 
 import CustomIndicator from '../../components/CustomIndicator';
+import CustomText from '../../components/CustomText';
 import CustomButton from '../../components/CustomButton';
 import CustomInput from '../../components/CustomInput';
 import CustomTitle from '../../components/CustomTitle';
@@ -13,6 +14,7 @@ import CustomGreyLine from '../../components/CustomGreyLine';
 import CustomScreenContainer from '../../components/CustomScreenContainer';
 import CustomOperationalContainer from '../../components/CustomOperationalContainer';
 
+import * as DocumentPicker from 'expo-document-picker';
 import * as userActions from '../../store/actions/user';
 import * as certActions from '../../store/actions/cert';
 import { formReducer } from '../../utils/formReducer';
@@ -21,6 +23,7 @@ import { FORM_INPUT_UPDATE } from '../../store/types';
 
 const EditCertCourse = (props) => {
   const cert = props.route.params.item;
+  const [certUpload, setCertUpload] = useState(null);
   const [cardText, setCardText] = useState('');
   const [error, setError] = useState('');
   const [updatingCourse, setUpdatingCourse] = useState(false);
@@ -34,13 +37,33 @@ const EditCertCourse = (props) => {
 
   const [formState, dispatchFormState] = useReducer(formReducer, {
     inputValues: {
-      courseName: '',
+      courseName: cert.courseName,
     },
     inputValidities: {
-      courseName: false,
+      courseName: true,
     },
     formIsValid: false,
   });
+
+  console.log('formState: ', formState);
+
+  const addCertHandler = async () => {
+    try {
+      const file = await DocumentPicker.getDocumentAsync({
+        type: '*/*',
+        copyToCacheDirectory: false,
+      });
+
+      if (file.type === 'success') {
+        setCertUpload(file);
+      }
+    } catch (err) {
+      console.log(err.message);
+      setError(
+        'There is something wrong with our network. Please try again later.'
+      );
+    }
+  };
 
   const inputChangeHandler = useCallback(
     (inputIdentifier, inputValue, inputValidity) => {
@@ -58,9 +81,13 @@ const EditCertCourse = (props) => {
     setUpdatingCourse(true);
     const courseName = formState.inputValues.courseName;
     try {
-      await dispatch(certActions.editCertCourseById(courseName, id));
+      if (certUpload) {
+        await dispatch(certActions.certUpdateById(courseName, certUpload, id));
+      } else {
+        await dispatch(certActions.editCertCourseById(courseName, id));
+      }
       await dispatch(userActions.getUser());
-      setCardText('Verifiable course name successfully updated');
+      setCardText('Verifiable course successfully updated');
       setUpdatingCourse(false);
     } catch (err) {
       console.log(err.message);
@@ -84,13 +111,21 @@ const EditCertCourse = (props) => {
             label="Edit Course Name"
             keyboardType="default"
             autoCapitalize="characters"
-            errorText="Please enter verifiable course name"
             placeholder={cert.courseName}
             placeholderColor={Colors.lightGrey}
             onInputChange={inputChangeHandler}
-            initialValue=""
+            initialValue={cert.courseName}
             required
           />
+          <CustomButton
+            style={{ marginTop: 20 }}
+            onSelect={() => addCertHandler()}
+          >
+            Select Course Certificate
+          </CustomButton>
+          <CustomText>
+            {certUpload !== null ? 'file: ' + certUpload.name : null}
+          </CustomText>
           {updatingCourse ? (
             <CustomButton style={{ marginVertical: 20 }}>
               Updating Course...

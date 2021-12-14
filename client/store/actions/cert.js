@@ -99,6 +99,45 @@ export const editCertCourseById = (courseName, id) => {
   };
 };
 
+export const certUpdateById = (courseName, cert, id) => {
+  return async (dispatch) => {
+    try {
+      const certName = cert.name;
+      const uri = cert.uri;
+
+      let formData = new FormData();
+
+      formData.append('courseName', courseName);
+      formData.append('cert', {
+        uri: `${uri}`,
+        type: '*/*',
+        name: `${certName}`,
+      });
+
+      const config = {
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'multipart/form-data',
+        },
+      };
+
+      const response = await axios.put(
+        `${CURRENT_IP}/api/upload/${id}`,
+        formData,
+        config
+      );
+      const data = response.data.data;
+
+      dispatch({
+        type: EDIT_CERT_COURSE,
+        certs: data,
+      });
+    } catch (err) {
+      throw new Error(err.response.data.error);
+    }
+  };
+};
+
 export const deleteCertObjById = (id) => {
   return async (dispatch) => {
     try {

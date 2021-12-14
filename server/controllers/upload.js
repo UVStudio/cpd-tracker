@@ -90,16 +90,17 @@ exports.uploadCert = asyncHandler(async (req, res, next) => {
   });
 });
 
-//@route   PUT /api/upload/:id
-//@desc    PUT Update FILE and CHUNKS by Cert Obj ID, Replace existing img ObjectID
+//@route   UPDATE /api/upload/:id
+//@desc    UPDATE Update courseName and FILE and CHUNKS by Cert Obj ID, Replace existing img ObjectID
 //@access  Private
-exports.updateCertImgByObjId = asyncHandler(async (req, res, next) => {
+exports.updateCertByObjId = asyncHandler(async (req, res, next) => {
   const newFile = req.file;
   const certId = req.params.id;
   const userId = req.user.id;
+  const { courseName } = req.body;
   let cert = await Cert.findById(certId);
   const existingCertImgId = cert.img;
-  const { year, courseName } = cert;
+  const { year } = cert;
 
   if (!newFile) {
     return next(new ErrorResponse('Please upload new certificate', 400));
@@ -131,7 +132,7 @@ exports.updateCertImgByObjId = asyncHandler(async (req, res, next) => {
 
   cert = await Cert.findOneAndUpdate(
     { _id: certId },
-    { img: response.id },
+    { img: response.id, courseName },
     { new: true }
   );
 
@@ -160,9 +161,15 @@ exports.updateCertImgByObjId = asyncHandler(async (req, res, next) => {
     return next(new ErrorResponse('File did not get deleted', 400));
   }
 
+  const user = await User.findById(req.user.id).populate('cert');
+
+  const certYear = cert.year;
+  const certs = user.cert;
+  const certsYear = certs.filter((cert) => cert.year === certYear);
+
   res.status(200).json({
     success: true,
-    data: cert,
+    data: certsYear,
     delete: {
       existingCertImgId,
       file: fileResult.deletedCount,

@@ -54,8 +54,9 @@ const CertHoursDetails = (props) => {
     loadCerts();
   }, []);
 
-  const editCourseHandler = (cert) => {
-    navigation.navigate('Edit Verifiable Course', { cert });
+  //this params needs to be called 'item' because of flexibility with CPD details screen
+  const editCourseHandler = (item) => {
+    navigation.navigate('Edit Verifiable Course', { item });
   };
 
   const deleteCardHandler = (cert) => {
