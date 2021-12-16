@@ -164,3 +164,42 @@ exports.getUsersCount = asyncHandler(async (req, res, next) => {
 
   res.status(200).json({ success: true, data: usersCount });
 });
+
+//desc    ADD User Field by ID
+//route   PUT /api/admin/user/:id
+//access  admin
+//note    USER MODEL MUST HAVE FIELD
+exports.addUserField = asyncHandler(async (req, res, next) => {
+  const userId = req.params.id;
+  const obj = req.body;
+
+  await User.updateOne(
+    { _id: userId },
+    {
+      $set: obj,
+    }
+  );
+
+  const user = await User.findById(userId);
+
+  res.status(200).json({ success: true, data: user });
+});
+
+//desc    REMOVE User Field by ID
+//route   PUT /api/admin/user/remove/:id
+//access  admin
+exports.removeUserField = asyncHandler(async (req, res, next) => {
+  const userId = req.params.id;
+  const obj = req.body;
+
+  await User.updateOne(
+    { _id: userId },
+    {
+      $unset: obj,
+    }
+  );
+
+  const user = await User.findById(userId);
+
+  res.status(200).json({ success: true, data: user });
+});

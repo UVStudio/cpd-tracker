@@ -1,6 +1,8 @@
 const express = require('express');
 const {
   getUserById,
+  addUserField,
+  removeUserField,
   getCertsByUserIdAndYear,
   getNonVerByUserIdAndYear,
   deleteUserById,
@@ -13,6 +15,8 @@ const router = express.Router();
 const { protect, authorize } = require('../middleware/auth');
 
 router.get('/user/:id', protect, authorize('admin'), getUserById);
+router.put('/user/:id', protect, authorize('admin'), addUserField);
+router.put('/user/remove/:id', protect, authorize('admin'), removeUserField);
 router.get('/user', protect, authorize('admin'), getUsersCount);
 router.get(
   '/user/certs/:id/:year',

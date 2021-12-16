@@ -24,13 +24,13 @@ const CustomProgressBar = (props) => {
   const barType = () => {
     let color;
     if (type === 'verifiable') {
-      if (progress > currentYearNeedVerHours) {
+      if (progress >= currentYearNeedVerHours) {
         color = Colors.brightGreen;
       } else {
         color = Colors.light;
       }
     } else {
-      if (progress > currentYearNeedCPDHours) {
+      if (progress >= currentYearNeedCPDHours) {
         color = Colors.brightGreen;
       } else {
         color = Colors.light;
