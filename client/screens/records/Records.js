@@ -165,10 +165,10 @@ const Records = () => {
           />
           <CustomInput
             id="hours"
-            label="Session Duration (hours)"
+            label="Course Duration (hours)"
             keyboardType="numeric"
             autoCapitalize="none"
-            errorText="Please enter session duration"
+            errorText="Please enter course duration"
             placeholder="ie: 2"
             placeholderColor={Colors.lightGrey}
             onInputChange={inputChangeHandler}

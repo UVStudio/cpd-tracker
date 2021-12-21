@@ -81,13 +81,13 @@ export const getAllCertObjsByYear = (year) => {
   };
 };
 
-export const editCertCourseById = (courseName, id) => {
+export const editCertCourseById = (courseName, hours, id) => {
   return async (dispatch) => {
     try {
-      const body = { courseName };
+      const body = { courseName, hours };
 
       const response = await axios.put(`${CURRENT_IP}/api/cert/${id}`, body);
-      const data = response.data.data;
+      const data = response.data.data.certsYear;
 
       dispatch({
         type: EDIT_CERT_COURSE,

@@ -69,14 +69,31 @@ exports.updateCertObjById = asyncHandler(async (req, res, next) => {
     );
   }
 
-  const { courseName } = req.body;
+  const prevHours = cert.hours;
+  const certYear = cert.year;
+  const { courseName, hours } = req.body;
+  const hoursDiff = hours - prevHours;
+  console.log('cert hours: ', prevHours);
+  console.log('difference hours: ', hoursDiff);
+
+  if (hoursDiff !== 0) {
+    const query = { _id: userId, 'hours.year': certYear };
+    const update = {
+      $inc: {
+        'hours.$.verifiable': hoursDiff,
+      },
+      $set: {
+        lastModifiedAt: Date.now(),
+      },
+    };
+    await User.updateOne(query, update);
+  }
+
   cert = await Cert.findOneAndUpdate(
     { _id: certId },
-    { courseName },
+    { courseName, hours },
     { new: true }
   );
-
-  const certYear = cert.year;
 
   if (!cert) {
     return next(
@@ -90,7 +107,9 @@ exports.updateCertObjById = asyncHandler(async (req, res, next) => {
   const certsYear = certs.filter((cert) => cert.year === certYear);
 
   //returns all cert courses under the same year as the cert course being updated
-  res.status(200).json({ success: true, data: certsYear });
+  res
+    .status(200)
+    .json({ success: true, data: { certsYear: certsYear, user: user } });
 });
 
 //desc    DELETE cert Obj by ID, and cascade delete user cert Array and update hours array

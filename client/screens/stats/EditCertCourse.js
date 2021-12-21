@@ -35,12 +35,17 @@ const EditCertCourse = (props) => {
 
   const dispatch = useDispatch();
 
+  const certHours = cert.hours;
+  const certHoursString = certHours.toString();
+
   const [formState, dispatchFormState] = useReducer(formReducer, {
     inputValues: {
       courseName: cert.courseName,
+      hours: certHoursString,
     },
     inputValidities: {
       courseName: true,
+      hours: true,
     },
     formIsValid: false,
   });
@@ -80,11 +85,14 @@ const EditCertCourse = (props) => {
   const editCourse = async (id) => {
     setUpdatingCourse(true);
     const courseName = formState.inputValues.courseName;
+    const hours = formState.inputValues.hours;
     try {
       if (certUpload) {
-        await dispatch(certActions.certUpdateById(courseName, certUpload, id));
+        await dispatch(
+          certActions.certUpdateById(courseName, certUpload, hours, id)
+        );
       } else {
-        await dispatch(certActions.editCertCourseById(courseName, id));
+        await dispatch(certActions.editCertCourseById(courseName, hours, id));
       }
       await dispatch(userActions.getUser());
       setCardText('Verifiable course successfully updated');
@@ -103,18 +111,24 @@ const EditCertCourse = (props) => {
   return (
     <CustomScreenContainer>
       <CustomScrollView>
-        <CustomTitle>Edit Verifiable Course Name</CustomTitle>
+        <CustomTitle>Edit Verifiable Course</CustomTitle>
         <CustomGreyLine />
         <CustomOperationalContainer>
           <CustomInput
             id="courseName"
             label="Edit Course Name"
             keyboardType="default"
-            autoCapitalize="characters"
-            placeholder={cert.courseName}
-            placeholderColor={Colors.lightGrey}
             onInputChange={inputChangeHandler}
             initialValue={cert.courseName}
+            required
+          />
+          <CustomInput
+            id="hours"
+            label="Edit Course Duration (hours)"
+            keyboardType="numeric"
+            autoCapitalize="none"
+            onInputChange={inputChangeHandler}
+            initialValue={certHoursString}
             required
           />
           <CustomButton
