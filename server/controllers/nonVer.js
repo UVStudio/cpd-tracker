@@ -116,6 +116,8 @@ exports.updateNonVerObjById = asyncHandler(async (req, res, next) => {
   const nonVerId = req.params.id;
   const userId = req.user.id;
   let nonVer = await NonVer.findById(nonVerId);
+  const prevHours = nonVer.hours;
+  const nonVerYear = nonVer.year;
 
   if (!nonVer) {
     return next(
@@ -129,14 +131,27 @@ exports.updateNonVerObjById = asyncHandler(async (req, res, next) => {
     );
   }
 
-  const { sessionName } = req.body;
+  const { sessionName, hours } = req.body;
+  const hoursDiff = hours - prevHours;
+
+  if (hoursDiff !== 0) {
+    const query = { _id: userId, 'hours.year': nonVerYear };
+    const update = {
+      $inc: {
+        'hours.$.nonVerifiable': hoursDiff,
+      },
+      $set: {
+        lastModifiedAt: Date.now(),
+      },
+    };
+    await User.updateOne(query, update);
+  }
+
   nonVer = await NonVer.findOneAndUpdate(
     { _id: nonVerId },
-    { sessionName },
+    { sessionName, hours },
     { new: true }
   );
-
-  const nonVerYear = nonVer.year;
 
   const user = await User.findById(req.user.id).populate('nonver');
 

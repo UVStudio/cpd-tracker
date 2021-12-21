@@ -58,10 +58,10 @@ export const addNonVerSession = (year, date, hours, sessionName) => {
   };
 };
 
-export const editNonVerSession = (sessionName, id) => {
+export const editNonVerSession = (sessionName, hours, id) => {
   return async (dispatch) => {
     try {
-      const body = { sessionName };
+      const body = { sessionName, hours };
       const response = await axios.put(`${CURRENT_IP}/api/nonver/${id}`, body);
 
       const data = response.data.data;

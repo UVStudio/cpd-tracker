@@ -28,8 +28,6 @@ const CustomInput = (props) => {
     touched: props.initialValue ? true : false,
   });
 
-  console.log('initialValue: ', props.initialValue);
-
   const { onInputChange, id } = props;
 
   useEffect(() => {

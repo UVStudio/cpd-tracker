@@ -87,7 +87,7 @@ export const editCertCourseById = (courseName, hours, id) => {
       const body = { courseName, hours };
 
       const response = await axios.put(`${CURRENT_IP}/api/cert/${id}`, body);
-      const data = response.data.data.certsYear;
+      const data = response.data.data;
 
       dispatch({
         type: EDIT_CERT_COURSE,

@@ -18,7 +18,6 @@ import * as DocumentPicker from 'expo-document-picker';
 import * as userActions from '../../store/actions/user';
 import * as certActions from '../../store/actions/cert';
 import { formReducer } from '../../utils/formReducer';
-import Colors from '../../constants/Colors';
 import { FORM_INPUT_UPDATE } from '../../store/types';
 
 const EditCertCourse = (props) => {

@@ -16,11 +16,10 @@ import CustomOperationalContainer from '../../components/CustomOperationalContai
 import * as userActions from '../../store/actions/user';
 import * as nonVerActions from '../../store/actions/nonVer';
 import { formReducer } from '../../utils/formReducer';
-import Colors from '../../constants/Colors';
 import { FORM_INPUT_UPDATE } from '../../store/types';
 
 const EditNonVerSession = (props) => {
-  const nonver = props.route.params.item;
+  const nonver = props.route.params.item || props.route.params.nonver;
   const [cardText, setCardText] = useState('');
   const [error, setError] = useState('');
   const [updateCourse, setUpdatingSession] = useState(false);
@@ -32,15 +31,22 @@ const EditNonVerSession = (props) => {
 
   const dispatch = useDispatch();
 
+  const nonverHours = nonver.hours;
+  const nonverHoursString = nonverHours.toString();
+
   const [formState, dispatchFormState] = useReducer(formReducer, {
     inputValues: {
-      sessionName: '',
+      sessionName: nonver.sessionName,
+      hours: nonverHoursString,
     },
     inputValidities: {
       sessionName: false,
+      hours: false,
     },
     formIsValid: false,
   });
+
+  console.log('formState: ', formState);
 
   const inputChangeHandler = useCallback(
     (inputIdentifier, inputValue, inputValidity) => {
@@ -57,10 +63,11 @@ const EditNonVerSession = (props) => {
   const editSession = async (id) => {
     setUpdatingSession(true);
     const sessionName = formState.inputValues.sessionName;
+    const hours = formState.inputValues.hours;
     try {
-      await dispatch(nonVerActions.editNonVerSession(sessionName, id));
+      await dispatch(nonVerActions.editNonVerSession(sessionName, hours, id));
       await dispatch(userActions.getUser());
-      setCardText('Non-Verifiable session name successfully updated');
+      setCardText('Non-Verifiable session successfully updated');
       setUpdatingSession(false);
     } catch (err) {
       console.log(err.message);
@@ -76,7 +83,7 @@ const EditNonVerSession = (props) => {
   return (
     <CustomScreenContainer>
       <CustomScrollView>
-        <CustomTitle>Edit Your Session Name</CustomTitle>
+        <CustomTitle>Edit Your Session</CustomTitle>
         <CustomGreyLine />
         <CustomOperationalContainer>
           <CustomInput
@@ -84,11 +91,17 @@ const EditNonVerSession = (props) => {
             label="Edit Session Name"
             keyboardType="default"
             autoCapitalize="characters"
-            errorText="Please enter non-verifiable session name"
-            placeholder={nonver.sessionName}
-            placeholderColor={Colors.lightGrey}
             onInputChange={inputChangeHandler}
-            initialValue=""
+            initialValue={nonver.sessionName}
+            required
+          />
+          <CustomInput
+            id="hours"
+            label="Edit Session Duration (hours)"
+            keyboardType="default"
+            autoCapitalize="numeric"
+            onInputChange={inputChangeHandler}
+            initialValue={nonverHoursString}
             required
           />
           {updateCourse ? (
