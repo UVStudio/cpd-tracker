@@ -7,7 +7,7 @@ import * as certActions from '../../store/actions/cert';
 import * as userActions from '../../store/actions/user';
 
 import CustomButton from '../../components/CustomButton';
-import CustomText from '../../components/CustomText';
+import CustomBoldText from '../../components/CustomBoldText';
 import CustomTitle from '../../components/CustomTitle';
 import CustomInput from '../../components/CustomInput';
 import CustomErrorCard from '../../components/CustomErrorCard';
@@ -38,11 +38,11 @@ const Records = () => {
     inputValues: {
       year: placeholderYear,
       hours: '',
-      ethicsHours: '',
+      ethicsHours: '0',
       courseName: '',
     },
     inputValidities: {
-      year: true,
+      year: false,
       hours: false,
       ethicsHours: false,
       courseName: false,
@@ -85,14 +85,14 @@ const Records = () => {
   const ethicsHours = Number(formState.inputValues.ethicsHours);
   const { courseName } = formState.inputValues;
 
-  //console.log('formState: ', formState);
+  console.log('formState: ', formState);
 
   const saveVerfiableCourse = async () => {
     setSavingCourse(true);
 
     if (!year || !hours || !courseName) {
       setCardText(
-        'Session Year, Course Name, and Session Duration are required'
+        'Session Year, Course Name, and Session Duration are all required.'
       );
       setSavingCourse(false);
       return;
@@ -142,13 +142,8 @@ const Records = () => {
             id="year"
             label="Session Year"
             keyboardType="numeric"
-            autoCapitalize="none"
-            errorText="Please enter session year"
-            placeholder={placeholderYear}
-            placeholderColor={Colors.darkGrey}
             onInputChange={inputChangeHandler}
-            //initialValue={placeholderYear}
-            //value={placeholderYear}
+            initialValue={placeholderYear}
             required
           />
           <CustomInput
@@ -156,7 +151,6 @@ const Records = () => {
             label="Course Name"
             keyboardType="default"
             autoCapitalize="characters"
-            errorText="Please enter verifiable course name"
             placeholder="ie: ETHICS IN ACCOUNTING"
             placeholderColor={Colors.lightGrey}
             onInputChange={inputChangeHandler}
@@ -168,7 +162,6 @@ const Records = () => {
             label="Course Duration (hours)"
             keyboardType="numeric"
             autoCapitalize="none"
-            errorText="Please enter course duration"
             placeholder="ie: 2"
             placeholderColor={Colors.lightGrey}
             onInputChange={inputChangeHandler}
@@ -180,11 +173,8 @@ const Records = () => {
             label="Ethics hours (hours count as ethics)"
             keyboardType="numeric"
             autoCapitalize="none"
-            errorText="Please enter ethics hours count"
-            placeholder="ie: 0"
-            placeholderColor={Colors.lightGrey}
             onInputChange={inputChangeHandler}
-            initialValue=""
+            initialValue="0"
             required
           />
 
@@ -194,7 +184,9 @@ const Records = () => {
           >
             Select Course Certificate
           </CustomButton>
-          <CustomText>{cert !== null ? 'file: ' + cert.name : null}</CustomText>
+          <CustomBoldText>
+            {cert !== null ? 'file: ' + cert.name : null}
+          </CustomBoldText>
           {savingCourse ? (
             <CustomButton style={{ marginTop: 10 }}>
               Saving Course...
