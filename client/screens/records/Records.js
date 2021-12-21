@@ -85,7 +85,7 @@ const Records = () => {
   const ethicsHours = Number(formState.inputValues.ethicsHours);
   const { courseName } = formState.inputValues;
 
-  console.log('formState: ', formState);
+  // console.log('formState: ', formState);
 
   const saveVerfiableCourse = async () => {
     setSavingCourse(true);

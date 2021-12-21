@@ -35,7 +35,10 @@ const Profile = () => {
   const [updatingPassword, setUpdatingPassword] = useState(false);
   const [specialMessage, setSpecialMessage] = useState(false);
 
-  const user = useSelector((state) => state.user.user);
+  const authState = useSelector((state) => state.auth.user);
+  const userState = useSelector((state) => state.auth.user);
+
+  const user = userState ? userState : authState;
 
   const dispatch = useDispatch();
   const navigation = useNavigation();
