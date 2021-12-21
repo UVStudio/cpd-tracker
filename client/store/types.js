@@ -1,6 +1,7 @@
 //User
 export const SET_USER = 'SET_USER';
 export const GET_USER = 'GET_USER';
+export const CLEAR_USER_STATE = 'CLEAR_USER_STATE';
 
 //Authentication
 export const AUTHENTICATE = 'AUTHENTICATE';

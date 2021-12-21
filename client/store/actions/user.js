@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { GET_USER } from '../types';
+import { GET_USER, CLEAR_USER_STATE } from '../types';
 import { CURRENT_IP } from '../../serverConfig';
 
 export const overrideHours = (year, certHours, nonVerHours, ethicsHours) => {
@@ -103,4 +103,8 @@ export const updatePassword = (passwordFormState) => {
       throw new Error(err.response.data.error);
     }
   };
+};
+
+export const clearUserState = () => {
+  return { type: CLEAR_USER_STATE };
 };
