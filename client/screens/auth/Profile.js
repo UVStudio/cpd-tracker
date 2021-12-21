@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useReducer, useCallback } from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
+import { useNavigation } from '@react-navigation/native';
 
 import * as authActions from '../../store/actions/auth';
 import * as userActions from '../../store/actions/user';
@@ -37,6 +38,7 @@ const Profile = () => {
   const user = useSelector((state) => state.user.user);
 
   const dispatch = useDispatch();
+  const navigation = useNavigation();
 
   const [formState, dispatchFormState] = useReducer(formReducer, {
     inputValues: {
@@ -185,6 +187,10 @@ Updating your Province or your CPD Membership Join Date might have material impa
     }
   };
 
+  const privacyHandler = () => {
+    navigation.navigate('Privacy Statement');
+  };
+
   const cardTextHandler = async () => {
     setDeleteText(
       `Are you sure you want to delete your account? 
@@ -322,7 +328,11 @@ All data and certificates will be erased permanently. The app does not keep any 
               </CustomButton>
             )}
           </View>
+          <CustomThinGreyLine style={{ marginBottom: 15 }} />
           <CustomButton onSelect={logoutHandler}>Logout</CustomButton>
+          <CustomButton onSelect={privacyHandler}>
+            Privacy Statement
+          </CustomButton>
           <CustomButton onSelect={cardTextHandler}>
             Delete Your Account
           </CustomButton>

@@ -6,6 +6,7 @@ import { MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
 
 import Auth from '../screens/auth/Auth';
 import Profile from '../screens/auth/Profile';
+import Privacy from '../screens/auth/Privacy';
 import Stats from '../screens/stats/Stats';
 import CertHoursDetails from '../screens/stats/CertHoursDetails';
 import NonVerHoursDetails from '../screens/stats/NonVerHoursDetails';
@@ -127,6 +128,10 @@ const ProfileNavigator = () => {
   return (
     <ProfileStackNavigator.Navigator screenOptions={defaultNavOptions}>
       <ProfileStackNavigator.Screen name="Your Profile" component={Profile} />
+      <ProfileStackNavigator.Screen
+        name="Privacy Statement"
+        component={Privacy}
+      />
     </ProfileStackNavigator.Navigator>
   );
 };
