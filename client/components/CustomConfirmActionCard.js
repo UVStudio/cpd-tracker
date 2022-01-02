@@ -1,7 +1,5 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { useDispatch } from 'react-redux';
-import * as authActions from '../store/actions/auth';
 
 import Colors from '../constants/Colors';
 import CustomButton from './CustomButton';
