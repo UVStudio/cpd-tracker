@@ -1,10 +1,14 @@
 import React from 'react';
-import { Text, StyleSheet, Platform } from 'react-native';
+import { View, Text, StyleSheet, Platform } from 'react-native';
 import Colors from '../constants/Colors';
 
 const CustomSubtitle = (props) => {
   return (
-    <Text style={{ ...styles.subtitle, ...props.style }}>{props.children}</Text>
+    <View style={{ alignSelf: 'flex-start' }}>
+      <Text style={{ ...styles.subtitle, ...props.style }}>
+        {props.children}
+      </Text>
+    </View>
   );
 };
 
