@@ -19,13 +19,23 @@
     },
     "assetBundlePatterns": ["**/*"],
     "ios": {
+      "bundleIdentifier": "com.sheriffconsulting.cpdtracker",
+      "buildNumber": "1.0.0",
       "supportsTablet": true
     },
     "android": {
+      "package": "com.sheriffconsulting.cpdtracker",
+      "versionCode": 1,
+      "icon": "./assets/adaptive-icon.png",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#3E8194"
-      }
+      },
+      "permissions": [
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE",
+        "MANAGE_DOCUMENTS"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
