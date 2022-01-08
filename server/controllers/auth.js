@@ -2,6 +2,8 @@ const User = require('../models/User');
 const Cert = require('../models/Cert');
 const NonVer = require('../models/NonVer');
 const bcrypt = require('bcryptjs');
+const crypto = require('crypto');
+const sgMail = require('@sendgrid/mail');
 const mongoose = require('mongoose');
 const ErrorResponse = require('../utils/errorResponse');
 const asyncHandler = require('../middleware/async');
@@ -186,6 +188,111 @@ exports.updatePassword = asyncHandler(async (req, res, next) => {
   user = await User.findById(req.user.id);
 
   res.status(200).json({ success: true, data: user });
+});
+
+//desc    GENERATE Verification code
+//route   POST /api/auth/forgotPassword
+//access  public
+exports.forgotPassword = asyncHandler(async (req, res, next) => {
+  console.log('email: ', req.body);
+  const user = await User.findOne({ email: req.body.email });
+
+  if (!user) {
+    return next(new ErrorResponse('This user does not exist.', 404));
+  }
+
+  //get reset token
+  const veriCode = user.getVerificationCode();
+
+  await user.save({ validateBeforeSave: false });
+
+  sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+
+  const mailText = `You have requested to reset your password for the CPD Tracker. Here is your 6 digit verification code: <strong>${veriCode}</strong>. If you did not request a reset, please contact developer@sheriffconsulting.com immediately.`;
+  console.log('veriCode: ', veriCode);
+
+  try {
+    await sgMail.send({
+      to: user.email,
+      from: 'developer@sheriffconsulting.com',
+      subject: 'CPD Tracker Password Reset',
+      html: `<p>Hello ${user.name}, <br><br>
+        ${mailText}<br>
+        <br>
+        Thanks, <br><br>
+        Leonard Shen, Application Developer<br>
+        Sheriff Consulting
+        <br>
+        </p>`,
+    });
+    res.status(200).json({
+      success: true,
+      data: veriCode,
+    });
+  } catch (err) {
+    user.verificationCode = undefined;
+    user.verificationCodeExpire = undefined;
+
+    await user.save({ validateBeforeSave: false });
+
+    return next(new ErrorResponse(err, 500));
+  }
+});
+
+//desc    POST Verification code
+//route   POST /api/auth/forgotpassword/:vericode
+//access  public
+exports.verificationCode = asyncHandler(async (req, res, next) => {
+  const verificationCode = crypto
+    .createHash('sha256')
+    .update(req.params.vericode)
+    .digest('hex');
+
+  const user = await User.findOne({
+    verificationCode,
+    verificationCodeExpire: { $gt: Date.now() },
+  });
+
+  if (!user) {
+    return next(new ErrorResponse('Invalid verification code', 400));
+  }
+
+  res.status(200).json({
+    success: true,
+  });
+});
+
+//desc    UPDATE password
+//route   PUT /api/auth/forgotpassword/:vericode/
+//access  public
+exports.updatePassword = asyncHandler(async (req, res, next) => {
+  const verificationCode = crypto
+    .createHash('sha256')
+    .update(req.params.vericode)
+    .digest('hex');
+
+  const user = await User.findOne({
+    verificationCode,
+    verificationCodeExpire: { $gt: Date.now() },
+  });
+
+  if (!user) {
+    return next(new ErrorResponse('Invalid verification code', 400));
+  }
+  //mongoose syntax has an User.pre function to encrypt password before saving to DB
+  //so no need to bcrypt password here
+  const password = req.body.password;
+
+  user.password = password;
+  user.lastModifiedAt = Date.now();
+  user.verificationCode = undefined;
+  user.verificationCodeExpire = undefined;
+
+  await user.save();
+
+  res.status(200).json({
+    success: true,
+  });
 });
 
 //desc    LOGOUT user / clear cookie

@@ -2,7 +2,9 @@ import {
   AUTHENTICATE,
   LOGOUT,
   SET_USER,
-  GET_USER,
+  GET_VERIFICATION_CODE,
+  CODE_VERIFIED,
+  SET_NEW_PASSWORD,
   SET_DID_TRY_AL,
 } from '../types';
 
@@ -11,7 +13,9 @@ const initialState = {
   userId: null,
   didTryAutoLogin: false,
   user: {},
-  //veriCode: null,
+  veriCode: null,
+  verified: false,
+  newPassword: false,
 };
 
 export default (state = initialState, action) => {
@@ -34,6 +38,21 @@ export default (state = initialState, action) => {
       return {
         ...state,
         user: action.user,
+      };
+    case GET_VERIFICATION_CODE:
+      return {
+        ...state,
+        veriCode: action.veriCode,
+      };
+    case CODE_VERIFIED:
+      return {
+        ...state,
+        verified: action.verified,
+      };
+    case SET_NEW_PASSWORD:
+      return {
+        ...state,
+        newPassword: action.newPassword,
       };
     case LOGOUT:
       return {

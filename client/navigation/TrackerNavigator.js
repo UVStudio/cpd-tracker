@@ -7,6 +7,9 @@ import { MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
 import Auth from '../screens/auth/Auth';
 import Profile from '../screens/auth/Profile';
 import Privacy from '../screens/auth/Privacy';
+import ForgotPassword from '../screens/auth/ForgotPassword';
+import Verification from '../screens/auth/Verification';
+import ResetPassword from '../screens/auth/ResetPassword';
 import Stats from '../screens/stats/Stats';
 import CertHoursDetails from '../screens/stats/CertHoursDetails';
 import NonVerHoursDetails from '../screens/stats/NonVerHoursDetails';
@@ -49,6 +52,18 @@ export const AuthNavigator = () => {
         options={{ headerTitle: 'Login / Register' }}
       />
       <AuthStackNavigator.Screen name="Profile" component={Profile} />
+      <AuthStackNavigator.Screen
+        name="Forgot Password"
+        component={ForgotPassword}
+      />
+      <AuthStackNavigator.Screen
+        name="Verification Code"
+        component={Verification}
+      />
+      <AuthStackNavigator.Screen
+        name="Reset Password"
+        component={ResetPassword}
+      />
     </AuthStackNavigator.Navigator>
   );
 };

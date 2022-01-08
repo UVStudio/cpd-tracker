@@ -132,7 +132,6 @@ const getRandomInt = (min, max) => {
 UserSchema.methods.getVerificationCode = function () {
   const veriCodeNumber = getRandomInt(100000, 999999); //6 digits
   const veriCode = veriCodeNumber.toString();
-  console.log(veriCode);
 
   this.verificationCode = crypto
     .createHash('sha256')

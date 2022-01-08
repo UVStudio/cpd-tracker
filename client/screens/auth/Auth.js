@@ -8,6 +8,7 @@ import {
   Pressable,
 } from 'react-native';
 import { useDispatch } from 'react-redux';
+import { useNavigation } from '@react-navigation/native';
 
 import CustomFormCard from '../../components/CustomFormCard';
 import CustomInput from '../../components/CustomInput';
@@ -31,6 +32,7 @@ const Auth = () => {
   const [province, setProvince] = useState('');
 
   const dispatch = useDispatch();
+  const navigation = useNavigation();
 
   const [formState, dispatchFormState] = useReducer(formReducer, {
     inputValues: {
@@ -264,8 +266,7 @@ const Auth = () => {
                 {`Switch to ${isSignup ? 'Login' : 'Register'}`}
               </CustomButton>
               <CustomButton
-                title="Forgot Password"
-                onSelect={() => props.navigation.navigate('ForgotPassword')}
+                onSelect={() => navigation.navigate('Forgot Password')}
               >
                 Forgot Password
               </CustomButton>
