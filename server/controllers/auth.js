@@ -262,10 +262,10 @@ exports.verificationCode = asyncHandler(async (req, res, next) => {
   });
 });
 
-//desc    UPDATE password
+//desc    RESET password
 //route   PUT /api/auth/forgotpassword/:vericode/
 //access  public
-exports.updatePassword = asyncHandler(async (req, res, next) => {
+exports.resetPassword = asyncHandler(async (req, res, next) => {
   const verificationCode = crypto
     .createHash('sha256')
     .update(req.params.vericode)

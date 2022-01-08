@@ -9,7 +9,7 @@ const {
   deleteCurrentUser,
   forgotPassword,
   verificationCode,
-  updatePassword,
+  resetPassword,
 } = require('../controllers/auth');
 
 const router = express.Router();
@@ -21,7 +21,7 @@ router.put('/', protect, updateUser);
 router.get('/', protect, getCurrentUser);
 router.post('/forgotpassword', forgotPassword);
 router.post('/forgotpassword/:vericode', verificationCode);
-router.put('/forgotpassword/:vericode', updatePassword);
+router.put('/forgotpassword/:vericode', resetPassword);
 router.put('/password', protect, updatePassword);
 router.post('/login', login);
 router.post('/logout', logOut);
