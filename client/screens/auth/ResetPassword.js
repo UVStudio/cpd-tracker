@@ -8,6 +8,7 @@ import CustomFormCard from '../../components/CustomFormCard';
 import CustomButton from '../../components/CustomButton';
 import CustomText from '../../components/CustomText';
 import CustomInput from '../../components/CustomInput';
+import CustomErrorCard from '../../components/CustomErrorCard';
 import CustomRedirectCard from '../../components/CustomRedirectCard';
 
 import * as authActions from '../../store/actions/auth';
@@ -36,8 +37,6 @@ const ResetPassword = () => {
     },
     formIsValid: false,
   });
-
-  //console.log('reset: ', formState);
 
   useEffect(() => {
     if (newPasswordState) {
@@ -132,6 +131,9 @@ const ResetPassword = () => {
           toShow={setMessage}
           toRedirect={toAuthScreen}
         />
+      ) : null}
+      {error !== '' ? (
+        <CustomErrorCard error={error} toShow={setError} />
       ) : null}
     </CustomImageBackground>
   );

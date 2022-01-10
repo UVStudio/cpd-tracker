@@ -20,8 +20,6 @@ const Verification = () => {
 
   const verified = useSelector((state) => state.auth.verified);
 
-  console.log('verified: ', verified);
-
   const navigation = useNavigation();
   const dispatch = useDispatch();
 
@@ -49,8 +47,6 @@ const Verification = () => {
     }
     setIsLoading(false);
   };
-
-  //console.log('veriForm: ', formState);
 
   const inputChangeHandler = useCallback(
     (inputIdentifier, inputValue, inputValidity) => {
