@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback, useReducer } from 'react';
 import { StyleSheet } from 'react-native';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { useNavigation } from '@react-navigation/native';
 
 import CustomImageBackground from '../../components/CustomImageBackground';
@@ -21,6 +21,7 @@ const ForgotPassword = () => {
   const veriCode = useSelector((state) => state.auth.veriCode);
 
   const navigation = useNavigation();
+  const dispatch = useDispatch();
 
   const [formState, dispatchFormState] = useReducer(formReducer, {
     inputValues: {
@@ -49,7 +50,7 @@ const ForgotPassword = () => {
   );
 
   const verificationHandler = async (email) => {
-    setError(null);
+    setError('');
     setIsLoading(true);
     try {
       await dispatch(authActions.forgotPassword(email));
@@ -89,12 +90,12 @@ const ForgotPassword = () => {
             Email Me Verification Code
           </CustomButton>
         )}
-        <CustomButton
+        {/* <CustomButton
           style={{ marginVertical: 20 }}
           onSelect={() => navigation.navigate('Verification Code')}
         >
           Cheat to Verification
-        </CustomButton>
+        </CustomButton> */}
       </CustomFormCard>
       {error !== '' ? (
         <CustomErrorCard error={error} toShow={setError} />

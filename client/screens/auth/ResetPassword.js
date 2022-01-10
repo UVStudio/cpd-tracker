@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback, useReducer } from 'react';
 import { StyleSheet } from 'react-native';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { useNavigation } from '@react-navigation/native';
 
 import CustomImageBackground from '../../components/CustomImageBackground';
@@ -8,7 +8,6 @@ import CustomFormCard from '../../components/CustomFormCard';
 import CustomButton from '../../components/CustomButton';
 import CustomText from '../../components/CustomText';
 import CustomInput from '../../components/CustomInput';
-// import CustomMessageCard from '../../components/CustomMessageCard';
 import CustomRedirectCard from '../../components/CustomRedirectCard';
 
 import * as authActions from '../../store/actions/auth';
@@ -24,6 +23,7 @@ const ResetPassword = () => {
   const newPasswordState = useSelector((state) => state.auth.newPassword);
 
   const navigation = useNavigation();
+  const dispatch = useDispatch();
 
   const [formState, dispatchFormState] = useReducer(formReducer, {
     inputValues: {
@@ -41,7 +41,7 @@ const ResetPassword = () => {
 
   useEffect(() => {
     if (newPasswordState) {
-      setMessage('Your new password is ready.');
+      setMessage('Your new password is ready. Please try logging in.');
     }
   }, [newPasswordState]);
 
@@ -50,13 +50,12 @@ const ResetPassword = () => {
   };
 
   const setNewPasswordHandler = async (password, confirmPassword, veriCode) => {
+    setError('');
     setIsLoading(true);
-    setMessage('card message');
     try {
       await dispatch(
         authActions.setNewPassword(password, confirmPassword, veriCode)
       );
-      //props.navigation.navigate('Auth');
     } catch (err) {
       setError(err.message);
     }
@@ -79,7 +78,8 @@ const ResetPassword = () => {
     <CustomImageBackground>
       <CustomFormCard style={styles.authCard}>
         <CustomText style={{ marginBottom: 20 }}>
-          Enter your new password. Then confirm it.
+          Your verification code is confirmed. Please enter your new password,
+          then confirm it by entering your new password again.
         </CustomText>
         <CustomInput
           id="password"

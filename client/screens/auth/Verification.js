@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback, useReducer } from 'react';
 import { StyleSheet } from 'react-native';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { useNavigation } from '@react-navigation/native';
 
 import CustomImageBackground from '../../components/CustomImageBackground';
@@ -23,6 +23,7 @@ const Verification = () => {
   console.log('verified: ', verified);
 
   const navigation = useNavigation();
+  const dispatch = useDispatch();
 
   const [formState, dispatchFormState] = useReducer(formReducer, {
     inputValues: {
@@ -39,7 +40,7 @@ const Verification = () => {
   }, [verified]);
 
   const verificationCodeHandler = async (code) => {
-    setError(null);
+    setError('');
     setIsLoading(true);
     try {
       await dispatch(authActions.verifyCode(code));
@@ -49,7 +50,7 @@ const Verification = () => {
     setIsLoading(false);
   };
 
-  console.log('veriForm: ', formState);
+  //console.log('veriForm: ', formState);
 
   const inputChangeHandler = useCallback(
     (inputIdentifier, inputValue, inputValidity) => {
@@ -67,7 +68,8 @@ const Verification = () => {
     <CustomImageBackground>
       <CustomFormCard style={styles.authCard}>
         <CustomText style={{ marginBottom: 20 }}>
-          Please verify the 6 digit Verification Code to reset your password.
+          The verification code has been sent to your email. Please verify the
+          code to reset your password.
         </CustomText>
         <CustomInput
           id="veriCode"
@@ -94,12 +96,12 @@ const Verification = () => {
             Confirm Verification Code
           </CustomButton>
         )}
-        <CustomButton
+        {/* <CustomButton
           style={{ marginVertical: 20 }}
           onSelect={() => navigation.navigate('Reset Password')}
         >
           Cheat to Reset Password
-        </CustomButton>
+        </CustomButton> */}
       </CustomFormCard>
       {error !== '' ? (
         <CustomErrorCard error={error} toShow={setError} />

@@ -103,7 +103,6 @@ export const login = (email, password) => {
         resData.user
       );
       await dispatch(setUser(resData.user));
-      //await dispatch(getUser(resData.user));
     } catch (err) {
       throw new Error(err.response.data.error);
     }
