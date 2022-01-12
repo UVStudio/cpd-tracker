@@ -11,6 +11,7 @@ const CustomText = (props) => {
 const styles = StyleSheet.create({
   text: {
     fontSize: 16,
+    alignSelf: 'flex-start',
     color: Colors.darkGrey,
     fontFamily:
       Platform.OS === 'android'

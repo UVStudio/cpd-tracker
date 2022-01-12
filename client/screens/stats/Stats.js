@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Text, View, StyleSheet, Platform, Pressable } from 'react-native';
 import { downloadToFolder } from 'expo-file-dl';
+import { PieChart } from 'react-native-svg-charts';
 
 import * as Notifications from 'expo-notifications';
 import * as MediaLibrary from 'expo-media-library';
@@ -238,12 +239,18 @@ const Stats = ({ navigation }) => {
     const AWSFileName = `${user._id}-${showYear.toString()}-CPD-report.pdf`;
     try {
       setDownloadingPDF(true);
-      await downloadToFolder(pdfUri, fileName, 'Download', channelId, {
-        downloadProgressCallback: downloadProgressUpdater,
-      });
+      await downloadToFolder(
+        pdfUri,
+        fileName,
+        'CPD Tracker Folder',
+        channelId,
+        {
+          downloadProgressCallback: downloadProgressUpdater,
+        }
+      );
       await dispatch(reportActions.deleteReport(AWSFileName));
       setCardText(
-        `Report succesfully downloaded. For Android users, the PDF is located in Documents > Download folder.
+        `Report succesfully downloaded. For Android users, the PDF is located in the Documents > CPD Reports folder.
 
 For iOS users, the PDF is where you have chosen to save it.`
       );
@@ -261,6 +268,18 @@ For iOS users, the PDF is where you have chosen to save it.`
   //   getMediaLibraryPermissions();
   // });
 
+  /* <CustomProgressBar
+  progress={elem.verifiable}
+  hoursRequired={hoursRequired}
+  type="verifiable"
+  /> */
+
+  /* <CustomProgressBar
+  progress={elem.nonVerifiable + elem.verifiable}
+  hoursRequired={hoursRequired}
+  type="total-CPD"
+  /> */
+
   useEffect(() => {
     getNotificationPermissions();
   });
@@ -275,6 +294,14 @@ For iOS users, the PDF is where you have chosen to save it.`
         <Text>{Number(denom).toFixed(1)}</Text>
       </Text>
     );
+  };
+
+  const pieRemainder = (required, progress) => {
+    return required - progress > 0 ? required - progress : 0;
+  };
+
+  const pieColor = (required, progress) => {
+    return required - progress > 0 ? Colors.light : Colors.brightGreen;
   };
 
   if (loading) {
@@ -330,12 +357,35 @@ For iOS users, the PDF is where you have chosen to save it.`
                           )}
                           {userHours[0].year === showYear ? ' required' : null}
                         </CustomText>
-
                         {!elem.historic ? (
-                          <CustomProgressBar
-                            progress={elem.verifiable}
-                            hoursRequired={hoursRequired}
-                            type="verifiable"
+                          <PieChart
+                            style={{ height: 160 }}
+                            valueAccessor={({ item }) => item.portion}
+                            spacing={1}
+                            outerRadius={'85%'}
+                            innerRadius={'50%'}
+                            data={[
+                              {
+                                key: 1,
+                                name: 'progress',
+                                portion: elem.verifiable,
+                                svg: {
+                                  fill: pieColor(
+                                    currentYearNeedVerHours,
+                                    elem.verifiable
+                                  ),
+                                },
+                              },
+                              {
+                                key: 2,
+                                name: 'remainder',
+                                portion: pieRemainder(
+                                  currentYearNeedVerHours,
+                                  elem.verifiable
+                                ),
+                                svg: { fill: Colors.lightGrey },
+                              },
+                            ]}
                           />
                         ) : null}
                       </Pressable>
@@ -360,10 +410,34 @@ For iOS users, the PDF is where you have chosen to save it.`
                           {userHours[0].year === showYear ? ' required' : null}
                         </CustomText>
                         {!elem.historic ? (
-                          <CustomProgressBar
-                            progress={elem.nonVerifiable + elem.verifiable}
-                            hoursRequired={hoursRequired}
-                            type="total-CPD"
+                          <PieChart
+                            style={{ height: 160 }}
+                            valueAccessor={({ item }) => item.portion}
+                            spacing={1}
+                            outerRadius={'85%'}
+                            innerRadius={'50%'}
+                            data={[
+                              {
+                                key: 1,
+                                name: 'progress',
+                                portion: elem.nonVerifiable + elem.verifiable,
+                                svg: {
+                                  fill: pieColor(
+                                    currentYearNeedCPDHours,
+                                    elem.nonVerifiable + elem.verifiable
+                                  ),
+                                },
+                              },
+                              {
+                                key: 2,
+                                name: 'remainder',
+                                portion: pieRemainder(
+                                  currentYearNeedCPDHours,
+                                  elem.nonVerifiable + elem.verifiable
+                                ),
+                                svg: { fill: Colors.lightGrey },
+                              },
+                            ]}
                           />
                         ) : null}
                       </Pressable>

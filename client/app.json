@@ -11,7 +11,7 @@
     "primaryColor": "#3E8194",
     "splash": {
       "image": "./assets/splash.png",
-      "resizeMode": "cover",
+      "resizeMode": "contain",
       "backgroundColor": "#3E8194"
     },
     "updates": {

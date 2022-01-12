@@ -46,8 +46,6 @@ const EditNonVerSession = (props) => {
     formIsValid: false,
   });
 
-  console.log('formState: ', formState);
-
   const inputChangeHandler = useCallback(
     (inputIdentifier, inputValue, inputValidity) => {
       dispatchFormState({
@@ -98,8 +96,8 @@ const EditNonVerSession = (props) => {
           <CustomInput
             id="hours"
             label="Edit Session Duration (hours)"
-            keyboardType="default"
-            autoCapitalize="numeric"
+            keyboardType="numeric"
+            autoCapitalize="none"
             onInputChange={inputChangeHandler}
             initialValue={nonverHoursString}
             required
