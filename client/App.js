@@ -19,7 +19,7 @@ const fetchFonts = () => {
     'avenir-medium': require('./assets/fonts/AvenirNextCondensed-Medium.ttf'),
     'avenir-demibold': require('./assets/fonts/AvenirNextCondensed-DemiBold.ttf'),
     'avenir-bold': require('./assets/fonts/AvenirNextCondensed-Bold.ttf'),
-    'avenir-light': require('./assets/fonts/AvenirNextCondensed-UltraLight.ttf'),
+    // 'avenir-light': require('./assets/fonts/AvenirNextCondensed-UltraLight.ttf'),
   });
 };
 
