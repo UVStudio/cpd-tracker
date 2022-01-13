@@ -319,10 +319,7 @@ const styles = StyleSheet.create({
   label: {
     marginVertical: 2,
     marginTop: 4,
-    fontFamily:
-      Platform.OS === 'android'
-        ? 'sans-serif-condensed'
-        : 'AvenirNextCondensed-Medium',
+    fontFamily: ' avenir-medium',
   },
   rowSpaceBetween: {
     flexDirection: 'row',

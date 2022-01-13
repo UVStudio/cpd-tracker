@@ -21,10 +21,7 @@ const styles = StyleSheet.create({
   label: {
     marginVertical: 2,
     marginTop: 4,
-    fontFamily:
-      Platform.OS === 'android'
-        ? 'sans-serif-condensed'
-        : 'AvenirNextCondensed-Medium',
+    fontFamily: 'avenir-medium',
   },
   input: {
     fontSize: 16,
@@ -32,10 +29,7 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     borderColor: '#ccc',
     borderWidth: 1,
-    fontFamily:
-      Platform.OS === 'android'
-        ? 'sans-serif-condensed'
-        : 'AvenirNextCondensed-Medium',
+    fontFamily: 'avenir-medium',
   },
   errorContainer: {
     marginVertical: 2,
@@ -44,10 +38,7 @@ const styles = StyleSheet.create({
   errorText: {
     color: 'red',
     fontSize: 13,
-    fontFamily:
-      Platform.OS === 'android'
-        ? 'sans-serif-condensed'
-        : 'AvenirNextCondensed-Medium',
+    fontFamily: 'avenir-medium',
   },
 });
 

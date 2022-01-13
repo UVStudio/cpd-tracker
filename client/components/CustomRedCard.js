@@ -6,6 +6,7 @@ import * as authActions from '../store/actions/auth';
 import CustomRedButton from './CustomRedButton';
 import Colors from '../constants/Colors';
 import CustomButton from './CustomButton';
+import delayButton from '../utils/delayButton';
 
 const CustomRedCard = (props) => {
   const { text, toShow, toPassError } = props;
@@ -72,10 +73,7 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 16,
     marginBottom: 10,
-    fontFamily:
-      Platform.OS === 'android'
-        ? 'sans-serif-condensed'
-        : 'AvenirNextCondensed-Medium',
+    fontFamily: 'avenir-medium',
   },
 });
 

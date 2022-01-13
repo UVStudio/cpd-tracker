@@ -55,10 +55,7 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 16,
     marginVertical: 6,
-    fontFamily:
-      Platform.OS === 'android'
-        ? 'sans-serif-condensed'
-        : 'AvenirNextCondensed-Medium',
+    fontFamily: 'avenir-medium',
   },
 });
 

@@ -10,6 +10,7 @@ import * as userActions from '../../store/actions/user';
 import * as reportActions from '../../store/actions/report';
 
 import CustomText from '../../components/CustomText';
+import CustomTextStats from '../../components/CustomTextStats';
 import CustomBoldText from '../../components/CustomBoldText';
 import CustomTitle from '../../components/CustomTitle';
 import CustomSubtitle from '../../components/CustomSubtitle';
@@ -22,9 +23,9 @@ import CustomStatsInfoBox from '../../components/CustomStatsInfoBox';
 import CustomIndicator from '../../components/CustomIndicator';
 import CustomGreyLine from '../../components/CustomGreyLine';
 import CustomThinGreyLine from '../../components/CustomThinGreyLine';
-import CustomProgressBar from '../../components/CustomProgressBar';
 import CustomScrollView from '../../components/CustomScrollView';
 import CustomScreenContainer from '../../components/CustomScreenContainer';
+//import CustomProgressBar from '../../components/CustomProgressBar';
 
 import { provinceObjs } from '../../constants/Provinces';
 import Colors from '../../constants/Colors';
@@ -287,10 +288,10 @@ For iOS users, the PDF is where you have chosen to save it.`
   const statsFraction = (num, denom, num2) => {
     return (
       <Text>
-        <Text style={{ color: Colors.dark }}>
+        <Text style={{ color: Colors.dark, fontSize: 20 }}>
           {Number(num + num2).toFixed(1)}
         </Text>
-        <Text> / </Text>
+        <Text>{'  /  '}</Text>
         <Text>{Number(denom).toFixed(1)}</Text>
       </Text>
     );
@@ -342,8 +343,8 @@ For iOS users, the PDF is where you have chosen to save it.`
                     ) : null}
                     <CustomStatsDivider>
                       <Pressable onPress={() => verifiableHoursDetails()}>
-                        <CustomText>
-                          Verifiable Hours:{' '}
+                        <CustomTextStats>
+                          Verifiable Hours:{'  '}
                           {!elem.historic ? (
                             statsFraction(
                               elem.verifiable,
@@ -356,7 +357,7 @@ For iOS users, the PDF is where you have chosen to save it.`
                             </Text>
                           )}
                           {userHours[0].year === showYear ? ' required' : null}
-                        </CustomText>
+                        </CustomTextStats>
                         {!elem.historic ? (
                           <PieChart
                             style={{ height: 160 }}
@@ -392,8 +393,8 @@ For iOS users, the PDF is where you have chosen to save it.`
                     </CustomStatsDivider>
                     <CustomStatsDivider>
                       <Pressable onPress={() => totalCPDHoursDetails()}>
-                        <CustomText>
-                          Total CPD Hours:{' '}
+                        <CustomTextStats>
+                          Total CPD Hours:{'  '}
                           {!elem.historic ? (
                             statsFraction(
                               elem.nonVerifiable,
@@ -408,7 +409,7 @@ For iOS users, the PDF is where you have chosen to save it.`
                             </Text>
                           )}
                           {userHours[0].year === showYear ? ' required' : null}
-                        </CustomText>
+                        </CustomTextStats>
                         {!elem.historic ? (
                           <PieChart
                             style={{ height: 160 }}
@@ -444,17 +445,17 @@ For iOS users, the PDF is where you have chosen to save it.`
                     </CustomStatsDivider>
                     <CustomStatsDivider>
                       <Pressable onPress={() => nonVerHoursDetails()}>
-                        <CustomText>
-                          Non-Verifiable Hours:{' '}
-                          <Text style={{ color: 'black' }}>
+                        <CustomTextStats>
+                          Non-Verifiable Hours:{'  '}
+                          <Text style={{ color: 'black', fontSize: 20 }}>
                             {Number(elem.nonVerifiable).toFixed(1)}
                           </Text>
-                        </CustomText>
+                        </CustomTextStats>
                       </Pressable>
                     </CustomStatsDivider>
                     <CustomStatsDivider>
-                      <CustomText>
-                        Ethics Hours:{' '}
+                      <CustomTextStats>
+                        Ethics Hours:{'  '}
                         {!elem.historic ? (
                           statsFraction(
                             elem.ethics,
@@ -467,7 +468,7 @@ For iOS users, the PDF is where you have chosen to save it.`
                           </Text>
                         )}
                         {showYear === currentYear ? ethicsReqOrRec() : null}
-                      </CustomText>
+                      </CustomTextStats>
                     </CustomStatsDivider>
 
                     {!elem.historic ? (

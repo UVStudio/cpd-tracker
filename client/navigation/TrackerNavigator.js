@@ -29,10 +29,7 @@ const defaultNavOptions = {
     backgroundColor: Colors.primary,
   },
   headerTitleStyle: {
-    fontFamily:
-      Platform.OS === 'android'
-        ? 'sans-serif-light'
-        : 'AvenirNextCondensed-Medium',
+    fontFamily: 'avenir-bold',
     fontSize: 24,
   },
   headerBackTitleStyle: {
@@ -134,7 +131,10 @@ const RulesStackNavigator = createStackNavigator();
 const RulesNavigator = () => {
   return (
     <RulesStackNavigator.Navigator screenOptions={defaultNavOptions}>
-      <RulesStackNavigator.Screen name="CPD Rules" component={Rules} />
+      <RulesStackNavigator.Screen
+        name="Provincial CPD Rules"
+        component={Rules}
+      />
     </RulesStackNavigator.Navigator>
   );
 };
@@ -218,7 +218,7 @@ const bottomTabOptions = ({ route }) => ({
     backgroundColor: Colors.primary,
   },
   headerTitleStyle: {
-    fontFamily: 'sans-serif-light',
+    fontFamily: 'avenir-medium',
     fontSize: 24,
   },
   headerBackTitleStyle: {

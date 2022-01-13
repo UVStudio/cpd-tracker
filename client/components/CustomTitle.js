@@ -1,5 +1,5 @@
 import React from 'react';
-import { Text, StyleSheet, Platform } from 'react-native';
+import { Text, StyleSheet } from 'react-native';
 import Colors from '../constants/Colors';
 
 const CustomTitle = (props) => {
@@ -14,10 +14,7 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
     marginTop: 10,
     color: Colors.primary,
-    fontFamily:
-      Platform.OS === 'android'
-        ? 'sans-serif-condensed'
-        : 'AvenirNextCondensed-Medium',
+    fontFamily: 'avenir-demibold',
   },
 });
 

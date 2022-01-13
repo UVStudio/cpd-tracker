@@ -13,10 +13,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginBottom: 16,
     color: Colors.darkGrey,
-    fontFamily:
-      Platform.OS === 'android'
-        ? 'sans-serif-condensed'
-        : 'AvenirNextCondensed-Medium',
+    fontFamily: 'avenir-medium',
   },
 });
 
