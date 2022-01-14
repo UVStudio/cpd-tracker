@@ -147,10 +147,9 @@ const Stats = ({ navigation }) => {
     if (
       user.province === provinceObjs.alberta.name ||
       user.province === provinceObjs.nwtNu.name
-    ) {
-      return showYear - user.cpdYear > 2 ? ' required' : ' recommended';
-    }
-    return showYear - user.cpdYear > 1 ? ' required' : ' recommended';
+    )
+      return showYear - user.cpdYear > 2 ? ' - Required' : ' - Recommended';
+    return showYear - user.cpdYear > 1 ? ' - Required' : ' - Recommended';
   };
 
   //OverwriteCPD
@@ -356,7 +355,7 @@ For iOS users, the PDF is where you have chosen to save it.`
                               {Number(elem.verifiable).toFixed(1)}
                             </Text>
                           )}
-                          {userHours[0].year === showYear ? ' required' : null}
+                          {!elem.historic ? ' - Required' : null}
                         </CustomTextStats>
                         {!elem.historic ? (
                           <PieChart
@@ -408,7 +407,7 @@ For iOS users, the PDF is where you have chosen to save it.`
                               ).toFixed(1)}
                             </Text>
                           )}
-                          {userHours[0].year === showYear ? ' required' : null}
+                          {!elem.historic ? ' - Required' : null}
                         </CustomTextStats>
                         {!elem.historic ? (
                           <PieChart
@@ -447,9 +446,15 @@ For iOS users, the PDF is where you have chosen to save it.`
                       <Pressable onPress={() => nonVerHoursDetails()}>
                         <CustomTextStats>
                           Non-Verifiable Hours:{'  '}
-                          <Text style={{ color: 'black', fontSize: 20 }}>
-                            {Number(elem.nonVerifiable).toFixed(1)}
-                          </Text>
+                          {!elem.historic ? (
+                            <Text style={{ color: 'black', fontSize: 20 }}>
+                              {Number(elem.nonVerifiable).toFixed(1)}
+                            </Text>
+                          ) : (
+                            <Text style={{ color: 'black' }}>
+                              {Number(elem.nonVerifiable).toFixed(1)}
+                            </Text>
+                          )}
                         </CustomTextStats>
                       </Pressable>
                     </CustomStatsDivider>
@@ -467,7 +472,7 @@ For iOS users, the PDF is where you have chosen to save it.`
                             {Number(elem.ethics).toFixed(1)}
                           </Text>
                         )}
-                        {showYear === currentYear ? ethicsReqOrRec() : null}
+                        {!elem.historic ? ethicsReqOrRec() : null}
                       </CustomTextStats>
                     </CustomStatsDivider>
 
