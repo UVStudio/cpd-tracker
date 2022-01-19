@@ -6,6 +6,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 
 import CustomIndicator from '../../components/CustomIndicator';
 import CustomButton from '../../components/CustomButton';
+import CustomButtonLoading from '../../components/CustomButtonLoading';
 import CustomInput from '../../components/CustomInput';
 import CustomTitle from '../../components/CustomTitle';
 import CustomErrorCard from '../../components/CustomErrorCard';
@@ -226,9 +227,7 @@ const Timer = () => {
                   onInputChange={inputChangeHandler}
                 />
                 {savingTimed ? (
-                  <CustomButton style={{ marginVertical: 20 }}>
-                    Saving Session...
-                  </CustomButton>
+                  <CustomButtonLoading style={{ marginVertical: 20 }} />
                 ) : (
                   <CustomButton
                     onSelect={saveTimedSession}
@@ -300,9 +299,7 @@ const Timer = () => {
               required
             />
             {savingDirect ? (
-              <CustomButton style={{ marginVertical: 20 }}>
-                Saving Direct Session...
-              </CustomButton>
+              <CustomButtonLoading style={{ marginVertical: 20 }} />
             ) : (
               <CustomButton
                 onSelect={saveDirectSession}

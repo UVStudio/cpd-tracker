@@ -7,6 +7,7 @@ import * as authActions from '../../store/actions/auth';
 import * as userActions from '../../store/actions/user';
 
 import CustomButton from '../../components/CustomButton';
+import CustomButtonLoading from '../../components/CustomButtonLoading';
 import CustomTitle from '../../components/CustomTitle';
 import CustomInput from '../../components/CustomInput';
 import CustomSelectField from '../../components/CustomSelectField';
@@ -23,6 +24,7 @@ import CustomProvinceSelectionCard from '../../components/CustomProvinceSelectio
 
 import { formReducer } from '../../utils/formReducer';
 import { FORM_INPUT_UPDATE, PASSWORD_INPUT_UPDATE } from '../../store/types';
+import { ActivityIndicator } from 'react-native-paper';
 
 const Profile = () => {
   const [cardText, setCardText] = useState('');
@@ -279,7 +281,7 @@ All data and certificates will be erased permanently. The app does not keep any 
           </View>
           <View style={{ ...styles.fullWidthCenterItems, marginVertical: 10 }}>
             {updatingProfile ? (
-              <CustomButton>Updating Profile...</CustomButton>
+              <CustomButtonLoading />
             ) : (
               <CustomButton onSelect={updateProfileHandler}>
                 Update Profile
@@ -325,7 +327,7 @@ All data and certificates will be erased permanently. The app does not keep any 
           />
           <View style={{ ...styles.fullWidthCenterItems, marginVertical: 10 }}>
             {updatingPassword ? (
-              <CustomButton>Updating Password...</CustomButton>
+              <CustomButtonLoading />
             ) : (
               <CustomButton onSelect={updatePasswordHandler}>
                 Update Password

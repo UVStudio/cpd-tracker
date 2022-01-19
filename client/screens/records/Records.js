@@ -7,6 +7,7 @@ import * as certActions from '../../store/actions/cert';
 import * as userActions from '../../store/actions/user';
 
 import CustomButton from '../../components/CustomButton';
+import CustomButtonLoading from '../../components/CustomButtonLoading';
 import CustomBoldText from '../../components/CustomBoldText';
 import CustomTitle from '../../components/CustomTitle';
 import CustomInput from '../../components/CustomInput';
@@ -23,8 +24,6 @@ import { formReducer } from '../../utils/formReducer';
 import { FORM_INPUT_UPDATE } from '../../store/types';
 
 const Records = () => {
-  const user = useSelector((state) => state.auth.user);
-
   const [cert, setCert] = useState(null); //if true, app uploads a cert. if not, app uploads default no-cert.jpg from S3
   const [cardText, setCardText] = useState('');
   const [error, setError] = useState('');
@@ -188,9 +187,7 @@ const Records = () => {
             {cert !== null ? 'file: ' + cert.name : null}
           </CustomBoldText>
           {savingCourse ? (
-            <CustomButton style={{ marginTop: 10 }}>
-              Saving Course...
-            </CustomButton>
+            <CustomButtonLoading style={{ marginTop: 10 }} />
           ) : (
             <CustomButton
               style={{ marginTop: 10 }}

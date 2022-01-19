@@ -1,6 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { Text, View, StyleSheet, Platform, Pressable } from 'react-native';
+import {
+  Text,
+  View,
+  StyleSheet,
+  Platform,
+  Pressable,
+  ActivityIndicator,
+} from 'react-native';
 import { downloadToFolder } from 'expo-file-dl';
 import { PieChart } from 'react-native-svg-charts';
 
@@ -15,6 +22,7 @@ import CustomBoldText from '../../components/CustomBoldText';
 import CustomTitle from '../../components/CustomTitle';
 import CustomSubtitle from '../../components/CustomSubtitle';
 import CustomButton from '../../components/CustomButton';
+import CustomButtonLoading from '../../components/CustomButtonLoading';
 import CustomErrorCard from '../../components/CustomErrorCard';
 import CustomMessageCard from '../../components/CustomMessageCard';
 import CustomAccordionUnit from '../../components/CustomAccordionUnit';
@@ -116,18 +124,18 @@ const Stats = ({ navigation }) => {
     }
   }, [userState]);
 
-  const refreshUser = async () => {
-    setRefreshingData(true);
-    try {
-      await dispatch(userActions.getUser());
-    } catch (err) {
-      console.log(err.message);
-      setError(
-        'There is something wrong with our network. Please try again later.'
-      );
-    }
-    setRefreshingData(false);
-  };
+  // const refreshUser = async () => {
+  //   setRefreshingData(true);
+  //   try {
+  //     await dispatch(userActions.getUser());
+  //   } catch (err) {
+  //     console.log(err.message);
+  //     setError(
+  //       'There is something wrong with our network. Please try again later.'
+  //     );
+  //   }
+  //   setRefreshingData(false);
+  // };
 
   //Session details
   const verifiableHoursDetails = () => {
@@ -239,18 +247,12 @@ const Stats = ({ navigation }) => {
     const AWSFileName = `${user._id}-${showYear.toString()}-CPD-report.pdf`;
     try {
       setDownloadingPDF(true);
-      await downloadToFolder(
-        pdfUri,
-        fileName,
-        'CPD Tracker Folder',
-        channelId,
-        {
-          downloadProgressCallback: downloadProgressUpdater,
-        }
-      );
+      await downloadToFolder(pdfUri, fileName, 'CPD Tracker App', channelId, {
+        downloadProgressCallback: downloadProgressUpdater,
+      });
       await dispatch(reportActions.deleteReport(AWSFileName));
       setCardText(
-        `Report succesfully downloaded. For Android users, the PDF is located in the Documents > CPD Reports folder.
+        `Report succesfully downloaded. For Android users, the PDF is located in the Documents > CPD Tracker Folder.
 
 For iOS users, the PDF is where you have chosen to save it.`
       );
@@ -543,13 +545,7 @@ For iOS users, the PDF is where you have chosen to save it.`
             ) : null}
           </CustomAccordionUnit>
         ))}
-        {refreshingData ? (
-          <CustomButton onSelect={() => refreshUser()}>
-            Refreshing Your Data...
-          </CustomButton>
-        ) : (
-          <CustomButton onSelect={() => loadUser()}>Refresh Data</CustomButton>
-        )}
+        <CustomButton onSelect={() => loadUser()}>Refresh Data</CustomButton>
       </CustomScrollView>
       {error !== '' ? (
         <CustomErrorCard error={error} toShow={setError} />
