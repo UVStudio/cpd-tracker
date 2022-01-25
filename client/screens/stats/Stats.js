@@ -8,8 +8,8 @@ import {
   Pressable,
   ActivityIndicator,
 } from 'react-native';
-import { downloadToFolder } from 'expo-file-dl';
-import { PieChart } from 'react-native-svg-charts';
+//import { downloadToFolder } from 'expo-file-dl';
+//import { PieChart } from 'react-native-svg-charts';
 
 import * as Notifications from 'expo-notifications';
 import * as MediaLibrary from 'expo-media-library';
@@ -235,35 +235,36 @@ const Stats = ({ navigation }) => {
   const fileName = `${userFirstName}-${showYear.toString()}-CPD-report.pdf`;
 
   const downloadPDFHandler = async () => {
-    await getMediaLibraryPermissions();
-    const permResult = await MediaLibrary.getPermissionsAsync();
-    if (permResult.status !== 'granted') {
-      setError(
-        'We cannot proceed with downloading your report without your permission to access your media libary.'
-      );
-      return;
-    }
+    console.log('download clicked');
+    //     await getMediaLibraryPermissions();
+    //     const permResult = await MediaLibrary.getPermissionsAsync();
+    //     if (permResult.status !== 'granted') {
+    //       setError(
+    //         'We cannot proceed with downloading your report without your permission to access your media libary.'
+    //       );
+    //       return;
+    //     }
 
-    const AWSFileName = `${user._id}-${showYear.toString()}-CPD-report.pdf`;
-    try {
-      setDownloadingPDF(true);
-      await downloadToFolder(pdfUri, fileName, 'CPD Tracker App', channelId, {
-        downloadProgressCallback: downloadProgressUpdater,
-      });
-      await dispatch(reportActions.deleteReport(AWSFileName));
-      setCardText(
-        `Report succesfully downloaded. For Android users, the PDF is located in the Documents > CPD Tracker Folder.
+    //     const AWSFileName = `${user._id}-${showYear.toString()}-CPD-report.pdf`;
+    //     try {
+    //       setDownloadingPDF(true);
+    //       await downloadToFolder(pdfUri, fileName, 'CPD Tracker App', channelId, {
+    //         downloadProgressCallback: downloadProgressUpdater,
+    //       });
+    //       await dispatch(reportActions.deleteReport(AWSFileName));
+    //       setCardText(
+    //         `Report succesfully downloaded. For Android users, the PDF is located in the Documents > CPD Tracker Folder.
 
-For iOS users, the PDF is where you have chosen to save it.`
-      );
-      setDownloadProgress('0%');
-    } catch (err) {
-      console.log(err.message);
-      setError(
-        'There is something wrong with our network. Your Report cannot be downloaded at the moment. Please try again later.'
-      );
-    }
-    setDownloadingPDF(false);
+    // For iOS users, the PDF is where you have chosen to save it.`
+    //       );
+    //       setDownloadProgress('0%');
+    //     } catch (err) {
+    //       console.log(err.message);
+    //       setError(
+    //         'There is something wrong with our network. Your Report cannot be downloaded at the moment. Please try again later.'
+    //       );
+    //     }
+    //     setDownloadingPDF(false);
   };
 
   // useEffect(() => {
@@ -359,7 +360,7 @@ For iOS users, the PDF is where you have chosen to save it.`
                           )}
                           {!elem.historic ? ' - Required' : null}
                         </CustomTextStats>
-                        {!elem.historic ? (
+                        {/* {!elem.historic ? (
                           <PieChart
                             style={{ height: 160 }}
                             valueAccessor={({ item }) => item.portion}
@@ -389,7 +390,7 @@ For iOS users, the PDF is where you have chosen to save it.`
                               },
                             ]}
                           />
-                        ) : null}
+                        ) : null} */}
                       </Pressable>
                     </CustomStatsDivider>
                     <CustomStatsDivider>
@@ -411,7 +412,7 @@ For iOS users, the PDF is where you have chosen to save it.`
                           )}
                           {!elem.historic ? ' - Required' : null}
                         </CustomTextStats>
-                        {!elem.historic ? (
+                        {/* {!elem.historic ? (
                           <PieChart
                             style={{ height: 160 }}
                             valueAccessor={({ item }) => item.portion}
@@ -441,7 +442,7 @@ For iOS users, the PDF is where you have chosen to save it.`
                               },
                             ]}
                           />
-                        ) : null}
+                        ) : null} */}
                       </Pressable>
                     </CustomStatsDivider>
                     <CustomStatsDivider>
