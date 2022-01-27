@@ -32,10 +32,7 @@ const defaultNavOptions = {
     fontFamily: 'avenir-bold',
     fontSize: 24,
   },
-  headerBackTitleStyle: {
-    fontSize: 24,
-  },
-  headerBackTitle: '',
+  headerBackTitleVisible: false,
   headerTintColor: 'white',
 };
 
@@ -214,16 +211,4 @@ const bottomTabOptions = ({ route }) => ({
     },
     null,
   ],
-  headerStyle: {
-    backgroundColor: Colors.primary,
-  },
-  headerTitleStyle: {
-    fontFamily: 'avenir-medium',
-    fontSize: 24,
-  },
-  headerBackTitleStyle: {
-    fontSize: 24,
-  },
-  headerBackTitle: '',
-  headerTintColor: 'white',
 });
