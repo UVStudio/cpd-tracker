@@ -9,7 +9,9 @@ import {
   ActivityIndicator,
 } from 'react-native';
 //import { downloadToFolder } from 'expo-file-dl';
-//import { PieChart } from 'react-native-svg-charts';
+import { PieChart } from 'react-native-svg-charts';
+//import Svg, { Circle } from 'react-native-svg'; //"RNSVGCircle" was not found in the UIManager.
+//import Svg, { Circle } from 'react-native-svg';
 
 import * as Notifications from 'expo-notifications';
 import * as MediaLibrary from 'expo-media-library';
@@ -360,7 +362,7 @@ const Stats = ({ navigation }) => {
                           )}
                           {!elem.historic ? ' - Required' : null}
                         </CustomTextStats>
-                        {/* {!elem.historic ? (
+                        {!elem.historic ? (
                           <PieChart
                             style={{ height: 160 }}
                             valueAccessor={({ item }) => item.portion}
@@ -390,7 +392,7 @@ const Stats = ({ navigation }) => {
                               },
                             ]}
                           />
-                        ) : null} */}
+                        ) : null}
                       </Pressable>
                     </CustomStatsDivider>
                     <CustomStatsDivider>
@@ -412,7 +414,7 @@ const Stats = ({ navigation }) => {
                           )}
                           {!elem.historic ? ' - Required' : null}
                         </CustomTextStats>
-                        {/* {!elem.historic ? (
+                        {!elem.historic ? (
                           <PieChart
                             style={{ height: 160 }}
                             valueAccessor={({ item }) => item.portion}
@@ -442,7 +444,7 @@ const Stats = ({ navigation }) => {
                               },
                             ]}
                           />
-                        ) : null} */}
+                        ) : null}
                       </Pressable>
                     </CustomStatsDivider>
                     <CustomStatsDivider>
