@@ -7,16 +7,15 @@ import {
   Platform,
   Pressable,
   PermissionsAndroid,
-  ActivityIndicator,
 } from 'react-native';
-//import { downloadToFolder } from 'expo-file-dl';
-import { PieChart } from 'react-native-svg-charts';
+import CustomPieChart from '../../components/CustomPieChart';
 import RNFS from 'react-native-fs';
 
 import * as Notifications from 'expo-notifications';
-import * as MediaLibrary from 'expo-media-library';
+import * as Sharing from 'expo-sharing';
 import * as userActions from '../../store/actions/user';
 import * as reportActions from '../../store/actions/report';
+//import * as MediaLibrary from 'expo-media-library';
 
 import CustomText from '../../components/CustomText';
 import CustomTextStats from '../../components/CustomTextStats';
@@ -24,7 +23,6 @@ import CustomBoldText from '../../components/CustomBoldText';
 import CustomTitle from '../../components/CustomTitle';
 import CustomSubtitle from '../../components/CustomSubtitle';
 import CustomButton from '../../components/CustomButton';
-import CustomButtonLoading from '../../components/CustomButtonLoading';
 import CustomErrorCard from '../../components/CustomErrorCard';
 import CustomMessageCard from '../../components/CustomMessageCard';
 import CustomAccordionUnit from '../../components/CustomAccordionUnit';
@@ -69,8 +67,7 @@ const Stats = ({ navigation }) => {
   const [cardText, setCardText] = useState('');
   const [generatingPDF, setGeneratingPDF] = useState(false);
   const [downloadingPDF, setDownloadingPDF] = useState(false);
-  const [refreshingData, setRefreshingData] = useState(false);
-  const [downloadPath, setDownloadPath] = useState(undefined);
+  const [dirPath, setDirPath] = useState(`${RNFS.DocumentDirectoryPath}`);
   const [downloadProgress, setDownloadProgress] = useState(0);
 
   const authState = useSelector((state) => state.auth.user);
@@ -126,20 +123,7 @@ const Stats = ({ navigation }) => {
     }
   }, [userState]);
 
-  // const refreshUser = async () => {
-  //   setRefreshingData(true);
-  //   try {
-  //     await dispatch(userActions.getUser());
-  //   } catch (err) {
-  //     console.log(err.message);
-  //     setError(
-  //       'There is something wrong with our network. Please try again later.'
-  //     );
-  //   }
-  //   setRefreshingData(false);
-  // };
-
-  //Session details
+  //Session details navigations
   const verifiableHoursDetails = () => {
     navigation.navigate('Verifiable Details', { year: showYear });
   };
@@ -193,24 +177,9 @@ const Stats = ({ navigation }) => {
   useEffect(() => {
     if (Platform.OS === 'android') {
       setNotificationChannel();
+      setDirPath(`${RNFS.DownloadDirectoryPath}/CPD`);
     }
   });
-
-  const getMediaLibraryPermissions = async () => {
-    await MediaLibrary.requestPermissionsAsync();
-  };
-
-  const getNotificationPermissions = async () => {
-    await Notifications.requestPermissionsAsync();
-  };
-
-  // const downloadProgressUpdater = ({
-  //   totalBytesWritten,
-  //   totalBytesExpectedToWrite,
-  // }) => {
-  //   const pctg = 100 * (totalBytesWritten / totalBytesExpectedToWrite);
-  //   setDownloadProgress(`${pctg.toFixed(0)}%`);
-  // };
 
   //Generate PDF Report
   const generatePDFHandler = async (year) => {
@@ -228,40 +197,43 @@ const Stats = ({ navigation }) => {
   };
 
   //Download PDF Report
+  //set vars of names and paths
   const userFirstName = user.name.split(' ')[0];
   const pdfUri = `https://cpdtracker.s3.us-east-2.amazonaws.com/reports/${
     user._id
   }-${showYear.toString()}-CPD-report.pdf`;
   const fileName = `${userFirstName}-${showYear.toString()}-CPD-${Date.now()}.pdf`;
   const AWSFileName = `${user._id}-${showYear.toString()}-CPD-report.pdf`;
-  const dirPath = `${RNFS.DownloadDirectoryPath}/CPD`;
+
+  //DocumentDirectoryPath
   const headers = {
     Accept: 'application/pdf',
     'Content-Type': 'application/pdf',
   };
 
   const downloadPDFHandler = async () => {
-    const granted = await PermissionsAndroid.request(
-      PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
-      {
-        title: 'Permission',
-        message:
-          'CPD Tracker needs your permission to save this report onto your phone',
-      }
-    );
-
-    if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-      RNFS.mkdir(dirPath)
-        .then(() => {
-          console.log('folder built');
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    } else {
-      setError(
-        'We cannot proceed with downloading your report without your permission to access your media libary.'
+    if (Platform.OS === 'android') {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+        {
+          title: 'Permission',
+          message:
+            'CPD Tracker needs your permission to save this report onto your phone',
+        }
       );
+      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+        RNFS.mkdir(dirPath)
+          .then(() => {
+            console.log('folder built');
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      } else {
+        setError(
+          'We cannot proceed with downloading your report without your permission to access your media libary.'
+        );
+      }
     }
 
     const filePath = `${dirPath}/${fileName}`;
@@ -277,13 +249,14 @@ const Stats = ({ navigation }) => {
       progress: (res) => {
         let pctg = 100 * (res.bytesWritten / res.contentLength);
         setDownloadProgress(pctg.toFixed(0));
-        console.log('bytes: ', res.bytesWritten);
       },
     };
 
     try {
       setDownloadingPDF(true);
       setDownloadProgress(0);
+
+      //for Android and iOS < 15, this will directly save file in CPD folder
       RNFS.downloadFile(downloadReportOptions)
         .promise.then((res) => {
           console.log('total written: ', res.bytesWritten);
@@ -292,11 +265,32 @@ const Stats = ({ navigation }) => {
           console.log(error);
         });
 
+      // iOS version < 15 does not require folder selection
+      // current simulator setup:
+      // 1) iPhone 8 - 13
+      // 2) iPhone 11 - 14
+      // 3) iPhone 13 - 15
+
+      //this conditional is only for iOS 15 (and perhaps beyond)
+      const majorVersionIOS = parseInt(Platform.Version, 10);
+      if (
+        Platform.OS === 'ios' &&
+        majorVersionIOS > 14 &&
+        (await Sharing.isAvailableAsync())
+      ) {
+        await Sharing.shareAsync('file://' + filePath);
+      }
+      //end of iOS 15 conditional requirement
+
       await dispatch(reportActions.deleteReport(AWSFileName));
       setCardText(
-        `Report succesfully downloaded! For Android users, the PDF is located in the Downloads > CPD folder.
+        `Report succesfully downloaded! 
+        
+For Android users, the PDF is located in the Downloads > CPD folder.
 
-    For iOS users, the PDF is where you have chosen to save it.`
+For iOS 14 and older users, the report is in the File > CPD Tracker folder.
+
+For iOS 15 and beyond, the PDF is where you have chosen to save it.`
       );
       setDownloadProgress(0);
     } catch (err) {
@@ -308,26 +302,6 @@ const Stats = ({ navigation }) => {
     setDownloadingPDF(false);
   };
 
-  // useEffect(() => {
-  //   getMediaLibraryPermissions();
-  // });
-
-  /* <CustomProgressBar
-  progress={elem.verifiable}
-  hoursRequired={hoursRequired}
-  type="verifiable"
-  /> */
-
-  /* <CustomProgressBar
-  progress={elem.nonVerifiable + elem.verifiable}
-  hoursRequired={hoursRequired}
-  type="total-CPD"
-  /> */
-
-  useEffect(() => {
-    getNotificationPermissions();
-  });
-
   const statsFraction = (num, denom, num2) => {
     return (
       <Text>
@@ -338,14 +312,6 @@ const Stats = ({ navigation }) => {
         <Text>{Number(denom).toFixed(1)}</Text>
       </Text>
     );
-  };
-
-  const pieRemainder = (required, progress) => {
-    return required - progress > 0 ? required - progress : 0;
-  };
-
-  const pieColor = (required, progress) => {
-    return required - progress > 0 ? Colors.light : Colors.brightGreen;
   };
 
   if (loading) {
@@ -402,34 +368,9 @@ const Stats = ({ navigation }) => {
                           {!elem.historic ? ' - Required' : null}
                         </CustomTextStats>
                         {!elem.historic ? (
-                          <PieChart
-                            style={{ height: 160 }}
-                            valueAccessor={({ item }) => item.portion}
-                            spacing={1}
-                            outerRadius={'85%'}
-                            innerRadius={'50%'}
-                            data={[
-                              {
-                                key: 1,
-                                name: 'progress',
-                                portion: elem.verifiable,
-                                svg: {
-                                  fill: pieColor(
-                                    currentYearNeedVerHours,
-                                    elem.verifiable
-                                  ),
-                                },
-                              },
-                              {
-                                key: 2,
-                                name: 'remainder',
-                                portion: pieRemainder(
-                                  currentYearNeedVerHours,
-                                  elem.verifiable
-                                ),
-                                svg: { fill: Colors.lightGrey },
-                              },
-                            ]}
+                          <CustomPieChart
+                            required={currentYearNeedVerHours}
+                            progress={elem.verifiable}
                           />
                         ) : null}
                       </Pressable>
@@ -454,34 +395,9 @@ const Stats = ({ navigation }) => {
                           {!elem.historic ? ' - Required' : null}
                         </CustomTextStats>
                         {!elem.historic ? (
-                          <PieChart
-                            style={{ height: 160 }}
-                            valueAccessor={({ item }) => item.portion}
-                            spacing={1}
-                            outerRadius={'85%'}
-                            innerRadius={'50%'}
-                            data={[
-                              {
-                                key: 1,
-                                name: 'progress',
-                                portion: elem.nonVerifiable + elem.verifiable,
-                                svg: {
-                                  fill: pieColor(
-                                    currentYearNeedCPDHours,
-                                    elem.nonVerifiable + elem.verifiable
-                                  ),
-                                },
-                              },
-                              {
-                                key: 2,
-                                name: 'remainder',
-                                portion: pieRemainder(
-                                  currentYearNeedCPDHours,
-                                  elem.nonVerifiable + elem.verifiable
-                                ),
-                                svg: { fill: Colors.lightGrey },
-                              },
-                            ]}
+                          <CustomPieChart
+                            required={currentYearNeedCPDHours}
+                            progress={elem.nonVerifiable + elem.verifiable}
                           />
                         ) : null}
                       </Pressable>
@@ -625,3 +541,19 @@ const styles = StyleSheet.create({
 });
 
 export default Stats;
+
+// const getNotificationPermissions = async () => {
+//   await Notifications.requestPermissionsAsync();
+// };
+
+// const getMediaLibraryPermissions = async () => {
+//   await MediaLibrary.requestPermissionsAsync();
+// };
+
+// useEffect(() => {
+//   getMediaLibraryPermissions();
+// });
+
+// useEffect(() => {
+//   getNotificationPermissions();
+// });

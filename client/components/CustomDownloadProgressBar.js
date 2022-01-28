@@ -22,7 +22,7 @@ const CustomDownloadProgressBar = (props) => {
         style={{
           ...styles.progress,
           width: barProgress(),
-          backgroundColor: Colors.primary,
+          backgroundColor: Colors.light,
           maxWidth: barWidth,
         }}
       />
@@ -33,17 +33,19 @@ const CustomDownloadProgressBar = (props) => {
 const styles = StyleSheet.create({
   bar: {
     width: 250,
-    height: 5,
-    backgroundColor: Colors.lightGrey,
-    borderRadius: 2,
-    marginVertical: 2,
+    height: 10,
+    backgroundColor: Colors.veryLightGrey,
+    borderColor: Colors.grey,
+    borderWidth: 1,
+    borderRadius: 4,
+    marginVertical: 4,
   },
   progress: {
     width: 0,
-    height: 5,
-    borderRadius: 2,
-    marginVertical: 2,
-    top: -9,
+    height: 8,
+    borderRadius: 4,
+    marginVertical: 4,
+    top: -17,
   },
 });
 
