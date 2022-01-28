@@ -6,12 +6,12 @@ import {
   StyleSheet,
   Platform,
   Pressable,
+  PermissionsAndroid,
   ActivityIndicator,
 } from 'react-native';
 //import { downloadToFolder } from 'expo-file-dl';
 import { PieChart } from 'react-native-svg-charts';
-//import Svg, { Circle } from 'react-native-svg'; //"RNSVGCircle" was not found in the UIManager.
-//import Svg, { Circle } from 'react-native-svg';
+import RNFS from 'react-native-fs';
 
 import * as Notifications from 'expo-notifications';
 import * as MediaLibrary from 'expo-media-library';
@@ -35,14 +35,13 @@ import CustomGreyLine from '../../components/CustomGreyLine';
 import CustomThinGreyLine from '../../components/CustomThinGreyLine';
 import CustomScrollView from '../../components/CustomScrollView';
 import CustomScreenContainer from '../../components/CustomScreenContainer';
-//import CustomProgressBar from '../../components/CustomProgressBar';
+import CustomDownloadProgressBar from '../../components/CustomDownloadProgressBar';
 
 import { provinceObjs } from '../../constants/Provinces';
 import Colors from '../../constants/Colors';
 
 import currentYear from '../../utils/currentYear';
-//test currentYear;
-//const currentYear = 2023;
+//const currentYear = 2023; //test currentYear;
 import { hoursRequiredLogic } from '../../utils/hoursRequiredLogic';
 
 import {
@@ -66,12 +65,13 @@ const channelId = 'DownloadInfo';
 const Stats = ({ navigation }) => {
   const [showYear, setShowYear] = useState(currentYear);
   const [loading, setLoading] = useState(true);
-  const [downloadProgress, setDownloadProgress] = useState('0%');
   const [error, setError] = useState('');
   const [cardText, setCardText] = useState('');
   const [generatingPDF, setGeneratingPDF] = useState(false);
   const [downloadingPDF, setDownloadingPDF] = useState(false);
   const [refreshingData, setRefreshingData] = useState(false);
+  const [downloadPath, setDownloadPath] = useState(undefined);
+  const [downloadProgress, setDownloadProgress] = useState(0);
 
   const authState = useSelector((state) => state.auth.user);
   const userState = useSelector((state) => state.user.user);
@@ -204,13 +204,13 @@ const Stats = ({ navigation }) => {
     await Notifications.requestPermissionsAsync();
   };
 
-  const downloadProgressUpdater = ({
-    totalBytesWritten,
-    totalBytesExpectedToWrite,
-  }) => {
-    const pctg = 100 * (totalBytesWritten / totalBytesExpectedToWrite);
-    setDownloadProgress(`${pctg.toFixed(0)}%`);
-  };
+  // const downloadProgressUpdater = ({
+  //   totalBytesWritten,
+  //   totalBytesExpectedToWrite,
+  // }) => {
+  //   const pctg = 100 * (totalBytesWritten / totalBytesExpectedToWrite);
+  //   setDownloadProgress(`${pctg.toFixed(0)}%`);
+  // };
 
   //Generate PDF Report
   const generatePDFHandler = async (year) => {
@@ -229,44 +229,83 @@ const Stats = ({ navigation }) => {
 
   //Download PDF Report
   const userFirstName = user.name.split(' ')[0];
-
   const pdfUri = `https://cpdtracker.s3.us-east-2.amazonaws.com/reports/${
     user._id
   }-${showYear.toString()}-CPD-report.pdf`;
-
-  const fileName = `${userFirstName}-${showYear.toString()}-CPD-report.pdf`;
+  const fileName = `${userFirstName}-${showYear.toString()}-CPD-${Date.now()}.pdf`;
+  const AWSFileName = `${user._id}-${showYear.toString()}-CPD-report.pdf`;
+  const dirPath = `${RNFS.DownloadDirectoryPath}/CPD`;
+  const headers = {
+    Accept: 'application/pdf',
+    'Content-Type': 'application/pdf',
+  };
 
   const downloadPDFHandler = async () => {
-    console.log('download clicked');
-    //     await getMediaLibraryPermissions();
-    //     const permResult = await MediaLibrary.getPermissionsAsync();
-    //     if (permResult.status !== 'granted') {
-    //       setError(
-    //         'We cannot proceed with downloading your report without your permission to access your media libary.'
-    //       );
-    //       return;
-    //     }
+    const granted = await PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+      {
+        title: 'Permission',
+        message:
+          'CPD Tracker needs your permission to save this report onto your phone',
+      }
+    );
 
-    //     const AWSFileName = `${user._id}-${showYear.toString()}-CPD-report.pdf`;
-    //     try {
-    //       setDownloadingPDF(true);
-    //       await downloadToFolder(pdfUri, fileName, 'CPD Tracker App', channelId, {
-    //         downloadProgressCallback: downloadProgressUpdater,
-    //       });
-    //       await dispatch(reportActions.deleteReport(AWSFileName));
-    //       setCardText(
-    //         `Report succesfully downloaded. For Android users, the PDF is located in the Documents > CPD Tracker Folder.
+    if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+      RNFS.mkdir(dirPath)
+        .then(() => {
+          console.log('folder built');
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    } else {
+      setError(
+        'We cannot proceed with downloading your report without your permission to access your media libary.'
+      );
+    }
 
-    // For iOS users, the PDF is where you have chosen to save it.`
-    //       );
-    //       setDownloadProgress('0%');
-    //     } catch (err) {
-    //       console.log(err.message);
-    //       setError(
-    //         'There is something wrong with our network. Your Report cannot be downloaded at the moment. Please try again later.'
-    //       );
-    //     }
-    //     setDownloadingPDF(false);
+    const filePath = `${dirPath}/${fileName}`;
+
+    const downloadReportOptions = {
+      fromUrl: pdfUri,
+      toFile: filePath,
+      headers,
+      begin: (res) => {
+        console.log('file size: ', res.contentLength);
+      },
+      progressInterval: 20,
+      progress: (res) => {
+        let pctg = 100 * (res.bytesWritten / res.contentLength);
+        setDownloadProgress(pctg.toFixed(0));
+        console.log('bytes: ', res.bytesWritten);
+      },
+    };
+
+    try {
+      setDownloadingPDF(true);
+      setDownloadProgress(0);
+      RNFS.downloadFile(downloadReportOptions)
+        .promise.then((res) => {
+          console.log('total written: ', res.bytesWritten);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+
+      await dispatch(reportActions.deleteReport(AWSFileName));
+      setCardText(
+        `Report succesfully downloaded! For Android users, the PDF is located in the Downloads > CPD folder.
+
+    For iOS users, the PDF is where you have chosen to save it.`
+      );
+      setDownloadProgress(0);
+    } catch (err) {
+      console.log(err.message);
+      setError(
+        'There is something wrong with our network. Your Report cannot be downloaded at the moment. Please try again later.'
+      );
+    }
+    setDownloadingPDF(false);
   };
 
   // useEffect(() => {
@@ -511,8 +550,12 @@ const Stats = ({ navigation }) => {
                             Downloading Your Report...
                           </CustomButton>
                           <CustomText style={{ alignSelf: 'center' }}>
-                            {downloadProgress}
+                            {downloadProgress + ' %'}
                           </CustomText>
+                          <CustomDownloadProgressBar
+                            progress={downloadProgress}
+                            fileSize={100}
+                          />
                         </View>
                       ) : (
                         <View style={styles.fullWidthCenter}>
@@ -523,7 +566,7 @@ const Stats = ({ navigation }) => {
                             Download Report
                           </CustomButton>
                           <CustomText style={{ alignSelf: 'center' }}>
-                            {downloadProgress}
+                            {downloadProgress + '%'}
                           </CustomText>
                         </View>
                       )
