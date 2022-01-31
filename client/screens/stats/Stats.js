@@ -221,6 +221,9 @@ const Stats = ({ navigation }) => {
             'CPD Tracker needs your permission to save this report onto your phone',
         }
       );
+      //for Android 10, if a CPD folder had been created on a prior date, a new folder will be created.
+      //it seems to treat a folder created on a different date as a different folder
+      //Android 11 doesn't suffer from the above bug
       if (granted === PermissionsAndroid.RESULTS.GRANTED) {
         RNFS.mkdir(dirPath)
           .then(() => {
@@ -256,7 +259,7 @@ const Stats = ({ navigation }) => {
       setDownloadingPDF(true);
       setDownloadProgress(0);
 
-      //for Android and iOS < 15, this will directly save file in CPD folder
+      //for Android or iOS < 15, this will directly save file in CPD folder
       RNFS.downloadFile(downloadReportOptions)
         .promise.then((res) => {
           console.log('total written: ', res.bytesWritten);
@@ -267,9 +270,10 @@ const Stats = ({ navigation }) => {
 
       // iOS version < 15 does not require folder selection
       // current simulator setup:
-      // 1) iPhone 8 - 13
-      // 2) iPhone 11 - 14
-      // 3) iPhone 13 - 15
+      // 1) iPhone 8 - 12
+      // 2) iPhone 8 - 13
+      // 3) iPhone 11 - 14
+      // 4) iPhone 13 - 15
 
       //this conditional is only for iOS 15 (and perhaps beyond)
       const majorVersionIOS = parseInt(Platform.Version, 10);

@@ -27,7 +27,7 @@ import Colors from '../../constants/Colors';
 import { FORM_INPUT_UPDATE } from '../../store/types';
 
 const Timer = () => {
-  const [showInputType, setShowInputType] = useState(null);
+  const [showInputType, setShowInputType] = useState('timer');
   const [seconds, setSeconds] = useState(0);
   const [isActive, setIsActive] = useState(false);
   const [startButton, setStartButton] = useState('Start');

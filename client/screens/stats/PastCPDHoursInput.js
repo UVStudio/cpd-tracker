@@ -126,7 +126,11 @@ const PastCPDHoursInput = (props) => {
         <CustomTitle>Past CPD Hours Input</CustomTitle>
         <CustomGreyLine />
         <View style={{ alignSelf: 'flex-start', marginBottom: 15 }}>
-          <CustomText>Hello, thank you for using CPD Tracker.</CustomText>
+          <CustomText>
+            Hello, thank you for using CPD Tracker. Please keep your previous
+            record keeping system in place for at least the prevous 2 years as a
+            backup.
+          </CustomText>
         </View>
         {yearsToOverride.length === 1 ? (
           <CustomText>

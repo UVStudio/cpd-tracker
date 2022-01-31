@@ -32,6 +32,11 @@ const Rules = () => {
           </CustomSubtitle>
           <CustomThinGreyLine />
           <CustomText style={{ marginBottom: 10 }}>
+            Thank you for using the CPD Tracker. Please keep your previous
+            record keeping system in place for at least the prevous 2 years as a
+            backup.
+          </CustomText>
+          <CustomText style={{ marginBottom: 10 }}>
             {user.province}, along with most other provincial jurisdictions,
             require each CPA member to obtain at least 20 hours of CPD, of
             which, at least 10 hours are required to be verifiable hours.
