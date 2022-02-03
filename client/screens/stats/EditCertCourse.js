@@ -28,9 +28,8 @@ const EditCertCourse = (props) => {
   const [updatingCourse, setUpdatingCourse] = useState(false);
 
   const authState = useSelector((state) => state.auth.user);
-  const userState = useSelector((state) => state.user.user);
 
-  const user = userState ? userState : authState;
+  const user = authState;
 
   const dispatch = useDispatch();
 
@@ -93,7 +92,7 @@ const EditCertCourse = (props) => {
       } else {
         await dispatch(certActions.editCertCourseById(courseName, hours, id));
       }
-      await dispatch(userActions.getUser());
+      await dispatch(authActions.getUser());
       setCardText('Verifiable course successfully updated');
       setUpdatingCourse(false);
     } catch (err) {

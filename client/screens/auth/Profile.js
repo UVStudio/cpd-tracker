@@ -38,9 +38,8 @@ const Profile = () => {
   const [specialMessage, setSpecialMessage] = useState(false);
 
   const authState = useSelector((state) => state.auth.user);
-  const userState = useSelector((state) => state.auth.user);
 
-  const user = userState ? userState : authState;
+  const user = authState;
 
   const dispatch = useDispatch();
   const navigation = useNavigation();
@@ -186,8 +185,8 @@ Updating your Province or your CPD Membership Join Date might have material impa
 
   const logoutHandler = async () => {
     try {
-      await dispatch(userActions.clearUserState());
-      await dispatch(authActions.logout());
+      //dispatch(authActions.clearUserState());
+      dispatch(authActions.logout());
     } catch (err) {
       console.log(err.message);
     }

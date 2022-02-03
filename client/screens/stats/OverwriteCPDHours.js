@@ -32,9 +32,8 @@ const OverwriteCPDHours = (props) => {
   const dispatch = useDispatch();
 
   const authState = useSelector((state) => state.auth.user);
-  const userState = useSelector((state) => state.user.user);
 
-  const user = userState ? userState : authState;
+  const user = authState;
 
   const userHoursArr = user.hours;
   const thisYearHours = userHoursArr.find((elem) => elem.year === showYear);
@@ -75,7 +74,7 @@ const OverwriteCPDHours = (props) => {
     setSavingCPD(true);
     try {
       await dispatch(
-        userActions.overrideHours(
+        authActions.overrideHours(
           showYear,
           formState.inputValues.CertHours,
           formState.inputValues.NonVerHours,

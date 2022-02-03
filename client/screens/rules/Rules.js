@@ -17,9 +17,7 @@ import CustomScreenContainer from '../../components/CustomScreenContainer';
 
 const Rules = () => {
   const authState = useSelector((state) => state.auth.user);
-  const userState = useSelector((state) => state.user.user);
-
-  const user = userState ? userState : authState;
+  const user = authState;
 
   return (
     <CustomScreenContainer>

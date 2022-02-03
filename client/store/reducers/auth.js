@@ -2,17 +2,19 @@ import {
   AUTHENTICATE,
   LOGOUT,
   SET_USER,
+  GET_USER,
   GET_VERIFICATION_CODE,
   CODE_VERIFIED,
   SET_NEW_PASSWORD,
   SET_DID_TRY_AL,
+  CLEAR_USER_STATE,
 } from '../types';
 
 const initialState = {
   token: null,
   userId: null,
   didTryAutoLogin: false,
-  user: {},
+  user: null,
   veriCode: null,
   verified: false,
   newPassword: false,
@@ -22,11 +24,11 @@ export default (state = initialState, action) => {
   switch (action.type) {
     case AUTHENTICATE:
       return {
-        ...state,
+        //...state,
         token: action.token,
         userId: action.userId,
         didTryAutoLogin: true,
-        user: action.user,
+        //user: action.user,
       };
     case SET_DID_TRY_AL:
       return {
@@ -35,6 +37,11 @@ export default (state = initialState, action) => {
         user: action.user,
       };
     case SET_USER:
+      return {
+        ...state,
+        user: action.user,
+      };
+    case GET_USER:
       return {
         ...state,
         user: action.user,
@@ -53,6 +60,10 @@ export default (state = initialState, action) => {
       return {
         ...state,
         newPassword: action.newPassword,
+      };
+    case CLEAR_USER_STATE:
+      return {
+        ...initialState,
       };
     case LOGOUT:
       return {

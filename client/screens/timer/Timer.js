@@ -18,7 +18,7 @@ import CustomThinGreyLine from '../../components/CustomThinGreyLine';
 import CustomScreenContainer from '../../components/CustomScreenContainer';
 import CustomOperationalContainer from '../../components/CustomOperationalContainer';
 
-import * as userActions from '../../store/actions/user';
+import * as authActions from '../../store/actions/auth';
 import * as nonVerActions from '../../store/actions/nonVer';
 import { secondsToHms, secondsToTime } from '../../utils/timeConversions';
 import { formReducer } from '../../utils/formReducer';
@@ -42,9 +42,8 @@ const Timer = () => {
   const [show, setShow] = useState(false);
 
   const authState = useSelector((state) => state.auth.user);
-  const userState = useSelector((state) => state.user.user);
 
-  const user = userState ? userState : authState;
+  const user = authState;
 
   const dispatch = useDispatch();
 
@@ -89,7 +88,7 @@ const Timer = () => {
       await dispatch(
         nonVerActions.addNonVerSession(currentYear, today, hours, sessionName)
       );
-      await dispatch(userActions.getUser());
+      await dispatch(authActions.getUser());
       setSavingTimed(false);
       setCardText('Non-Verifiable session successfully saved');
       setSeconds(0);
@@ -172,7 +171,7 @@ const Timer = () => {
           sessionName
         )
       );
-      await dispatch(userActions.getUser());
+      await dispatch(authActions.getUser());
       setSavingDirect(false);
       setCardText('Non-Verifiable session successfully saved');
     } catch (err) {

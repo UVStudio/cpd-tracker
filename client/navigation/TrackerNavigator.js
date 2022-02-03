@@ -19,7 +19,6 @@ import OverwriteCPDHours from '../screens/stats/OverwriteCPDHours';
 import EditNonVerSession from '../screens/stats/EditNonVerSession';
 import EditCertCourse from '../screens/stats/EditCertCourse';
 import Timer from '../screens/timer/Timer';
-import UploadSession from '../screens/timer/UploadSession';
 import Rules from '../screens/rules/Rules';
 import Records from '../screens/records/Records';
 import Colors from '../constants/Colors';
@@ -106,10 +105,6 @@ const TimerNavigator = () => {
         name="Non-Verifiable Hours"
         component={Timer}
       />
-      <TimerStackNavigator.Screen
-        name="UploadSession"
-        component={UploadSession}
-      />
     </TimerStackNavigator.Navigator>
   );
 };
@@ -150,6 +145,7 @@ const ProfileNavigator = () => {
 
 const TrackerBottomTabNavigator = createBottomTabNavigator();
 export const BottomTabNavigator = () => {
+  console.log('BottomTabNavigator Activated');
   return (
     <TrackerBottomTabNavigator.Navigator screenOptions={bottomTabOptions}>
       <TrackerBottomTabNavigator.Screen

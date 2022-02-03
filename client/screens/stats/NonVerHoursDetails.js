@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useNavigation } from '@react-navigation/native';
 
 import * as nonVerActions from '../../store/actions/nonVer';
-import * as userActions from '../../store/actions/user';
+import * as authActions from '../../store/actions/auth';
 
 import CustomTitle from '../../components/CustomTitle';
 import CustomGreyLine from '../../components/CustomGreyLine';
@@ -60,8 +60,7 @@ const NonVerHoursDetails = (props) => {
     setDeletingSession(true);
     try {
       await dispatch(nonVerActions.deleteNonVerSession(nonVerToDeleteID));
-      //await dispatch(nonVerActions.getAllNonVerObjsByYear(year));
-      await dispatch(userActions.getUser());
+      await dispatch(authActions.getUser());
       setDeletingSession(false);
       setConfirmCardText('');
     } catch (err) {

@@ -25,9 +25,8 @@ const EditNonVerSession = (props) => {
   const [updateCourse, setUpdatingSession] = useState(false);
 
   const authState = useSelector((state) => state.auth.user);
-  const userState = useSelector((state) => state.user.user);
 
-  const user = userState ? userState : authState;
+  const user = authState;
 
   const dispatch = useDispatch();
 
@@ -64,7 +63,7 @@ const EditNonVerSession = (props) => {
     const hours = formState.inputValues.hours;
     try {
       await dispatch(nonVerActions.editNonVerSession(sessionName, hours, id));
-      await dispatch(userActions.getUser());
+      await dispatch(authActions.getUser());
       setCardText('Non-Verifiable session successfully updated');
       setUpdatingSession(false);
     } catch (err) {

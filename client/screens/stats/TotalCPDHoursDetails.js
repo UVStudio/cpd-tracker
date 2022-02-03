@@ -103,7 +103,7 @@ const TotalCPDHoursDetails = (props) => {
         //await dispatch(certsActions.getAllCertObjsByYear(year));
         setVerObjToDelete(null);
       }
-      await dispatch(userActions.getUser());
+      await dispatch(authActions.getUser());
       setDeletingSession(false);
       setConfirmCardText('');
     } catch (err) {

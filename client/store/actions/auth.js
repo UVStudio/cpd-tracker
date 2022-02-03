@@ -8,17 +8,18 @@ import {
   GET_VERIFICATION_CODE,
   CODE_VERIFIED,
   SET_NEW_PASSWORD,
+  GET_USER,
+  CLEAR_USER_STATE,
 } from '../types';
 import { CURRENT_IP } from '../../serverConfig';
 
 let timer;
 const oneMonth = 30 * 24 * 60 * 60 * 1000;
 
-export const authenticate = (token, userId, expiryTime, user) => {
+export const authenticate = (token, userId, expiryTime) => {
   return (dispatch) => {
+    dispatch({ type: AUTHENTICATE, token, userId });
     dispatch(setLogoutTimer(expiryTime));
-    dispatch({ type: AUTHENTICATE, token, userId, user });
-    dispatch({ type: SET_USER, user: user });
   };
 };
 
@@ -58,17 +59,10 @@ export const register = (
 
       const resData = response.data;
 
-      await dispatch(
-        authenticate(resData.token, resData.user._id, oneMonth, resData.user)
-      );
-      const expirationDate = resData.options.expires;
-      await saveDataToStorage(
-        resData.token,
-        resData.user._id,
-        expirationDate,
-        resData.user
-      );
+      await dispatch(authenticate(resData.token, resData.user._id, oneMonth));
       await dispatch(setUser(resData.user));
+      const expirationDate = resData.options.expires;
+      await saveDataToStorage(resData.token, resData.user._id, expirationDate);
     } catch (err) {
       throw new Error(err.response.data.error);
     }
@@ -91,20 +85,15 @@ export const login = (email, password) => {
       );
 
       const resData = response.data;
-
-      await dispatch(
-        authenticate(resData.token, resData.user._id, oneMonth, resData.user)
-      );
+      console.log('before auth & setUser');
+      dispatch(authenticate(resData.token, resData.user._id, oneMonth));
+      dispatch(setUser(resData.user));
+      console.log('auth & setUser success');
       const expirationDate = resData.options.expires;
-      await saveDataToStorage(
-        resData.token,
-        resData.user._id,
-        expirationDate,
-        resData.user
-      );
-      await dispatch(setUser(resData.user));
+      saveDataToStorage(resData.token, resData.user._id, expirationDate);
     } catch (err) {
-      throw new Error(err.response.data.error);
+      //throw new Error(err.response.data.error);
+      throw new Error('Unable to login');
     }
   };
 };
@@ -116,6 +105,116 @@ export const setUser = (resData) => {
       user: resData,
     });
   };
+};
+
+export const overrideHours = (year, certHours, nonVerHours, ethicsHours) => {
+  return async (dispatch) => {
+    const config = {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    };
+
+    const body = JSON.stringify({ year, certHours, nonVerHours, ethicsHours });
+
+    try {
+      const response = await axios.put(
+        `${CURRENT_IP}/api/user/override`,
+        body,
+        config
+      );
+      const user = response.data.data;
+
+      dispatch({
+        type: GET_USER,
+        user: user,
+      });
+    } catch (err) {
+      throw new Error('Unable to get user infor.');
+      //throw new Error(err.response.data.error);
+    }
+  };
+};
+
+export const getUser = () => {
+  return async (dispatch) => {
+    try {
+      console.log('auth action called');
+      const response = await axios.get(`${CURRENT_IP}/api/auth/`);
+      const user = response.data.data;
+
+      dispatch({
+        type: GET_USER,
+        user: user,
+      });
+    } catch (err) {
+      throw new Error('Unable to get user info.');
+      //throw new Error(err.response.data.error);
+    }
+  };
+};
+
+export const updateUser = (formState) => {
+  return async (dispatch) => {
+    const { name, email, province, cpdYear, cpdMonth } = formState.inputValues;
+
+    try {
+      const config = {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      };
+
+      const body = JSON.stringify({
+        name,
+        email,
+        province,
+        cpdMonth,
+        cpdYear,
+      });
+
+      const response = await axios.put(`${CURRENT_IP}/api/auth/`, body, config);
+      const user = response.data.data;
+
+      dispatch({
+        type: GET_USER,
+        user: user,
+      });
+    } catch (err) {
+      throw new Error(err.response.data.error);
+    }
+  };
+};
+
+export const updatePassword = (passwordFormState) => {
+  return async () => {
+    const { oldPassword, newPassword, confirmPassword } =
+      passwordFormState.inputValues;
+
+    if (newPassword !== confirmPassword) {
+      return new Error(
+        'Please check your new password fields to make sure they are the same.'
+      );
+    }
+
+    const body = JSON.stringify({ oldPassword, newPassword });
+
+    const config = {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    };
+
+    try {
+      await axios.put(`${CURRENT_IP}/api/auth/password`, body, config);
+    } catch (err) {
+      throw new Error(err.response.data.error);
+    }
+  };
+};
+
+export const clearUserState = () => {
+  return { type: CLEAR_USER_STATE };
 };
 
 export const logout = () => {

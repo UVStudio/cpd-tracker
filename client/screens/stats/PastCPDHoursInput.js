@@ -91,7 +91,7 @@ const PastCPDHoursInput = (props) => {
     setSavingCPD(true);
     try {
       await dispatch(
-        userActions.overrideHours(
+        authActions.overrideHours(
           yearsToOverride[0].year,
           formState.inputValues['0CertHours'],
           formState.inputValues['0NonVerHours'],
@@ -100,7 +100,7 @@ const PastCPDHoursInput = (props) => {
       );
       if (yearsToOverride[1]) {
         await dispatch(
-          userActions.overrideHours(
+          authActions.overrideHours(
             yearsToOverride[1].year,
             formState.inputValues['1CertHours'],
             formState.inputValues['1NonVerHours'],
@@ -109,7 +109,7 @@ const PastCPDHoursInput = (props) => {
         );
       }
       setSavingCPD(false);
-      //await dispatch(userActions.getUser());
+      //await dispatch(authActions.getUser());
       navigation.navigate('Your CPD Statistics');
     } catch (err) {
       setSavingCPD(false);

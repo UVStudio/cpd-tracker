@@ -5,7 +5,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { Ionicons } from '@expo/vector-icons';
 
 import * as certsActions from '../../store/actions/cert';
-import * as userActions from '../../store/actions/user';
+import * as authActions from '../../store/actions/auth';
 
 import CustomTitle from '../../components/CustomTitle';
 import CustomText from '../../components/CustomText';
@@ -39,7 +39,9 @@ const CertHoursDetails = (props) => {
   const loadCerts = async () => {
     setLoading(true);
     try {
-      await dispatch(certsActions.getAllCertObjsByYear(year));
+      await dispatch(certsActions.getAllCertObjsByYear(year))
+        .then(() => {})
+        .catch(() => {});
     } catch (error) {
       console.log(err.message);
       setLoading(false);
@@ -73,7 +75,7 @@ const CertHoursDetails = (props) => {
       await dispatch(certsActions.deleteCertObjById(verObjToDelete._id));
       await dispatch(certsActions.deleteUploadByCertImgId(imageId));
       //await dispatch(certsActions.getAllCertObjsByYear(year));
-      await dispatch(userActions.getUser());
+      await dispatch(authActions.getUser());
       setVerObjToDelete(null);
       setDeletingSession(false);
       setConfirmCardText('');

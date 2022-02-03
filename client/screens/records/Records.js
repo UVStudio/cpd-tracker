@@ -120,7 +120,7 @@ const Records = () => {
       }
       setCert(null);
       setCardText('Verifiable session successfully saved');
-      await dispatch(userActions.getUser());
+      await dispatch(authActions.getUser());
       setSavingCourse(false);
     } catch (err) {
       console.log(err.message);

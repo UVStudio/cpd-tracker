@@ -11,9 +11,9 @@ import {
 import CustomPieChart from '../../components/CustomPieChart';
 import RNFS from 'react-native-fs';
 
-import * as Notifications from 'expo-notifications';
+//import * as Notifications from 'expo-notifications';
 import * as Sharing from 'expo-sharing';
-import * as userActions from '../../store/actions/user';
+import * as authActions from '../../store/actions/auth';
 import * as reportActions from '../../store/actions/report';
 //import * as MediaLibrary from 'expo-media-library';
 
@@ -42,21 +42,21 @@ import currentYear from '../../utils/currentYear';
 //const currentYear = 2023; //test currentYear;
 import { hoursRequiredLogic } from '../../utils/hoursRequiredLogic';
 
-import {
-  AndroidImportance,
-  AndroidNotificationVisibility,
-  NotificationChannel,
-  NotificationChannelInput,
-  NotificationContentInput,
-} from 'expo-notifications';
+// import {
+//   AndroidImportance,
+//   AndroidNotificationVisibility,
+//   NotificationChannel,
+//   NotificationChannelInput,
+//   NotificationContentInput,
+// } from 'expo-notifications';
 
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: false,
-    shouldSetBadge: false,
-  }),
-});
+// Notifications.setNotificationHandler({
+//   handleNotification: async () => ({
+//     shouldShowAlert: true,
+//     shouldPlaySound: false,
+//     shouldSetBadge: false,
+//   }),
+// });
 
 const channelId = 'DownloadInfo';
 
@@ -71,10 +71,33 @@ const Stats = ({ navigation }) => {
   const [downloadProgress, setDownloadProgress] = useState(0);
 
   const authState = useSelector((state) => state.auth.user);
-  const userState = useSelector((state) => state.user.user);
   const reportReady = useSelector((state) => state.report.report);
 
-  const user = userState ? userState : authState;
+  useEffect(() => {
+    console.log('stats screen loadUser()');
+    loadUser();
+  }, []);
+
+  const loadUser = async () => {
+    setLoading(true);
+    try {
+      await dispatch(authActions.getUser())
+        .then(() => {
+          console.log('got User: ', authState);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    } catch (err) {
+      console.log(err.message);
+      setError(
+        'Attempting to retrieve user Info. There is something wrong with our network. Please try again later.'
+      );
+    }
+    setLoading(false);
+  };
+
+  const user = authState;
   const userHours = user.hours;
 
   const yearsToOverride = userHours
@@ -82,23 +105,6 @@ const Stats = ({ navigation }) => {
     .filter((hours) => !hours.overriden);
 
   const dispatch = useDispatch();
-
-  const loadUser = async () => {
-    setLoading(true);
-    try {
-      await dispatch(userActions.getUser());
-    } catch (err) {
-      console.log(err.message);
-      setError(
-        'There is something wrong with our network. Please try again later.'
-      );
-    }
-    setLoading(false);
-  };
-
-  useEffect(() => {
-    loadUser();
-  }, []);
 
   const hoursRequired = hoursRequiredLogic(user, showYear);
 
@@ -121,7 +127,7 @@ const Stats = ({ navigation }) => {
         'While you are only required to obtain 20 CPD hours this year, 10 of which needs to be verifiable, you are encouraged to get 2x as many, so you will have an easier time meeting the CPD 3 year rolling requirement in the near future.'
       );
     }
-  }, [userState]);
+  }, [user]);
 
   //Session details navigations
   const verifiableHoursDetails = () => {
@@ -152,31 +158,31 @@ const Stats = ({ navigation }) => {
   };
 
   //PDF report begins
-  const setNotificationChannel = async () => {
-    const loadingChannel = await Notifications.getNotificationChannelAsync(
-      channelId
-    );
+  // const setNotificationChannel = async () => {
+  //   const loadingChannel = await Notifications.getNotificationChannelAsync(
+  //     channelId
+  //   );
 
-    // if we didn't find a notification channel set how we like it, then we create one
-    if (loadingChannel == null) {
-      const channelOptions = {
-        name: channelId,
-        importance: AndroidImportance.HIGH,
-        lockscreenVisibility: AndroidNotificationVisibility.PUBLIC,
-        sound: 'default',
-        vibrationPattern: [250],
-        enableVibrate: true,
-      };
-      await Notifications.setNotificationChannelAsync(
-        channelId,
-        channelOptions
-      );
-    }
-  };
+  //   // if we didn't find a notification channel set how we like it, then we create one
+  //   if (loadingChannel == null) {
+  //     const channelOptions = {
+  //       name: channelId,
+  //       importance: AndroidImportance.HIGH,
+  //       lockscreenVisibility: AndroidNotificationVisibility.PUBLIC,
+  //       sound: 'default',
+  //       vibrationPattern: [250],
+  //       enableVibrate: true,
+  //     };
+  //     await Notifications.setNotificationChannelAsync(
+  //       channelId,
+  //       channelOptions
+  //     );
+  //   }
+  // };
 
   useEffect(() => {
     if (Platform.OS === 'android') {
-      setNotificationChannel();
+      //setNotificationChannel();
       setDirPath(`${RNFS.DownloadDirectoryPath}/CPD`);
     }
   });
@@ -185,7 +191,9 @@ const Stats = ({ navigation }) => {
   const generatePDFHandler = async (year) => {
     try {
       setGeneratingPDF(true);
-      await dispatch(reportActions.buildReport(year));
+      await dispatch(reportActions.buildReport(year))
+        .then(() => {})
+        .catch(() => {});
       await downloadPDFHandler();
     } catch (err) {
       console.log(err.message);
@@ -285,8 +293,9 @@ const Stats = ({ navigation }) => {
         await Sharing.shareAsync('file://' + filePath);
       }
       //end of iOS 15 conditional requirement
-
-      await dispatch(reportActions.deleteReport(AWSFileName));
+      await dispatch(reportActions.deleteReport(AWSFileName))
+        .then(() => {})
+        .catch(() => {});
       setCardText(
         `Report succesfully downloaded! 
         
@@ -318,7 +327,7 @@ For iOS 15 and beyond, the PDF is where you have chosen to save it.`
     );
   };
 
-  if (loading) {
+  if (loading || !user) {
     return <CustomIndicator />;
   }
 
