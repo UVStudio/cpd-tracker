@@ -14,6 +14,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     color: Colors.darkGrey,
     fontFamily: 'avenir-medium',
+    alignSelf: 'flex-start',
   },
 });
 

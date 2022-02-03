@@ -25,7 +25,7 @@ const Rules = () => {
     <CustomScreenContainer>
       <CustomScrollView>
         <CustomTitle>CPA {user.province}</CustomTitle>
-        <CustomGreyLine />
+        <CustomGreyLine style={{ marginBottom: 2 }} />
         <CustomOperationalContainer>
           <CustomSubtitle style={{ alignSelf: 'flex-start' }}>
             Annual Minimum CPD Hours
@@ -82,14 +82,5 @@ const Rules = () => {
     </CustomScreenContainer>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
 
 export default Rules;

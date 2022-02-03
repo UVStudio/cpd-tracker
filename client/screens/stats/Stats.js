@@ -290,7 +290,7 @@ const Stats = ({ navigation }) => {
       setCardText(
         `Report succesfully downloaded! 
         
-For Android users, the PDF is located in the Downloads > CPD folder.
+For Android users, the PDF is located in the CPD folder.
 
 For iOS 14 and older users, the report is in the File > CPD Tracker folder.
 

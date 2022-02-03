@@ -3,7 +3,7 @@ import { View, StyleSheet } from 'react-native';
 import Colors from '../constants/Colors';
 
 const CustomGreyLine = (props) => {
-  return <View style={{ ...props.style, ...styles.greyline }}></View>;
+  return <View style={{ ...styles.greyline, ...props.style }}></View>;
 };
 
 const styles = StyleSheet.create({
