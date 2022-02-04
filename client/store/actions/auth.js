@@ -84,11 +84,12 @@ export const login = (email, password) => {
         config
       );
 
-      const resData = response.data;
-      console.log('before auth & setUser');
+      const resData = await response.data;
+      console.log('before auth & setUser: ', resData.user.name);
       dispatch(authenticate(resData.token, resData.user._id, oneMonth));
+      console.log('auth success');
       dispatch(setUser(resData.user));
-      console.log('auth & setUser success');
+      console.log('setUser success');
       const expirationDate = resData.options.expires;
       saveDataToStorage(resData.token, resData.user._id, expirationDate);
     } catch (err) {
@@ -130,7 +131,7 @@ export const overrideHours = (year, certHours, nonVerHours, ethicsHours) => {
         user: user,
       });
     } catch (err) {
-      throw new Error('Unable to get user infor.');
+      throw new Error('Unable to get user info.');
       //throw new Error(err.response.data.error);
     }
   };
@@ -139,9 +140,9 @@ export const overrideHours = (year, certHours, nonVerHours, ethicsHours) => {
 export const getUser = () => {
   return async (dispatch) => {
     try {
-      console.log('auth action called');
+      console.log('auth action getUser() called');
       const response = await axios.get(`${CURRENT_IP}/api/auth/`);
-      const user = response.data.data;
+      const user = await response.data.data;
 
       dispatch({
         type: GET_USER,
@@ -211,16 +212,6 @@ export const updatePassword = (passwordFormState) => {
       throw new Error(err.response.data.error);
     }
   };
-};
-
-export const clearUserState = () => {
-  return { type: CLEAR_USER_STATE };
-};
-
-export const logout = () => {
-  clearLogoutTimer();
-  AsyncStorage.removeItem('userData');
-  return { type: LOGOUT };
 };
 
 export const forgotPassword = (email) => {
@@ -318,6 +309,7 @@ export const setNewPassword = (password, passwordConfirm, veriCode) => {
 
 export const deleteCurrentUser = () => {
   return async (dispatch) => {
+    //await dispatch(clearUserState());
     dispatch(logout());
     try {
       await axios.delete(`${CURRENT_IP}/api/auth/`);
@@ -325,6 +317,16 @@ export const deleteCurrentUser = () => {
       throw new Error(err.response.data.error);
     }
   };
+};
+
+export const clearUserState = () => {
+  return { type: CLEAR_USER_STATE };
+};
+
+export const logout = () => {
+  clearLogoutTimer();
+  AsyncStorage.removeItem('userData');
+  return { type: LOGOUT };
 };
 
 /** UTILS */

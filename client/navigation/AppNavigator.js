@@ -8,16 +8,18 @@ import Startup from '../screens/Startup';
 
 const AppNavigator = () => {
   const isAuth = useSelector((state) => !!state.auth.token);
-  const isUserLoaded = useSelector((state) => !!state.auth.user);
+  const isUserSet = useSelector((state) => !!state.auth.user);
   const didTryAutoLogin = useSelector((state) => state.auth.didTryAutoLogin);
-  console.log('user loaded? ', isUserLoaded);
+  console.log('isAuth? ', isAuth);
+  console.log('isUserSet? ', isUserSet);
+  console.log('didTryAutoLogin? ', didTryAutoLogin);
 
   return (
     <NavigationContainer>
-      {isAuth && isUserLoaded && <BottomTabNavigator />}
+      {isAuth && isUserSet && <BottomTabNavigator />}
       {!isAuth && didTryAutoLogin && <AuthNavigator />}
       {!isAuth && !didTryAutoLogin && <Startup />}
-      {isAuth && !isUserLoaded && <CustomIndicator />}
+      {isAuth && !isUserSet && <CustomIndicator />}
     </NavigationContainer>
   );
 };

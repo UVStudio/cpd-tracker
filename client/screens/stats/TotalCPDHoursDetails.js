@@ -2,31 +2,23 @@ import React, { useState, useEffect } from 'react';
 import { Pressable } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useSelector, useDispatch } from 'react-redux';
-import { Ionicons } from '@expo/vector-icons';
 
 import * as certsActions from '../../store/actions/cert';
 import * as nonVerActions from '../../store/actions/nonVer';
-import * as userActions from '../../store/actions/user';
+import * as authActions from '../../store/actions/auth';
 
 import CustomTitle from '../../components/CustomTitle';
-import CustomText from '../../components/CustomText';
 import CustomSubtitle from '../../components/CustomSubtitle';
 import CustomGreyLine from '../../components/CustomGreyLine';
 import CustomThinGreyLine from '../../components/CustomThinGreyLine';
-import CustomFaintThinGreyLine from '../../components/CustomFaintThinGreyLine';
 import CustomErrorCard from '../../components/CustomErrorCard';
 import CustomIndicator from '../../components/CustomIndicator';
 import CustomAccordionUnit from '../../components/CustomAccordionUnit';
-import CustomStatsInfoBox from '../../components/CustomStatsInfoBox';
 import CustomScrollView from '../../components/CustomScrollView';
 import CustomConfirmActionCard from '../../components/CustomConfirmActionCard';
-import CustomFullWidthContainer from '../../components/CustomFullWidthContainer';
 import CustomScreenContainer from '../../components/CustomScreenContainer';
-import CustomRowSpace from '../../components/CustomRowSpace';
 import CustomNonVerHoursDetails from '../../components/CustomNonVerHoursDetails';
 import CustomCertHoursDetails from '../../components/CustomCertHoursDetails';
-
-import Colors from '../../constants/Colors';
 
 const TotalCPDHoursDetails = (props) => {
   const { year } = props.route.params;

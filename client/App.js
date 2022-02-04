@@ -3,15 +3,16 @@ import { LogBox } from 'react-native';
 import AppLoading from 'expo-app-loading';
 import * as Font from 'expo-font';
 import { createStore, combineReducers, applyMiddleware } from 'redux';
+import { composeWithDevTools } from 'remote-redux-devtools';
 import { Provider } from 'react-redux';
 import ReduxThunk from 'redux-thunk';
 
 import AppNavigator from './navigation/AppNavigator';
 import authReducer from './store/reducers/auth';
-//import userReducer from './store/reducers/user';
 import reportReducer from './store/reducers/report';
 import certReducer from './store/reducers/cert';
 import nonVerReducer from './store/reducers/nonVer';
+//import userReducer from './store/reducers/user';
 
 const fetchFonts = () => {
   return Font.loadAsync({
@@ -23,10 +24,10 @@ const fetchFonts = () => {
 
 const rootReducer = combineReducers({
   auth: authReducer,
-  //user: userReducer,
   report: reportReducer,
   cert: certReducer,
   nonVer: nonVerReducer,
+  //user: userReducer,
 });
 
 const store = createStore(rootReducer, applyMiddleware(ReduxThunk));

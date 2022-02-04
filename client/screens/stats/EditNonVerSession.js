@@ -1,5 +1,4 @@
 import React, { useState, useReducer, useCallback } from 'react';
-import { StyleSheet } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 
 import CustomIndicator from '../../components/CustomIndicator';
@@ -13,7 +12,7 @@ import CustomGreyLine from '../../components/CustomGreyLine';
 import CustomScreenContainer from '../../components/CustomScreenContainer';
 import CustomOperationalContainer from '../../components/CustomOperationalContainer';
 
-import * as userActions from '../../store/actions/user';
+import * as authActions from '../../store/actions/auth';
 import * as nonVerActions from '../../store/actions/nonVer';
 import { formReducer } from '../../utils/formReducer';
 import { FORM_INPUT_UPDATE } from '../../store/types';

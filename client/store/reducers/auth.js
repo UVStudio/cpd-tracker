@@ -34,7 +34,7 @@ export default (state = initialState, action) => {
       return {
         ...state,
         didTryAutoLogin: true,
-        user: action.user,
+        //user: action.user,
       };
     case SET_USER:
       return {
@@ -64,12 +64,13 @@ export default (state = initialState, action) => {
     case CLEAR_USER_STATE:
       return {
         ...initialState,
+        //didTryAutoLogin: false,
       };
     case LOGOUT:
       return {
         ...initialState,
-        didTryAutoLogin: false,
-        //set to false so to prevent logout Auth screen artifacts
+        didTryAutoLogin: true,
+        //set to false to prevent logout Auth screen artifacts
       };
     default:
       return state;

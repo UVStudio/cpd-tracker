@@ -1,5 +1,4 @@
 import React, { useState, useReducer, useCallback } from 'react';
-import { StyleSheet } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 
 import CustomIndicator from '../../components/CustomIndicator';
@@ -15,7 +14,7 @@ import CustomScreenContainer from '../../components/CustomScreenContainer';
 import CustomOperationalContainer from '../../components/CustomOperationalContainer';
 
 import * as DocumentPicker from 'expo-document-picker';
-import * as userActions from '../../store/actions/user';
+import * as authActions from '../../store/actions/auth';
 import * as certActions from '../../store/actions/cert';
 import { formReducer } from '../../utils/formReducer';
 import { FORM_INPUT_UPDATE } from '../../store/types';

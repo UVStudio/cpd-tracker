@@ -4,7 +4,6 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useNavigation } from '@react-navigation/native';
 
 import * as authActions from '../../store/actions/auth';
-import * as userActions from '../../store/actions/user';
 
 import CustomButton from '../../components/CustomButton';
 import CustomButtonLoading from '../../components/CustomButtonLoading';
@@ -125,7 +124,7 @@ const Profile = () => {
       ) {
         setSpecialMessage(true);
       }
-      await dispatch(userActions.updateUser(formState));
+      await dispatch(authActions.updateUser(formState));
       setUpdatingProfile(false);
 
       setCardText(
@@ -167,7 +166,7 @@ Updating your Province or your CPD Membership Join Date might have material impa
     }
 
     try {
-      await dispatch(userActions.updatePassword(passwordFormState));
+      await dispatch(authActions.updatePassword(passwordFormState));
       setUpdatingPassword(false);
       setCardText('Your password has been updated');
     } catch (err) {
@@ -183,10 +182,12 @@ Updating your Province or your CPD Membership Join Date might have material impa
     setProvinceCard(true);
   };
 
-  const logoutHandler = async () => {
+  const logoutHandler = () => {
     try {
+      //console.log('logout');
       //dispatch(authActions.clearUserState());
       dispatch(authActions.logout());
+      //navigation.navigate('Auth');
     } catch (err) {
       console.log(err.message);
     }
@@ -334,7 +335,9 @@ All data and certificates will be erased permanently. The app does not keep any 
             )}
           </View>
           <CustomThinGreyLine style={{ marginBottom: 15 }} />
-          <CustomButton onSelect={logoutHandler}>Logout</CustomButton>
+          <CustomButton onSelect={() => dispatch(authActions.logout())}>
+            Logout
+          </CustomButton>
           <CustomButton onSelect={privacyHandler}>
             Privacy Statement
           </CustomButton>

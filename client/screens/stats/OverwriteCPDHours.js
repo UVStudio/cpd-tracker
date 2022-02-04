@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback, useReducer } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import React, { useState, useCallback, useReducer } from 'react';
+import { View, StyleSheet } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigation } from '@react-navigation/native';
 
@@ -8,15 +8,13 @@ import CustomText from '../../components/CustomText';
 import CustomInput from '../../components/CustomInput';
 import CustomButton from '../../components/CustomButton';
 import CustomRowSpace from '../../components/CustomRowSpace';
-import CustomBoldText from '../../components/CustomBoldText';
 import CustomErrorCard from '../../components/CustomErrorCard';
 import CustomGreyLine from '../../components/CustomGreyLine';
-import CustomThinGreyLine from '../../components/CustomThinGreyLine';
 import CustomStatsInfoBox from '../../components/CustomStatsInfoBox';
 import CustomConfirmActionCard from '../../components/CustomConfirmActionCard';
 import CustomScreenContainer from '../../components/CustomScreenContainer';
 
-import * as userActions from '../../store/actions/user';
+import * as authActions from '../../store/actions/auth';
 
 import { formReducer } from '../../utils/formReducer';
 import { FORM_INPUT_UPDATE } from '../../store/types';

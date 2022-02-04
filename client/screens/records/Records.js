@@ -1,10 +1,10 @@
-import React, { useEffect, useState, useReducer, useCallback } from 'react';
-import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
-import { useSelector, useDispatch } from 'react-redux';
+import React, { useState, useReducer, useCallback } from 'react';
+import { StyleSheet } from 'react-native';
+import { useDispatch } from 'react-redux';
 
 import * as DocumentPicker from 'expo-document-picker';
 import * as certActions from '../../store/actions/cert';
-import * as userActions from '../../store/actions/user';
+import * as authActions from '../../store/actions/auth';
 
 import CustomButton from '../../components/CustomButton';
 import CustomButtonLoading from '../../components/CustomButtonLoading';
@@ -29,7 +29,7 @@ const Records = () => {
   const [error, setError] = useState('');
   const [savingCourse, setSavingCourse] = useState(false);
 
-  const placeholderYear = currentYear.toString(); //Expo crashes if not set to string
+  const placeholderYear = currentYear.toString();
 
   const dispatch = useDispatch();
 
@@ -86,7 +86,7 @@ const Records = () => {
 
   // console.log('formState: ', formState);
 
-  const saveVerfiableCourse = async () => {
+  const saveVerifiableCourse = async () => {
     setSavingCourse(true);
 
     if (!year || !hours || !courseName) {
@@ -191,7 +191,7 @@ const Records = () => {
           ) : (
             <CustomButton
               style={{ marginTop: 10 }}
-              onSelect={() => saveVerfiableCourse(year)}
+              onSelect={() => saveVerifiableCourse(year)}
             >
               Save Verifiable Course
             </CustomButton>

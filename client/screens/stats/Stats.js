@@ -81,13 +81,9 @@ const Stats = ({ navigation }) => {
   const loadUser = async () => {
     setLoading(true);
     try {
-      await dispatch(authActions.getUser())
-        .then(() => {
-          console.log('got User: ', authState);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
+      await dispatch(authActions.getUser()).then(() => {
+        console.log('got User: ', authState.name);
+      });
     } catch (err) {
       console.log(err.message);
       setError(
@@ -185,7 +181,7 @@ const Stats = ({ navigation }) => {
       //setNotificationChannel();
       setDirPath(`${RNFS.DownloadDirectoryPath}/CPD`);
     }
-  });
+  }, []);
 
   //Generate PDF Report
   const generatePDFHandler = async (year) => {
