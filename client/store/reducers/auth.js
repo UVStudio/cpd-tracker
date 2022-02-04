@@ -69,7 +69,7 @@ export default (state = initialState, action) => {
     case LOGOUT:
       return {
         ...initialState,
-        didTryAutoLogin: true,
+        didTryAutoLogin: false,
         //set to false to prevent logout Auth screen artifacts
       };
     default:

@@ -1,6 +1,5 @@
 import React from 'react';
-import { Platform } from 'react-native';
-import { createStackNavigator } from '@react-navigation/stack';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
 
@@ -35,7 +34,7 @@ const defaultNavOptions = {
   headerTintColor: 'white',
 };
 
-const AuthStackNavigator = createStackNavigator();
+const AuthStackNavigator = createNativeStackNavigator();
 export const AuthNavigator = () => {
   return (
     <AuthStackNavigator.Navigator screenOptions={defaultNavOptions}>
@@ -61,7 +60,7 @@ export const AuthNavigator = () => {
   );
 };
 
-const CPDStackNavigator = createStackNavigator();
+const CPDStackNavigator = createNativeStackNavigator();
 const CPDNavigator = () => {
   return (
     <CPDStackNavigator.Navigator screenOptions={defaultNavOptions}>
@@ -97,7 +96,7 @@ const CPDNavigator = () => {
     </CPDStackNavigator.Navigator>
   );
 };
-const TimerStackNavigator = createStackNavigator();
+const TimerStackNavigator = createNativeStackNavigator();
 const TimerNavigator = () => {
   return (
     <TimerStackNavigator.Navigator screenOptions={defaultNavOptions}>
@@ -108,7 +107,7 @@ const TimerNavigator = () => {
     </TimerStackNavigator.Navigator>
   );
 };
-const RecordsStackNavigator = createStackNavigator();
+const RecordsStackNavigator = createNativeStackNavigator();
 const RecordsNavigator = () => {
   return (
     <RecordsStackNavigator.Navigator screenOptions={defaultNavOptions}>
@@ -119,7 +118,7 @@ const RecordsNavigator = () => {
     </RecordsStackNavigator.Navigator>
   );
 };
-const RulesStackNavigator = createStackNavigator();
+const RulesStackNavigator = createNativeStackNavigator();
 const RulesNavigator = () => {
   return (
     <RulesStackNavigator.Navigator screenOptions={defaultNavOptions}>
@@ -130,7 +129,7 @@ const RulesNavigator = () => {
     </RulesStackNavigator.Navigator>
   );
 };
-const ProfileStackNavigator = createStackNavigator();
+const ProfileStackNavigator = createNativeStackNavigator();
 const ProfileNavigator = () => {
   return (
     <ProfileStackNavigator.Navigator screenOptions={defaultNavOptions}>
