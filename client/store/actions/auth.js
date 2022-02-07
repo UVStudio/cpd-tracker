@@ -85,16 +85,13 @@ export const login = (email, password) => {
       );
 
       const resData = await response.data;
-      console.log('before auth & setUser: ', resData.user.name);
       dispatch(authenticate(resData.token, resData.user._id, oneMonth));
-      console.log('auth success');
       dispatch(setUser(resData.user));
-      console.log('setUser success');
       const expirationDate = resData.options.expires;
       saveDataToStorage(resData.token, resData.user._id, expirationDate);
     } catch (err) {
-      //throw new Error(err.response.data.error);
-      throw new Error('Unable to login');
+      throw new Error(err.response.data.error);
+      //throw new Error('Unable to login');
     }
   };
 };

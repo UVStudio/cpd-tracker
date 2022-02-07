@@ -98,13 +98,7 @@ const Auth = () => {
     setError('');
     try {
       console.log('form sending!');
-      await dispatch(action)
-        .then(() => {
-          console.log('form sent!');
-        })
-        .catch((err) => {
-          console.log(err);
-        });
+      await dispatch(action);
     } catch (err) {
       setError(err.message);
       setIsLogging(false);

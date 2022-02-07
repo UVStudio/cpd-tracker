@@ -184,10 +184,8 @@ Updating your Province or your CPD Membership Join Date might have material impa
 
   const logoutHandler = () => {
     try {
-      //console.log('logout');
       //dispatch(authActions.clearUserState());
       dispatch(authActions.logout());
-      //navigation.navigate('Auth');
     } catch (err) {
       console.log(err.message);
     }
@@ -335,9 +333,7 @@ All data and certificates will be erased permanently. The app does not keep any 
             )}
           </View>
           <CustomThinGreyLine style={{ marginBottom: 15 }} />
-          <CustomButton onSelect={() => dispatch(authActions.logout())}>
-            Logout
-          </CustomButton>
+          <CustomButton onSelect={logoutHandler}>Logout</CustomButton>
           <CustomButton onSelect={privacyHandler}>
             Privacy Statement
           </CustomButton>
