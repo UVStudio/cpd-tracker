@@ -8,7 +8,6 @@ import {
   Pressable,
   PermissionsAndroid,
 } from 'react-native';
-import CustomPieChart from '../../components/CustomPieChart';
 import RNFS from 'react-native-fs';
 
 //import * as Notifications from 'expo-notifications';
@@ -23,6 +22,8 @@ import CustomBoldText from '../../components/CustomBoldText';
 import CustomTitle from '../../components/CustomTitle';
 import CustomSubtitle from '../../components/CustomSubtitle';
 import CustomButton from '../../components/CustomButton';
+import CustomPieChart from '../../components/CustomPieChart';
+import CustomAnimatedPie from '../../components/CustomAnimatedPie';
 import CustomErrorCard from '../../components/CustomErrorCard';
 import CustomMessageCard from '../../components/CustomMessageCard';
 import CustomAccordionUnit from '../../components/CustomAccordionUnit';
@@ -361,6 +362,7 @@ For iOS 15 and beyond, the PDF is where you have chosen to save it.`
                     ) : null}
                     <CustomStatsDivider>
                       <Pressable onPress={() => verifiableHoursDetails()}>
+                        {/* <CustomAnimatedPie /> */}
                         <CustomTextStats>
                           Verifiable Hours:{'  '}
                           {!elem.historic ? (
@@ -377,7 +379,7 @@ For iOS 15 and beyond, the PDF is where you have chosen to save it.`
                           {!elem.historic ? ' - Required' : null}
                         </CustomTextStats>
                         {!elem.historic ? (
-                          <CustomPieChart
+                          <CustomAnimatedPie
                             required={currentYearNeedVerHours}
                             progress={elem.verifiable}
                           />
@@ -404,7 +406,7 @@ For iOS 15 and beyond, the PDF is where you have chosen to save it.`
                           {!elem.historic ? ' - Required' : null}
                         </CustomTextStats>
                         {!elem.historic ? (
-                          <CustomPieChart
+                          <CustomAnimatedPie
                             required={currentYearNeedCPDHours}
                             progress={elem.nonVerifiable + elem.verifiable}
                           />
@@ -498,7 +500,7 @@ For iOS 15 and beyond, the PDF is where you have chosen to save it.`
                     ) : null}
                   </View>
                 )}
-                {currentYear !== showYear ? (
+                {currentYear > showYear ? (
                   <View style={styles.fullWidthCenter}>
                     <CustomButton
                       onSelect={

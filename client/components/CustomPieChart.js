@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { PieChart } from 'react-native-svg-charts';
 import Colors from '../constants/Colors';
 
@@ -28,6 +28,8 @@ const CustomPieChart = (props) => {
           svg: {
             fill: pieColor(required, progress),
           },
+          animate: true,
+          animationDuration: 1000,
         },
         {
           key: 2,
