@@ -217,6 +217,9 @@ const Stats = ({ navigation }) => {
   };
 
   const downloadPDFHandler = async () => {
+    setDownloadingPDF(true);
+    setDownloadProgress(0);
+
     if (Platform.OS === 'android') {
       const granted = await PermissionsAndroid.request(
         PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
@@ -261,13 +264,11 @@ const Stats = ({ navigation }) => {
     };
 
     try {
-      setDownloadingPDF(true);
-      setDownloadProgress(0);
-
       //for Android or iOS < 15, this will directly save file in CPD folder
-      RNFS.downloadFile(downloadReportOptions)
+      await RNFS.downloadFile(downloadReportOptions)
         .promise.then((res) => {
           console.log('total written: ', res.bytesWritten);
+          setDownloadProgress(100);
         })
         .catch((error) => {
           console.log(error);
@@ -290,9 +291,8 @@ const Stats = ({ navigation }) => {
         await Sharing.shareAsync('file://' + filePath);
       }
       //end of iOS 15 conditional requirement
-      await dispatch(reportActions.deleteReport(AWSFileName))
-        .then(() => {})
-        .catch(() => {});
+
+      await dispatch(reportActions.deleteReport(AWSFileName));
       setCardText(
         `Report succesfully downloaded! 
         
@@ -302,13 +302,13 @@ For iOS 14 and older users, the report is in the File > CPD Tracker folder.
 
 For iOS 15 and beyond, the PDF is where you have chosen to save it.`
       );
-      setDownloadProgress(0);
     } catch (err) {
       console.log(err.message);
       setError(
         'There is something wrong with our network. Your Report cannot be downloaded at the moment. Please try again later.'
       );
     }
+    setDownloadProgress(0);
     setDownloadingPDF(false);
   };
 
@@ -362,7 +362,6 @@ For iOS 15 and beyond, the PDF is where you have chosen to save it.`
                     ) : null}
                     <CustomStatsDivider>
                       <Pressable onPress={() => verifiableHoursDetails()}>
-                        {/* <CustomAnimatedPie /> */}
                         <CustomTextStats>
                           Verifiable Hours:{'  '}
                           {!elem.historic ? (

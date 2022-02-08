@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { View, Text, Easing, Animated } from 'react-native';
+import { View, Easing, Animated } from 'react-native';
 import Svg, { G, Circle } from 'react-native-svg';
 import Colors from '../constants/Colors';
 
@@ -22,7 +22,7 @@ const CustomAnimatedPie = (props) => {
   const animation = (toValue) => {
     return Animated.timing(animatedValue, {
       toValue,
-      duration: 800,
+      duration: (progress / required) * 1600,
       delay: 250,
       easing: Easing.in.cubic,
       useNativeDriver: true,
@@ -58,7 +58,7 @@ const CustomAnimatedPie = (props) => {
             strokeWidth={strokeWidth}
             r={radius}
             fill="transparent"
-            strokeOpacity={0.5}
+            strokeOpacity={0.7}
           />
           <AnimatedCircle
             ref={circleRef}
