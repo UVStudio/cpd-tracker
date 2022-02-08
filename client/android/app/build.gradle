@@ -136,7 +136,7 @@ android {
         applicationId 'com.sheriffconsulting.cpdtracker'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 12
+        versionCode 13
         versionName "1.0.0"
     }
     splits {

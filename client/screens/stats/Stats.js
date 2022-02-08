@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import {
   Text,
@@ -9,12 +9,11 @@ import {
   PermissionsAndroid,
 } from 'react-native';
 import RNFS from 'react-native-fs';
+import { Transition, Transitioning } from 'react-native-reanimated';
 
-//import * as Notifications from 'expo-notifications';
 import * as Sharing from 'expo-sharing';
 import * as authActions from '../../store/actions/auth';
 import * as reportActions from '../../store/actions/report';
-//import * as MediaLibrary from 'expo-media-library';
 
 import CustomText from '../../components/CustomText';
 import CustomTextStats from '../../components/CustomTextStats';
@@ -22,7 +21,6 @@ import CustomBoldText from '../../components/CustomBoldText';
 import CustomTitle from '../../components/CustomTitle';
 import CustomSubtitle from '../../components/CustomSubtitle';
 import CustomButton from '../../components/CustomButton';
-import CustomPieChart from '../../components/CustomPieChart';
 import CustomAnimatedPie from '../../components/CustomAnimatedPie';
 import CustomErrorCard from '../../components/CustomErrorCard';
 import CustomMessageCard from '../../components/CustomMessageCard';
@@ -43,23 +41,13 @@ import currentYear from '../../utils/currentYear';
 //const currentYear = 2023; //test currentYear;
 import { hoursRequiredLogic } from '../../utils/hoursRequiredLogic';
 
-// import {
-//   AndroidImportance,
-//   AndroidNotificationVisibility,
-//   NotificationChannel,
-//   NotificationChannelInput,
-//   NotificationContentInput,
-// } from 'expo-notifications';
-
-// Notifications.setNotificationHandler({
-//   handleNotification: async () => ({
-//     shouldShowAlert: true,
-//     shouldPlaySound: false,
-//     shouldSetBadge: false,
-//   }),
-// });
-
-const channelId = 'DownloadInfo';
+const transition = (
+  <Transition.Together>
+    <Transition.In type="fade" durationMs={600} delayMs={200} />
+    <Transition.Change />
+    <Transition.Out type="fade" durationMs={200} />
+  </Transition.Together>
+);
 
 const Stats = ({ navigation }) => {
   const [showYear, setShowYear] = useState(currentYear);
@@ -73,18 +61,16 @@ const Stats = ({ navigation }) => {
 
   const authState = useSelector((state) => state.auth.user);
   const reportReady = useSelector((state) => state.report.report);
+  const ref = useRef();
 
   useEffect(() => {
-    console.log('stats screen loadUser()');
     loadUser();
   }, []);
 
   const loadUser = async () => {
     setLoading(true);
     try {
-      await dispatch(authActions.getUser()).then(() => {
-        console.log('got User: ', authState.name);
-      });
+      await dispatch(authActions.getUser());
     } catch (err) {
       console.log(err.message);
       setError(
@@ -154,29 +140,6 @@ const Stats = ({ navigation }) => {
     navigation.navigate('Overwrite CPD Hours', { showYear });
   };
 
-  //PDF report begins
-  // const setNotificationChannel = async () => {
-  //   const loadingChannel = await Notifications.getNotificationChannelAsync(
-  //     channelId
-  //   );
-
-  //   // if we didn't find a notification channel set how we like it, then we create one
-  //   if (loadingChannel == null) {
-  //     const channelOptions = {
-  //       name: channelId,
-  //       importance: AndroidImportance.HIGH,
-  //       lockscreenVisibility: AndroidNotificationVisibility.PUBLIC,
-  //       sound: 'default',
-  //       vibrationPattern: [250],
-  //       enableVibrate: true,
-  //     };
-  //     await Notifications.setNotificationChannelAsync(
-  //       channelId,
-  //       channelOptions
-  //     );
-  //   }
-  // };
-
   useEffect(() => {
     if (Platform.OS === 'android') {
       //setNotificationChannel();
@@ -188,9 +151,7 @@ const Stats = ({ navigation }) => {
   const generatePDFHandler = async (year) => {
     try {
       setGeneratingPDF(true);
-      await dispatch(reportActions.buildReport(year))
-        .then(() => {})
-        .catch(() => {});
+      await dispatch(reportActions.buildReport(year));
       await downloadPDFHandler();
     } catch (err) {
       console.log(err.message);
@@ -329,228 +290,276 @@ For iOS 15 and beyond, the PDF is where you have chosen to save it.`
   }
 
   return (
-    <CustomScreenContainer>
-      <CustomScrollView>
-        <CustomTitle>Statistics Overview</CustomTitle>
-        <CustomGreyLine />
-        {userHours.map((elem, index) => (
-          <CustomAccordionUnit key={index}>
-            <Pressable
-              onPress={() => setShowYear(userHours[index].year)}
-              disabled={reportReady}
-            >
-              <CustomSubtitle>{elem.year}</CustomSubtitle>
-            </Pressable>
-            <CustomThinGreyLine />
-            {showYear === elem.year ? (
-              <CustomStatsInfoBox>
-                {currentYear !== showYear &&
-                elem.verifiable + elem.nonVerifiable === 0 ? (
-                  <CustomText>
-                    Looks like you did not use the CPD Tracker App for the year
-                    of {showYear}. In order for the app to calculate how many
-                    hours you need for {currentYear}, and beyond, properly,
-                    please click on the 'Overwrite CPD Data' button to manually
-                    input your CPD hours for {showYear}.
-                  </CustomText>
-                ) : (
-                  <View style={styles.fullWidthCenter}>
-                    {elem.historic ? (
-                      <CustomBoldText style={{ marginBottom: 10 }}>
-                        Past CPD Hours Data
-                      </CustomBoldText>
-                    ) : null}
-                    <CustomStatsDivider>
-                      <Pressable onPress={() => verifiableHoursDetails()}>
+    <Transitioning.View
+      transition={transition}
+      style={styles.container}
+      ref={ref}
+    >
+      <CustomScreenContainer>
+        <CustomScrollView>
+          <CustomTitle>Statistics Overview</CustomTitle>
+          <CustomGreyLine />
+          {userHours.map((elem, index) => (
+            <CustomAccordionUnit key={index}>
+              <Pressable
+                onPress={() => {
+                  setShowYear(userHours[index].year);
+                  ref.current.animateNextTransition();
+                }}
+                disabled={reportReady}
+              >
+                <CustomSubtitle>{elem.year}</CustomSubtitle>
+              </Pressable>
+              <CustomThinGreyLine />
+              {showYear === elem.year ? (
+                <CustomStatsInfoBox>
+                  {currentYear !== showYear &&
+                  elem.verifiable + elem.nonVerifiable === 0 ? (
+                    <CustomText>
+                      Looks like you did not use the CPD Tracker App for the
+                      year of {showYear}. In order for the app to calculate how
+                      many hours you need for {currentYear}, and beyond,
+                      properly, please click on the 'Overwrite CPD Data' button
+                      to manually input your CPD hours for {showYear}.
+                    </CustomText>
+                  ) : (
+                    <View style={styles.fullWidthCenter}>
+                      {elem.historic ? (
+                        <CustomBoldText style={{ marginBottom: 10 }}>
+                          Past CPD Hours Data
+                        </CustomBoldText>
+                      ) : null}
+                      <CustomStatsDivider>
+                        <Pressable onPress={() => verifiableHoursDetails()}>
+                          <CustomTextStats>
+                            Verifiable Hours:{'  '}
+                            {!elem.historic ? (
+                              statsFraction(
+                                elem.verifiable,
+                                currentYearNeedVerHours,
+                                null
+                              )
+                            ) : (
+                              <Text style={{ color: Colors.dark }}>
+                                {Number(elem.verifiable).toFixed(1)}
+                              </Text>
+                            )}
+                            {!elem.historic ? ' - Required' : null}
+                          </CustomTextStats>
+                          {!elem.historic ? (
+                            <CustomAnimatedPie
+                              required={currentYearNeedVerHours}
+                              progress={elem.verifiable}
+                            />
+                          ) : null}
+                        </Pressable>
+                      </CustomStatsDivider>
+                      <CustomStatsDivider>
+                        <Pressable onPress={() => totalCPDHoursDetails()}>
+                          <CustomTextStats>
+                            Total CPD Hours:{'  '}
+                            {!elem.historic ? (
+                              statsFraction(
+                                elem.nonVerifiable,
+                                currentYearNeedCPDHours,
+                                elem.verifiable
+                              )
+                            ) : (
+                              <Text style={{ color: 'black' }}>
+                                {Number(
+                                  elem.nonVerifiable + elem.verifiable
+                                ).toFixed(1)}
+                              </Text>
+                            )}
+                            {!elem.historic ? ' - Required' : null}
+                          </CustomTextStats>
+                          {!elem.historic ? (
+                            <CustomAnimatedPie
+                              required={currentYearNeedCPDHours}
+                              progress={elem.nonVerifiable + elem.verifiable}
+                            />
+                          ) : null}
+                        </Pressable>
+                      </CustomStatsDivider>
+                      <CustomStatsDivider>
+                        <Pressable onPress={() => nonVerHoursDetails()}>
+                          <CustomTextStats>
+                            Non-Verifiable Hours:{'  '}
+                            {!elem.historic ? (
+                              <Text style={{ color: 'black', fontSize: 20 }}>
+                                {Number(elem.nonVerifiable).toFixed(1)}
+                              </Text>
+                            ) : (
+                              <Text style={{ color: 'black' }}>
+                                {Number(elem.nonVerifiable).toFixed(1)}
+                              </Text>
+                            )}
+                          </CustomTextStats>
+                        </Pressable>
+                      </CustomStatsDivider>
+                      <CustomStatsDivider>
                         <CustomTextStats>
-                          Verifiable Hours:{'  '}
+                          Ethics Hours:{'  '}
                           {!elem.historic ? (
                             statsFraction(
-                              elem.verifiable,
-                              currentYearNeedVerHours,
+                              elem.ethics,
+                              currentYearNeedEthicsHours,
                               null
                             )
                           ) : (
-                            <Text style={{ color: Colors.dark }}>
-                              {Number(elem.verifiable).toFixed(1)}
-                            </Text>
-                          )}
-                          {!elem.historic ? ' - Required' : null}
-                        </CustomTextStats>
-                        {!elem.historic ? (
-                          <CustomAnimatedPie
-                            required={currentYearNeedVerHours}
-                            progress={elem.verifiable}
-                          />
-                        ) : null}
-                      </Pressable>
-                    </CustomStatsDivider>
-                    <CustomStatsDivider>
-                      <Pressable onPress={() => totalCPDHoursDetails()}>
-                        <CustomTextStats>
-                          Total CPD Hours:{'  '}
-                          {!elem.historic ? (
-                            statsFraction(
-                              elem.nonVerifiable,
-                              currentYearNeedCPDHours,
-                              elem.verifiable
-                            )
-                          ) : (
                             <Text style={{ color: 'black' }}>
-                              {Number(
-                                elem.nonVerifiable + elem.verifiable
-                              ).toFixed(1)}
+                              {Number(elem.ethics).toFixed(1)}
                             </Text>
                           )}
-                          {!elem.historic ? ' - Required' : null}
+                          {!elem.historic ? ethicsReqOrRec() : null}
                         </CustomTextStats>
-                        {!elem.historic ? (
-                          <CustomAnimatedPie
-                            required={currentYearNeedCPDHours}
-                            progress={elem.nonVerifiable + elem.verifiable}
-                          />
-                        ) : null}
-                      </Pressable>
-                    </CustomStatsDivider>
-                    <CustomStatsDivider>
-                      <Pressable onPress={() => nonVerHoursDetails()}>
-                        <CustomTextStats>
-                          Non-Verifiable Hours:{'  '}
-                          {!elem.historic ? (
-                            <Text style={{ color: 'black', fontSize: 20 }}>
-                              {Number(elem.nonVerifiable).toFixed(1)}
-                            </Text>
-                          ) : (
-                            <Text style={{ color: 'black' }}>
-                              {Number(elem.nonVerifiable).toFixed(1)}
-                            </Text>
-                          )}
-                        </CustomTextStats>
-                      </Pressable>
-                    </CustomStatsDivider>
-                    <CustomStatsDivider>
-                      <CustomTextStats>
-                        Ethics Hours:{'  '}
-                        {!elem.historic ? (
-                          statsFraction(
-                            elem.ethics,
-                            currentYearNeedEthicsHours,
-                            null
-                          )
-                        ) : (
-                          <Text style={{ color: 'black' }}>
-                            {Number(elem.ethics).toFixed(1)}
-                          </Text>
-                        )}
-                        {!elem.historic ? ethicsReqOrRec() : null}
-                      </CustomTextStats>
-                    </CustomStatsDivider>
+                      </CustomStatsDivider>
 
-                    {!elem.historic ? (
-                      <View style={styles.fullWidthCenter}>
-                        {reportReady ? null : generatingPDF ? (
+                      {!elem.historic ? (
+                        <View style={styles.fullWidthCenter}>
+                          {reportReady ? null : generatingPDF ? (
+                            <View style={styles.fullWidthCenter}>
+                              <CustomButton
+                                style={{ marginTop: 15, width: '100%' }}
+                              >
+                                Generating Your PDF...
+                              </CustomButton>
+                            </View>
+                          ) : (
+                            <View style={styles.fullWidthCenter}>
+                              <CustomButton
+                                style={{ marginTop: 15, width: '100%' }}
+                                onSelect={() => generatePDFHandler(showYear)}
+                              >
+                                Generate & Download PDF Report
+                              </CustomButton>
+                            </View>
+                          )}
+                        </View>
+                      ) : null}
+
+                      {reportReady ? (
+                        downloadingPDF ? (
                           <View style={styles.fullWidthCenter}>
-                            <CustomButton
-                              style={{ marginTop: 15, width: '100%' }}
-                            >
-                              Generating Your PDF...
+                            <CustomButton style={{ width: '100%' }}>
+                              Downloading Your Report...
                             </CustomButton>
+                            <CustomText style={{ alignSelf: 'center' }}>
+                              {downloadProgress + ' %'}
+                            </CustomText>
+                            <CustomDownloadProgressBar
+                              progress={downloadProgress}
+                              fileSize={100}
+                            />
                           </View>
                         ) : (
                           <View style={styles.fullWidthCenter}>
                             <CustomButton
-                              style={{ marginTop: 15, width: '100%' }}
-                              onSelect={() => generatePDFHandler(showYear)}
+                              onSelect={downloadPDFHandler}
+                              style={{ width: '100%' }}
                             >
-                              Generate & Download PDF Report
+                              Download Report
                             </CustomButton>
+                            <CustomText style={{ alignSelf: 'center' }}>
+                              {downloadProgress + '%'}
+                            </CustomText>
                           </View>
-                        )}
-                      </View>
-                    ) : null}
-
-                    {reportReady ? (
-                      downloadingPDF ? (
-                        <View style={styles.fullWidthCenter}>
-                          <CustomButton style={{ width: '100%' }}>
-                            Downloading Your Report...
-                          </CustomButton>
-                          <CustomText style={{ alignSelf: 'center' }}>
-                            {downloadProgress + ' %'}
-                          </CustomText>
-                          <CustomDownloadProgressBar
-                            progress={downloadProgress}
-                            fileSize={100}
-                          />
-                        </View>
-                      ) : (
-                        <View style={styles.fullWidthCenter}>
-                          <CustomButton
-                            onSelect={downloadPDFHandler}
-                            style={{ width: '100%' }}
-                          >
-                            Download Report
-                          </CustomButton>
-                          <CustomText style={{ alignSelf: 'center' }}>
-                            {downloadProgress + '%'}
-                          </CustomText>
-                        </View>
-                      )
-                    ) : null}
-                  </View>
-                )}
-                {currentYear > showYear ? (
-                  <View style={styles.fullWidthCenter}>
-                    <CustomButton
-                      onSelect={
-                        downloadingPDF || generatingPDF
-                          ? null
-                          : overwriteCPDHandler
-                      }
-                      style={{ alignSelf: 'center', width: '100%' }}
-                    >
-                      Overwrite CPD Data
-                    </CustomButton>
-                  </View>
-                ) : null}
-              </CustomStatsInfoBox>
-            ) : null}
-          </CustomAccordionUnit>
-        ))}
-        <CustomButton onSelect={() => loadUser()}>Refresh Data</CustomButton>
-      </CustomScrollView>
-      {error !== '' ? (
-        <CustomErrorCard error={error} toShow={setError} />
-      ) : null}
-      {cardText !== '' ? (
-        <CustomMessageCard text={cardText} toShow={setCardText} />
-      ) : null}
-    </CustomScreenContainer>
+                        )
+                      ) : null}
+                    </View>
+                  )}
+                  {currentYear > showYear ? (
+                    <View style={styles.fullWidthCenter}>
+                      <CustomButton
+                        onSelect={
+                          downloadingPDF || generatingPDF
+                            ? null
+                            : overwriteCPDHandler
+                        }
+                        style={{ alignSelf: 'center', width: '100%' }}
+                      >
+                        Overwrite CPD Data
+                      </CustomButton>
+                    </View>
+                  ) : null}
+                </CustomStatsInfoBox>
+              ) : null}
+            </CustomAccordionUnit>
+          ))}
+          <CustomButton onSelect={() => loadUser()}>Refresh Data</CustomButton>
+        </CustomScrollView>
+        {error !== '' ? (
+          <CustomErrorCard error={error} toShow={setError} />
+        ) : null}
+        {cardText !== '' ? (
+          <CustomMessageCard text={cardText} toShow={setCardText} />
+        ) : null}
+      </CustomScreenContainer>
+    </Transitioning.View>
   );
 };
 
 const styles = StyleSheet.create({
-  outerContainer: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
-  indicatorContainer: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   fullWidthCenter: {
     marginTop: 5,
     width: '100%',
     alignSelf: 'center',
   },
-  color: {
-    color: 'black',
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
   },
+  // indicatorContainer: {
+  //   flex: 1,
+  //   backgroundColor: '#fff',
+  //   alignItems: 'center',
+  //   justifyContent: 'center',
+  // },
+  // color: {
+  //   color: 'black',
+  // },
 });
 
 export default Stats;
+
+//PDF report begins
+// const setNotificationChannel = async () => {
+//   const loadingChannel = await Notifications.getNotificationChannelAsync(
+//     channelId
+//   );
+
+//   // if we didn't find a notification channel set how we like it, then we create one
+//   if (loadingChannel == null) {
+//     const channelOptions = {
+//       name: channelId,
+//       importance: AndroidImportance.HIGH,
+//       lockscreenVisibility: AndroidNotificationVisibility.PUBLIC,
+//       sound: 'default',
+//       vibrationPattern: [250],
+//       enableVibrate: true,
+//     };
+//     await Notifications.setNotificationChannelAsync(
+//       channelId,
+//       channelOptions
+//     );
+//   }
+// };
+
+// import {
+//   AndroidImportance,
+//   AndroidNotificationVisibility,
+//   NotificationChannel,
+//   NotificationChannelInput,
+//   NotificationContentInput,
+// } from 'expo-notifications';
+
+// Notifications.setNotificationHandler({
+//   handleNotification: async () => ({
+//     shouldShowAlert: true,
+//     shouldPlaySound: false,
+//     shouldSetBadge: false,
+//   }),
+// });
 
 // const getNotificationPermissions = async () => {
 //   await Notifications.requestPermissionsAsync();
