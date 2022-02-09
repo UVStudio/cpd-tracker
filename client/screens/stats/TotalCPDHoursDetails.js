@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { Pressable } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { Pressable, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useSelector, useDispatch } from 'react-redux';
+import { Transition, Transitioning } from 'react-native-reanimated';
 
 import * as certsActions from '../../store/actions/cert';
 import * as nonVerActions from '../../store/actions/nonVer';
@@ -33,9 +34,18 @@ const TotalCPDHoursDetails = (props) => {
 
   const dispatch = useDispatch();
   const navigation = useNavigation();
+  const ref = useRef();
 
   const certsYearState = useSelector((state) => state.cert.certs);
   const nonVerYearState = useSelector((state) => state.nonVer.nonver);
+
+  const transition = (
+    <Transition.Together>
+      <Transition.In type="fade" durationMs={600} delayMs={200} />
+      <Transition.Change />
+      <Transition.Out type="fade" durationMs={200} />
+    </Transition.Together>
+  );
 
   const loadData = async () => {
     setLoading(true);
@@ -115,58 +125,81 @@ const TotalCPDHoursDetails = (props) => {
   }
 
   return (
-    <CustomScreenContainer>
-      <CustomScrollView>
-        <CustomTitle>Total CPD Hours for {year}</CustomTitle>
-        <CustomGreyLine />
-        <CustomAccordionUnit>
-          <Pressable onPress={() => setShowHours('cert')}>
-            <CustomSubtitle>Verifiable Hours</CustomSubtitle>
-          </Pressable>
-          <CustomThinGreyLine />
-          {showHours === 'cert'
-            ? certsYearState.map((cert, index) => (
-                <CustomCertHoursDetails
-                  key={index}
-                  cert={cert}
-                  editCourseHandler={editSessionHandler}
-                  deleteCardHandler={deleteCardHandler}
-                />
-              ))
-            : null}
-        </CustomAccordionUnit>
-        <CustomAccordionUnit>
-          <Pressable onPress={() => setShowHours('nonVer')}>
-            <CustomSubtitle>Non-Verifiable Hours</CustomSubtitle>
-          </Pressable>
-          <CustomThinGreyLine />
-          {showHours === 'nonVer'
-            ? nonVerYearState.map((nonver, index) => (
-                <CustomNonVerHoursDetails
-                  key={index}
-                  nonver={nonver}
-                  editSessionHandler={editSessionHandler}
-                  deleteCardHandler={deleteCardHandler}
-                />
-              ))
-            : null}
-        </CustomAccordionUnit>
-      </CustomScrollView>
-      {error !== '' ? (
-        <CustomErrorCard error={error} toShow={setError} />
-      ) : null}
-      {confirmCardText !== '' ? (
-        <CustomConfirmActionCard
-          text={confirmCardText}
-          actionLoading={deletingSession}
-          toShow={setConfirmCardText}
-          confirmAction={deleteSessionHandler}
-          buttonText="Yes! Delete session"
-          savingButtonText="Deleting session..."
-        />
-      ) : null}
-    </CustomScreenContainer>
+    <Transitioning.View
+      transition={transition}
+      style={styles.container}
+      ref={ref}
+    >
+      <CustomScreenContainer>
+        <CustomScrollView>
+          <CustomTitle>Total CPD Hours for {year}</CustomTitle>
+          <CustomGreyLine />
+          <CustomAccordionUnit>
+            <Pressable
+              onPress={() => {
+                setShowHours('cert');
+                ref.current.animateNextTransition();
+              }}
+            >
+              <CustomSubtitle>Verifiable Hours</CustomSubtitle>
+            </Pressable>
+            <CustomThinGreyLine />
+            {showHours === 'cert'
+              ? certsYearState.map((cert, index) => (
+                  <CustomCertHoursDetails
+                    key={index}
+                    cert={cert}
+                    editCourseHandler={editSessionHandler}
+                    deleteCardHandler={deleteCardHandler}
+                  />
+                ))
+              : null}
+          </CustomAccordionUnit>
+          <CustomAccordionUnit>
+            <Pressable
+              onPress={() => {
+                setShowHours('nonVer');
+                ref.current.animateNextTransition();
+              }}
+            >
+              <CustomSubtitle>Non-Verifiable Hours</CustomSubtitle>
+            </Pressable>
+            <CustomThinGreyLine />
+            {showHours === 'nonVer'
+              ? nonVerYearState.map((nonver, index) => (
+                  <CustomNonVerHoursDetails
+                    key={index}
+                    nonver={nonver}
+                    editSessionHandler={editSessionHandler}
+                    deleteCardHandler={deleteCardHandler}
+                  />
+                ))
+              : null}
+          </CustomAccordionUnit>
+        </CustomScrollView>
+        {error !== '' ? (
+          <CustomErrorCard error={error} toShow={setError} />
+        ) : null}
+        {confirmCardText !== '' ? (
+          <CustomConfirmActionCard
+            text={confirmCardText}
+            actionLoading={deletingSession}
+            toShow={setConfirmCardText}
+            confirmAction={deleteSessionHandler}
+            buttonText="Yes! Delete session"
+            savingButtonText="Deleting session..."
+          />
+        ) : null}
+      </CustomScreenContainer>
+    </Transitioning.View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+});
 
 export default TotalCPDHoursDetails;

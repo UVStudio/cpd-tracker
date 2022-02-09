@@ -137,7 +137,6 @@ export const overrideHours = (year, certHours, nonVerHours, ethicsHours) => {
 export const getUser = () => {
   return async (dispatch) => {
     try {
-      console.log('auth action getUser() called');
       const response = await axios.get(`${CURRENT_IP}/api/auth/`);
       const user = await response.data.data;
 

@@ -144,7 +144,6 @@ const ProfileNavigator = () => {
 
 const TrackerBottomTabNavigator = createBottomTabNavigator();
 export const BottomTabNavigator = () => {
-  console.log('BottomTabNavigator Activated');
   return (
     <TrackerBottomTabNavigator.Navigator screenOptions={bottomTabOptions}>
       <TrackerBottomTabNavigator.Screen

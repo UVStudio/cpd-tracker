@@ -1,22 +1,15 @@
 import React, { useEffect } from 'react';
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
-import { useSelector, useDispatch } from 'react-redux';
-import { useNavigation } from '@react-navigation/native';
+import { useDispatch } from 'react-redux';
 import * as authActions from '../store/actions/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Startup = () => {
-  const isUserLoaded = useSelector((state) => !!state.auth.user);
-
   const dispatch = useDispatch();
-  const navigation = useNavigation();
-
-  console.log('startup user loaded?: ', isUserLoaded);
 
   useEffect(() => {
     const tryLogin = async () => {
       const userData = await AsyncStorage.getItem('userData');
-      console.log('startup userData: ', userData);
       if (!userData) {
         dispatch(authActions.setDidTryAL());
         return;

@@ -509,15 +509,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
   },
-  // indicatorContainer: {
-  //   flex: 1,
-  //   backgroundColor: '#fff',
-  //   alignItems: 'center',
-  //   justifyContent: 'center',
-  // },
-  // color: {
-  //   color: 'black',
-  // },
 });
 
 export default Stats;
