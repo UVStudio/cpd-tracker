@@ -13,6 +13,7 @@ import CustomErrorCard from '../../components/CustomErrorCard';
 import * as authActions from '../../store/actions/auth';
 import { formReducer } from '../../utils/formReducer';
 import { FORM_INPUT_UPDATE } from '../../store/types';
+import CustomSpinner from '../../components/CustomSpinner';
 
 const Verification = () => {
   const [error, setError] = useState('');
@@ -80,7 +81,7 @@ const Verification = () => {
         />
         {isLoading ? (
           <CustomButton style={{ marginVertical: 20 }}>
-            Confirming...
+            Confirming {'  '} <CustomSpinner />
           </CustomButton>
         ) : (
           <CustomButton

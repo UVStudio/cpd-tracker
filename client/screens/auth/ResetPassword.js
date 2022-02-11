@@ -3,6 +3,7 @@ import { StyleSheet } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigation } from '@react-navigation/native';
 
+import CustomSpinner from '../../components/CustomSpinner';
 import CustomImageBackground from '../../components/CustomImageBackground';
 import CustomFormCard from '../../components/CustomFormCard';
 import CustomButton from '../../components/CustomButton';
@@ -108,7 +109,7 @@ const ResetPassword = () => {
         />
         {isLoading ? (
           <CustomButton style={{ marginVertical: 20 }}>
-            Resetting Password...
+            Resetting Password {'  '} <CustomSpinner />
           </CustomButton>
         ) : (
           <CustomButton

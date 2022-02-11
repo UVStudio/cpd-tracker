@@ -19,6 +19,7 @@ import CustomScreenContainer from '../../components/CustomScreenContainer';
 import * as authActions from '../../store/actions/auth';
 
 import { FORM_INPUT_UPDATE } from '../../store/types';
+import CustomSpinner from '../../components/CustomSpinner';
 
 const formReducer = (state, action) => {
   if (action.type === FORM_INPUT_UPDATE) {
@@ -205,7 +206,9 @@ const PastCPDHoursInput = (props) => {
           </CustomStatsInfoBox>
         ))}
         {savingCPD ? (
-          <CustomButton>Saving CPD Data...</CustomButton>
+          <CustomButton>
+            Saving CPD Data {'  '} <CustomSpinner />
+          </CustomButton>
         ) : (
           <CustomButton onSelect={() => saveDataHandler()}>
             Save CPD Data

@@ -24,6 +24,7 @@ import CustomProvinceSelectionCard from '../../components/CustomProvinceSelectio
 import { formReducer } from '../../utils/formReducer';
 import { FORM_INPUT_UPDATE, PASSWORD_INPUT_UPDATE } from '../../store/types';
 import { ActivityIndicator } from 'react-native-paper';
+import CustomSpinner from '../../components/CustomSpinner';
 
 const Profile = () => {
   const [cardText, setCardText] = useState('');
@@ -279,7 +280,9 @@ All data and certificates will be erased permanently. The app does not keep any 
           </View>
           <View style={{ ...styles.fullWidthCenterItems, marginVertical: 10 }}>
             {updatingProfile ? (
-              <CustomButtonLoading />
+              <CustomButton>
+                Updating Profile {'  '} <CustomSpinner />
+              </CustomButton>
             ) : (
               <CustomButton onSelect={updateProfileHandler}>
                 Update Profile
@@ -325,7 +328,9 @@ All data and certificates will be erased permanently. The app does not keep any 
           />
           <View style={{ ...styles.fullWidthCenterItems, marginVertical: 10 }}>
             {updatingPassword ? (
-              <CustomButtonLoading />
+              <CustomButton>
+                Update Password {'  '} <CustomSpinner />
+              </CustomButton>
             ) : (
               <CustomButton onSelect={updatePasswordHandler}>
                 Update Password

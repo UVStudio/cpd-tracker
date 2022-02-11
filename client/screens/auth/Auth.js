@@ -10,8 +10,10 @@ import {
 import { useDispatch } from 'react-redux';
 import { useNavigation } from '@react-navigation/native';
 
+import CustomButtonText from '../../components/CustomButtonText';
 import CustomFormCard from '../../components/CustomFormCard';
 import CustomInput from '../../components/CustomInput';
+import CustomSpinner from '../../components/CustomSpinner';
 import CustomButton from '../../components/CustomButton';
 import CustomErrorCard from '../../components/CustomErrorCard';
 import CustomSelectField from '../../components/CustomSelectField';
@@ -97,7 +99,6 @@ const Auth = () => {
     }
     setError('');
     try {
-      console.log('form sending!');
       await dispatch(action);
     } catch (err) {
       setError(err.message);
@@ -251,13 +252,23 @@ const Auth = () => {
             ) : null}
             <View style={styles.buttonGroupContainer}>
               <CustomButton onSelect={authHandler}>
-                {isSignup
-                  ? isRegistering
-                    ? 'Registering...'
-                    : 'Register'
-                  : isLogging
-                  ? 'Logging in..'
-                  : 'Login'}
+                {isSignup ? (
+                  isRegistering ? (
+                    <Text>
+                      Registering {'  '}
+                      <CustomSpinner />
+                    </Text>
+                  ) : (
+                    'Register'
+                  )
+                ) : isLogging ? (
+                  <Text>
+                    Login in {'  '}
+                    <CustomSpinner />
+                  </Text>
+                ) : (
+                  'Login'
+                )}
               </CustomButton>
               <CustomButton
                 onSelect={() => setIsSignup((prevState) => !prevState)}
@@ -323,6 +334,13 @@ const styles = StyleSheet.create({
   rowSpaceBetween: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+  },
+  buttonText: {
+    fontSize: 16,
+    paddingVertical: 8,
+    textAlign: 'center',
+    color: 'white',
+    fontFamily: 'avenir-demibold',
   },
 });
 

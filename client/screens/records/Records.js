@@ -22,6 +22,7 @@ import Colors from '../../constants/Colors';
 
 import { formReducer } from '../../utils/formReducer';
 import { FORM_INPUT_UPDATE } from '../../store/types';
+import CustomSpinner from '../../components/CustomSpinner';
 
 const Records = () => {
   const [cert, setCert] = useState(null); //if true, app uploads a cert. if not, app uploads default no-cert.jpg from S3
@@ -187,7 +188,9 @@ const Records = () => {
             {cert !== null ? 'file: ' + cert.name : null}
           </CustomBoldText>
           {savingCourse ? (
-            <CustomButtonLoading style={{ marginTop: 10 }} />
+            <CustomButton style={{ marginTop: 10 }}>
+              Saving Course {'  '} <CustomSpinner />
+            </CustomButton>
           ) : (
             <CustomButton
               style={{ marginTop: 10 }}

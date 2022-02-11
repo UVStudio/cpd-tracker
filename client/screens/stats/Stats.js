@@ -18,6 +18,7 @@ import * as reportActions from '../../store/actions/report';
 import CustomText from '../../components/CustomText';
 import CustomTextStats from '../../components/CustomTextStats';
 import CustomBoldText from '../../components/CustomBoldText';
+import CustomSpinner from '../../components/CustomSpinner';
 import CustomTitle from '../../components/CustomTitle';
 import CustomSubtitle from '../../components/CustomSubtitle';
 import CustomButton from '../../components/CustomButton';
@@ -58,6 +59,7 @@ const Stats = ({ navigation }) => {
   const [downloadingPDF, setDownloadingPDF] = useState(false);
   const [dirPath, setDirPath] = useState(`${RNFS.DocumentDirectoryPath}`);
   const [downloadProgress, setDownloadProgress] = useState(0);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const authState = useSelector((state) => state.auth.user);
   const reportReady = useSelector((state) => state.report.report);
@@ -135,6 +137,20 @@ const Stats = ({ navigation }) => {
     return showYear - user.cpdYear > 1 ? ' - Required' : ' - Recommended';
   };
 
+  //Refresh Data
+  const refreshData = async () => {
+    setIsRefreshing(true);
+    try {
+      await loadUser();
+    } catch (err) {
+      console.log(err.message);
+      setError(
+        'Unable to refresh your data at this moment due to connectivity issues.'
+      );
+    }
+    setIsRefreshing(false);
+  };
+
   //OverwriteCPD
   const overwriteCPDHandler = () => {
     navigation.navigate('Overwrite CPD Hours', { showYear });
@@ -142,15 +158,14 @@ const Stats = ({ navigation }) => {
 
   useEffect(() => {
     if (Platform.OS === 'android') {
-      //setNotificationChannel();
       setDirPath(`${RNFS.DownloadDirectoryPath}/CPD`);
     }
   }, []);
 
   //Generate PDF Report
   const generatePDFHandler = async (year) => {
+    setGeneratingPDF(true);
     try {
-      setGeneratingPDF(true);
       await dispatch(reportActions.buildReport(year));
       await downloadPDFHandler();
     } catch (err) {
@@ -195,9 +210,7 @@ const Stats = ({ navigation }) => {
       //Android 11 doesn't suffer from the above bug
       if (granted === PermissionsAndroid.RESULTS.GRANTED) {
         RNFS.mkdir(dirPath)
-          .then(() => {
-            console.log('folder built');
-          })
+          .then(() => {})
           .catch((error) => {
             console.log(error);
           });
@@ -214,9 +227,7 @@ const Stats = ({ navigation }) => {
       fromUrl: pdfUri,
       toFile: filePath,
       headers,
-      begin: (res) => {
-        console.log('file size: ', res.contentLength);
-      },
+      begin: () => {},
       progressInterval: 20,
       progress: (res) => {
         let pctg = 100 * (res.bytesWritten / res.contentLength);
@@ -228,7 +239,6 @@ const Stats = ({ navigation }) => {
       //for Android or iOS < 15, this will directly save file in CPD folder
       await RNFS.downloadFile(downloadReportOptions)
         .promise.then((res) => {
-          console.log('total written: ', res.bytesWritten);
           setDownloadProgress(100);
         })
         .catch((error) => {
@@ -416,33 +426,32 @@ For iOS 15 and beyond, the PDF is where you have chosen to save it.`
                       </CustomStatsDivider>
 
                       {!elem.historic ? (
-                        <View style={styles.fullWidthCenter}>
-                          {reportReady ? null : generatingPDF ? (
-                            <View style={styles.fullWidthCenter}>
-                              <CustomButton
-                                style={{ marginTop: 15, width: '100%' }}
-                              >
-                                Generating Your PDF...
-                              </CustomButton>
-                            </View>
-                          ) : (
-                            <View style={styles.fullWidthCenter}>
-                              <CustomButton
-                                style={{ marginTop: 15, width: '100%' }}
-                                onSelect={() => generatePDFHandler(showYear)}
-                              >
-                                Generate & Download PDF Report
-                              </CustomButton>
-                            </View>
-                          )}
-                        </View>
+                        reportReady ? null : generatingPDF ? (
+                          <View style={styles.fullWidthCenter}>
+                            <CustomButton
+                              style={{ marginTop: 15, width: '100%' }}
+                            >
+                              Generating Your PDF {'  '} <CustomSpinner />
+                            </CustomButton>
+                          </View>
+                        ) : (
+                          <View style={styles.fullWidthCenter}>
+                            <CustomButton
+                              style={{ marginTop: 15, width: '100%' }}
+                              onSelect={() => generatePDFHandler(showYear)}
+                            >
+                              Generate & Download PDF Report
+                            </CustomButton>
+                          </View>
+                        )
                       ) : null}
 
                       {reportReady ? (
                         downloadingPDF ? (
                           <View style={styles.fullWidthCenter}>
                             <CustomButton style={{ width: '100%' }}>
-                              Downloading Your Report...
+                              Downloading Your Report {'   '}
+                              <CustomSpinner />
                             </CustomButton>
                             <CustomText style={{ alignSelf: 'center' }}>
                               {downloadProgress + ' %'}
@@ -486,7 +495,15 @@ For iOS 15 and beyond, the PDF is where you have chosen to save it.`
               ) : null}
             </CustomAccordionUnit>
           ))}
-          <CustomButton onSelect={() => loadUser()}>Refresh Data</CustomButton>
+          {isRefreshing ? (
+            <CustomButton>
+              Refreshing Data{'   '}
+              <CustomSpinner />
+            </CustomButton>
+          ) : (
+            <CustomButton onSelect={refreshData}>Refresh Data</CustomButton>
+          )}
+          {/* <CustomButton onSelect={() => loadUser()}>Refresh Data</CustomButton> */}
         </CustomScrollView>
         {error !== '' ? (
           <CustomErrorCard error={error} toShow={setError} />

@@ -49,7 +49,6 @@ const Timer = () => {
   const [show, setShow] = useState(false);
 
   const authState = useSelector((state) => state.auth.user);
-
   const user = authState;
 
   const dispatch = useDispatch();

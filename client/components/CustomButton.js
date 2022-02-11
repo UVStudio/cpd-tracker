@@ -30,7 +30,6 @@ const styles = StyleSheet.create({
   buttonText: {
     fontSize: 16,
     paddingVertical: 8,
-    paddingHorizontal: 15,
     textAlign: 'center',
     color: 'white',
     fontFamily: 'avenir-demibold',

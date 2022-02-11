@@ -5,6 +5,7 @@ import Colors from '../constants/Colors';
 import CustomButton from './CustomButton';
 
 import delayButton from '../utils/delayButton';
+import CustomSpinner from './CustomSpinner';
 
 const CustomConfirmActionCard = (props) => {
   const {
@@ -25,7 +26,7 @@ const CustomConfirmActionCard = (props) => {
         </CustomButton>
         {actionLoading ? (
           <CustomButton style={{ marginTop: 15 }}>
-            {savingButtonText}
+            {savingButtonText} {'  '} <CustomSpinner />
           </CustomButton>
         ) : (
           <CustomButton

@@ -18,6 +18,7 @@ import * as authActions from '../../store/actions/auth';
 import * as certActions from '../../store/actions/cert';
 import { formReducer } from '../../utils/formReducer';
 import { FORM_INPUT_UPDATE } from '../../store/types';
+import CustomSpinner from '../../components/CustomSpinner';
 
 const EditCertCourse = (props) => {
   const cert = props.route.params.item;
@@ -139,7 +140,7 @@ const EditCertCourse = (props) => {
           </CustomText>
           {updatingCourse ? (
             <CustomButton style={{ marginVertical: 20 }}>
-              Updating Course...
+              Updating Course {'  '} <CustomSpinner />
             </CustomButton>
           ) : (
             <CustomButton

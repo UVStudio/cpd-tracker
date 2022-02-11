@@ -80,7 +80,7 @@ const ForgotPassword = () => {
         />
         {isLoading ? (
           <CustomButton style={{ marginVertical: 20 }}>
-            Generating Code...
+            Generating Code {'  '} <CustomSpinner />
           </CustomButton>
         ) : (
           <CustomButton
