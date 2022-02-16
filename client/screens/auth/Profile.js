@@ -6,7 +6,6 @@ import { useNavigation } from '@react-navigation/native';
 import * as authActions from '../../store/actions/auth';
 
 import CustomButton from '../../components/CustomButton';
-import CustomButtonLoading from '../../components/CustomButtonLoading';
 import CustomTitle from '../../components/CustomTitle';
 import CustomInput from '../../components/CustomInput';
 import CustomSelectField from '../../components/CustomSelectField';
@@ -23,7 +22,6 @@ import CustomProvinceSelectionCard from '../../components/CustomProvinceSelectio
 
 import { formReducer } from '../../utils/formReducer';
 import { FORM_INPUT_UPDATE, PASSWORD_INPUT_UPDATE } from '../../store/types';
-import { ActivityIndicator } from 'react-native-paper';
 import CustomSpinner from '../../components/CustomSpinner';
 
 const Profile = () => {

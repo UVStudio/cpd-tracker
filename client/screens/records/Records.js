@@ -7,7 +7,6 @@ import * as certActions from '../../store/actions/cert';
 import * as authActions from '../../store/actions/auth';
 
 import CustomButton from '../../components/CustomButton';
-import CustomButtonLoading from '../../components/CustomButtonLoading';
 import CustomBoldText from '../../components/CustomBoldText';
 import CustomTitle from '../../components/CustomTitle';
 import CustomInput from '../../components/CustomInput';

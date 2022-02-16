@@ -10,7 +10,6 @@ import {
 import { useDispatch } from 'react-redux';
 import { useNavigation } from '@react-navigation/native';
 
-import CustomButtonText from '../../components/CustomButtonText';
 import CustomFormCard from '../../components/CustomFormCard';
 import CustomInput from '../../components/CustomInput';
 import CustomSpinner from '../../components/CustomSpinner';

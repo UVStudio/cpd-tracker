@@ -13,7 +13,6 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 
 import CustomIndicator from '../../components/CustomIndicator';
 import CustomButton from '../../components/CustomButton';
-import CustomButtonLoading from '../../components/CustomButtonLoading';
 import CustomInput from '../../components/CustomInput';
 import CustomTitle from '../../components/CustomTitle';
 import CustomErrorCard from '../../components/CustomErrorCard';
@@ -32,6 +31,7 @@ import { formReducer } from '../../utils/formReducer';
 import currentYear from '../../utils/currentYear';
 import Colors from '../../constants/Colors';
 import { FORM_INPUT_UPDATE } from '../../store/types';
+import CustomSpinner from '../../components/CustomSpinner';
 
 const Timer = () => {
   const [showInputType, setShowInputType] = useState('timer');
@@ -251,7 +251,9 @@ const Timer = () => {
                     onInputChange={inputChangeHandler}
                   />
                   {savingTimed ? (
-                    <CustomButtonLoading style={{ marginVertical: 20 }} />
+                    <CustomButton style={{ marginVertical: 20 }}>
+                      Saving Timed Session {'  '} <CustomSpinner />
+                    </CustomButton>
                   ) : (
                     <CustomButton
                       onSelect={saveTimedSession}
@@ -326,7 +328,9 @@ const Timer = () => {
                 required
               />
               {savingDirect ? (
-                <CustomButtonLoading style={{ marginVertical: 20 }} />
+                <CustomButton style={{ marginVertical: 20 }}>
+                  Saving Direct Session {'  '} <CustomSpinner />
+                </CustomButton>
               ) : (
                 <CustomButton
                   onSelect={saveDirectSession}
