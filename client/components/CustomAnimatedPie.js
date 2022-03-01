@@ -46,8 +46,8 @@ const CustomAnimatedPie = (props) => {
   return (
     <View style={{ alignItems: 'center' }}>
       <Svg
-        width={radius * 4}
-        height={radius * 4}
+        width={radius * 3}
+        height={radius * 3}
         viewBox={`0 0 ${halfCircle * 2} ${halfCircle * 2}`}
       >
         <G rotation="-90" origin={(`${halfCircle}`, `${halfCircle}`)}>
@@ -70,7 +70,7 @@ const CustomAnimatedPie = (props) => {
             fill="transparent"
             strokeDasharray={circleCircumference}
             strokeDashoffset={circleCircumference}
-            strokeLinecap="round"
+            strokeLinecap="butt"
           />
         </G>
       </Svg>

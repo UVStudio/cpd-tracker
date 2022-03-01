@@ -40,7 +40,10 @@ import Colors from '../../constants/Colors';
 
 import currentYear from '../../utils/currentYear';
 //const currentYear = 2023; //test currentYear;
-import { hoursRequiredLogic } from '../../utils/hoursRequiredLogic';
+import {
+  hoursRequiredLogic,
+  showThreeYearRolling,
+} from '../../utils/hoursRequiredLogic';
 
 const transition = (
   <Transition.Together>
@@ -97,10 +100,21 @@ const Stats = ({ navigation }) => {
     currentYearNeedCPDHours,
     currentYearNeedVerHours,
     currentYearNeedEthicsHours,
-    pastShowYearNeedCPDHours,
-    pastShowYearNeedVerHours,
-    pastShowYearNeedEthicsHours,
+    totalRollingVerRequired,
+    totalRollingCPDHoursRequired,
+    totalRollingEthicsRequired,
+    pastVerHours,
+    pastNonVerHours,
+    pastEthicsHours,
+    // pastShowYearNeedCPDHours,
+    // pastShowYearNeedVerHours,
+    // pastShowYearNeedEthicsHours,
   } = hoursRequired;
+
+  console.log('showYear:', showYear);
+  console.log('pastVerHours: ', pastVerHours);
+  console.log('pastNonVerHours: ', pastNonVerHours);
+  console.log('pastEthicsHours: ', pastEthicsHours);
 
   useEffect(() => {
     if (yearsToOverride.length > 0) {
@@ -340,6 +354,15 @@ For iOS 15 and beyond, the PDF is where you have chosen to save it.`
                         </CustomBoldText>
                       ) : null}
                       <CustomStatsDivider>
+                        {elem.historic ? null : (
+                          <View>
+                            <CustomSubtitle>
+                              Your 2022 annual CPD Requiremet
+                            </CustomSubtitle>
+                            <CustomThinGreyLine />
+                          </View>
+                        )}
+
                         <Pressable onPress={() => verifiableHoursDetails()}>
                           <CustomTextStats>
                             Verifiable Hours:{'  '}
@@ -408,7 +431,7 @@ For iOS 15 and beyond, the PDF is where you have chosen to save it.`
                         </Pressable>
                       </CustomStatsDivider>
                       <CustomStatsDivider>
-                        <CustomTextStats>
+                        <CustomTextStats style={{ marginBottom: 10 }}>
                           Ethics Hours:{'  '}
                           {!elem.historic ? (
                             statsFraction(
@@ -424,6 +447,111 @@ For iOS 15 and beyond, the PDF is where you have chosen to save it.`
                           {!elem.historic ? ethicsReqOrRec() : null}
                         </CustomTextStats>
                       </CustomStatsDivider>
+                      {showThreeYearRolling(
+                        user.province,
+                        user.cpdYear,
+                        showYear
+                      ) ? (
+                        <View>
+                          <CustomStatsDivider>
+                            {elem.historic ? null : (
+                              <View>
+                                <CustomSubtitle>
+                                  Your 3 Year Rolling CPD Requiremet
+                                </CustomSubtitle>
+                              </View>
+                            )}
+                            <CustomThinGreyLine />
+                            <Pressable onPress={() => verifiableHoursDetails()}>
+                              <CustomTextStats>
+                                Verifiable Hours:{'  '}
+                                {!elem.historic ? (
+                                  statsFraction(
+                                    pastVerHours,
+                                    totalRollingVerRequired,
+                                    null
+                                  )
+                                ) : (
+                                  <Text style={{ color: Colors.dark }}>
+                                    {Number(elem.verifiable).toFixed(1)}
+                                  </Text>
+                                )}
+                                {!elem.historic ? ' - Required' : null}
+                              </CustomTextStats>
+                              {!elem.historic ? (
+                                <CustomAnimatedPie
+                                  required={currentYearNeedVerHours}
+                                  progress={elem.verifiable}
+                                />
+                              ) : null}
+                            </Pressable>
+                          </CustomStatsDivider>
+                          <CustomStatsDivider>
+                            <Pressable onPress={() => totalCPDHoursDetails()}>
+                              <CustomTextStats>
+                                Total CPD Hours:{'  '}
+                                {!elem.historic ? (
+                                  statsFraction(
+                                    pastNonVerHours,
+                                    totalRollingCPDHoursRequired,
+                                    pastVerHours
+                                  )
+                                ) : (
+                                  <Text style={{ color: 'black' }}>
+                                    {Number(
+                                      elem.nonVerifiable + elem.verifiable
+                                    ).toFixed(1)}
+                                  </Text>
+                                )}
+                                {!elem.historic ? ' - Required' : null}
+                              </CustomTextStats>
+                              {!elem.historic ? (
+                                <CustomAnimatedPie
+                                  required={currentYearNeedCPDHours}
+                                  progress={
+                                    elem.nonVerifiable + elem.verifiable
+                                  }
+                                />
+                              ) : null}
+                            </Pressable>
+                          </CustomStatsDivider>
+                          <CustomStatsDivider>
+                            <Pressable onPress={() => nonVerHoursDetails()}>
+                              <CustomTextStats>
+                                Non-Verifiable Hours:{'  '}
+                                {!elem.historic ? (
+                                  <Text
+                                    style={{ color: 'black', fontSize: 20 }}
+                                  >
+                                    {Number(pastNonVerHours).toFixed(1)}
+                                  </Text>
+                                ) : (
+                                  <Text style={{ color: 'black' }}>
+                                    {Number(pastNonVerHours).toFixed(1)}
+                                  </Text>
+                                )}
+                              </CustomTextStats>
+                            </Pressable>
+                          </CustomStatsDivider>
+                          <CustomStatsDivider>
+                            <CustomTextStats>
+                              Ethics Hours:{'  '}
+                              {!elem.historic ? (
+                                statsFraction(
+                                  elem.ethics,
+                                  totalRollingEthicsRequired,
+                                  null
+                                )
+                              ) : (
+                                <Text style={{ color: 'black' }}>
+                                  {Number(elem.ethics).toFixed(1)}
+                                </Text>
+                              )}
+                              {!elem.historic ? ethicsReqOrRec() : null}
+                            </CustomTextStats>
+                          </CustomStatsDivider>
+                        </View>
+                      ) : null}
 
                       {!elem.historic ? (
                         reportReady ? null : generatingPDF ? (

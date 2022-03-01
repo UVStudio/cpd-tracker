@@ -1,5 +1,19 @@
 import { provinceObjs } from '../constants/Provinces';
 
+const showThreeYearRolling = (province, cpdYear, showYear) => {
+  if (cpdYear > showYear - 2) return false;
+  if (cpdYear === showYear - 2) {
+    switch (province) {
+      case provinceObjs.alberta.name:
+      case provinceObjs.nwtNu.name:
+        return false;
+      default:
+        return true;
+    }
+  }
+  if (cpdYear < showYear - 2) return true;
+};
+
 const hoursRequiredLogic = (user, showYear) => {
   const { hours, province, cpdYear, cpdMonth } = user;
 
@@ -73,10 +87,6 @@ const hoursRequiredLogic = (user, showYear) => {
       pastNonVerHours = pastNonVerHours + hours[i].nonVerifiable;
       pastEthicsHours = pastEthicsHours + hours[i].ethics;
     }
-
-    // console.log('hours length: ', hours.length);
-    // console.log('index: ', index);
-    // console.log('looplength: ', loopLength);
 
     currentYearNeedCPDHours =
       totalRollingCPDHoursRequired - (pastVerHours + pastNonVerHours);
@@ -266,4 +276,4 @@ const hoursRequiredLogic = (user, showYear) => {
   };
 };
 
-export { hoursRequiredLogic };
+export { hoursRequiredLogic, showThreeYearRolling };
