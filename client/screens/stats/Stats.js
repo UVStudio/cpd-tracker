@@ -25,6 +25,7 @@ import CustomButton from '../../components/CustomButton';
 import CustomAnimatedPie from '../../components/CustomAnimatedPie';
 import CustomErrorCard from '../../components/CustomErrorCard';
 import CustomMessageCard from '../../components/CustomMessageCard';
+import CustomYearSelectionCard from '../../components/CustomYearSelectionCard';
 import CustomAccordionUnit from '../../components/CustomAccordionUnit';
 import CustomStatsDivider from '../../components/CustomStatsDivider';
 import CustomStatsInfoBox from '../../components/CustomStatsInfoBox';
@@ -55,6 +56,7 @@ const transition = (
 
 const Stats = ({ navigation }) => {
   const [showYear, setShowYear] = useState(currentYear);
+  const [yearSelectionCard, setYearSelectionCard] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [cardText, setCardText] = useState('');
@@ -110,11 +112,6 @@ const Stats = ({ navigation }) => {
     // pastShowYearNeedVerHours,
     // pastShowYearNeedEthicsHours,
   } = hoursRequired;
-
-  console.log('showYear:', showYear);
-  console.log('pastVerHours: ', pastVerHours);
-  console.log('pastNonVerHours: ', pastNonVerHours);
-  console.log('pastEthicsHours: ', pastEthicsHours);
 
   useEffect(() => {
     if (yearsToOverride.length > 0) {
@@ -313,6 +310,8 @@ For iOS 15 and beyond, the PDF is where you have chosen to save it.`
     return <CustomIndicator />;
   }
 
+  console.log('showYear: ', showYear);
+
   return (
     <Transitioning.View
       transition={transition}
@@ -321,20 +320,12 @@ For iOS 15 and beyond, the PDF is where you have chosen to save it.`
     >
       <CustomScreenContainer>
         <CustomScrollView>
-          <CustomTitle>Statistics Overview</CustomTitle>
-          <CustomGreyLine />
+          <Pressable onPress={setYearSelectionCard} disabled={reportReady}>
+            <CustomTitle>Choose Year: {showYear} </CustomTitle>
+          </Pressable>
+          <CustomGreyLine style={{ marginBottom: 0 }} />
           {userHours.map((elem, index) => (
             <CustomAccordionUnit key={index}>
-              <Pressable
-                onPress={() => {
-                  setShowYear(userHours[index].year);
-                  ref.current.animateNextTransition();
-                }}
-                disabled={reportReady}
-              >
-                <CustomSubtitle>{elem.year}</CustomSubtitle>
-              </Pressable>
-              <CustomThinGreyLine />
               {showYear === elem.year ? (
                 <CustomStatsInfoBox>
                   {currentYear !== showYear &&
@@ -357,7 +348,7 @@ For iOS 15 and beyond, the PDF is where you have chosen to save it.`
                         {elem.historic ? null : (
                           <View>
                             <CustomSubtitle>
-                              Your 2022 annual CPD Requiremet
+                              Your {elem.year} annual CPD Requiremet
                             </CustomSubtitle>
                             <CustomThinGreyLine />
                           </View>
@@ -480,8 +471,8 @@ For iOS 15 and beyond, the PDF is where you have chosen to save it.`
                               </CustomTextStats>
                               {!elem.historic ? (
                                 <CustomAnimatedPie
-                                  required={currentYearNeedVerHours}
-                                  progress={elem.verifiable}
+                                  required={totalRollingVerRequired}
+                                  progress={pastVerHours}
                                 />
                               ) : null}
                             </Pressable>
@@ -507,10 +498,8 @@ For iOS 15 and beyond, the PDF is where you have chosen to save it.`
                               </CustomTextStats>
                               {!elem.historic ? (
                                 <CustomAnimatedPie
-                                  required={currentYearNeedCPDHours}
-                                  progress={
-                                    elem.nonVerifiable + elem.verifiable
-                                  }
+                                  required={totalRollingCPDHoursRequired}
+                                  progress={pastNonVerHours + pastVerHours}
                                 />
                               ) : null}
                             </Pressable>
@@ -538,9 +527,9 @@ For iOS 15 and beyond, the PDF is where you have chosen to save it.`
                               Ethics Hours:{'  '}
                               {!elem.historic ? (
                                 statsFraction(
-                                  elem.ethics,
+                                  pastEthicsHours,
                                   totalRollingEthicsRequired,
-                                  null
+                                  elem.ethics
                                 )
                               ) : (
                                 <Text style={{ color: 'black' }}>
@@ -605,6 +594,23 @@ For iOS 15 and beyond, the PDF is where you have chosen to save it.`
                       ) : null}
                     </View>
                   )}
+                  <View style={styles.fullWidthCenter}>
+                    {isRefreshing ? (
+                      <CustomButton
+                        style={{ alignSelf: 'center', width: '100%' }}
+                      >
+                        Refreshing Data...{'   '}
+                        <CustomSpinner />
+                      </CustomButton>
+                    ) : (
+                      <CustomButton
+                        onSelect={refreshData}
+                        style={{ alignSelf: 'center', width: '100%' }}
+                      >
+                        Refresh Data
+                      </CustomButton>
+                    )}
+                  </View>
                   {currentYear > showYear ? (
                     <View style={styles.fullWidthCenter}>
                       <CustomButton
@@ -615,7 +621,7 @@ For iOS 15 and beyond, the PDF is where you have chosen to save it.`
                         }
                         style={{ alignSelf: 'center', width: '100%' }}
                       >
-                        Overwrite CPD Data
+                        Overwrite Data
                       </CustomButton>
                     </View>
                   ) : null}
@@ -623,14 +629,7 @@ For iOS 15 and beyond, the PDF is where you have chosen to save it.`
               ) : null}
             </CustomAccordionUnit>
           ))}
-          {isRefreshing ? (
-            <CustomButton>
-              Refreshing Data{'   '}
-              <CustomSpinner />
-            </CustomButton>
-          ) : (
-            <CustomButton onSelect={refreshData}>Refresh Data</CustomButton>
-          )}
+
           {/* <CustomButton onSelect={() => loadUser()}>Refresh Data</CustomButton> */}
         </CustomScrollView>
         {error !== '' ? (
@@ -638,6 +637,13 @@ For iOS 15 and beyond, the PDF is where you have chosen to save it.`
         ) : null}
         {cardText !== '' ? (
           <CustomMessageCard text={cardText} toShow={setCardText} />
+        ) : null}
+        {yearSelectionCard ? (
+          <CustomYearSelectionCard
+            toShow={setYearSelectionCard}
+            toSet={setShowYear}
+            userHours={userHours}
+          />
         ) : null}
       </CustomScreenContainer>
     </Transitioning.View>

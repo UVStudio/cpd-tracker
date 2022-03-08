@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 
 const CustomStatsInfoBox = (props) => {
   return (
@@ -13,7 +13,7 @@ const CustomStatsInfoBox = (props) => {
 
 const styles = StyleSheet.create({
   container: {
-    width: '80%',
+    width: '90%',
     alignSelf: 'center',
     alignItems: 'center',
     marginVertical: 15,
