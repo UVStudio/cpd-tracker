@@ -1,11 +1,11 @@
 import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import Colors from '../constants/Colors';
-//import { provinces } from '../constants/Provinces';
+import CustomTitle from './CustomTitle';
+import CustomThinGreyLine from './CustomThinGreyLine';
 
 const CustomYearSelectionCard = (props) => {
   const { toShow, toSet, userHours } = props;
-  // const provincesArr = provinces();
 
   //build years list for Custom Year Selection Card
   const yearsList = [];
@@ -17,19 +17,26 @@ const CustomYearSelectionCard = (props) => {
   };
   yearsListBuild();
 
-  console.log('yearsList: ', yearsList);
-
   const yearSelection = (year) => {
     toShow(false);
     toSet(year);
   };
 
+  const lastYear = yearsList.length - 1;
+
   return (
     <View style={styles.container}>
       <View style={styles.innerContainer}>
         {yearsList.map((elem, index) => (
-          <Pressable key={index} onPress={() => yearSelection(elem)}>
-            <Text style={styles.text}>{elem}</Text>
+          <Pressable
+            key={index}
+            style={{ width: '100%' }}
+            onPress={() => yearSelection(elem)}
+          >
+            <CustomTitle style={{ alignSelf: 'center', paddingBottom: 8 }}>
+              {elem}
+            </CustomTitle>
+            {elem === yearsList[lastYear] ? null : <CustomThinGreyLine />}
           </Pressable>
         ))}
       </View>
@@ -43,7 +50,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     position: 'absolute',
-    width: '86%',
+    width: '80%',
     backgroundColor: '#fff',
     opacity: 1,
     borderWidth: 5,
@@ -60,13 +67,13 @@ const styles = StyleSheet.create({
   },
   innerContainer: {
     width: '100%',
-    padding: 20,
-    marginBottom: 5,
     alignItems: 'center',
   },
   text: {
-    fontSize: 16,
-    marginVertical: 6,
+    fontSize: 22,
+    marginVertical: 10,
+    color: Colors.dark,
+    alignSelf: 'center',
     fontFamily: 'avenir-medium',
   },
 });

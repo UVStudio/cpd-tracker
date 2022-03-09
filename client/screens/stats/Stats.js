@@ -45,6 +45,7 @@ import {
   hoursRequiredLogic,
   showThreeYearRolling,
 } from '../../utils/hoursRequiredLogic';
+import CustomRowSpace from '../../components/CustomRowSpace';
 
 const transition = (
   <Transition.Together>
@@ -294,7 +295,7 @@ For iOS 15 and beyond, the PDF is where you have chosen to save it.`
     setDownloadingPDF(false);
   };
 
-  const statsFraction = (num, denom, num2) => {
+  const statsFraction = (num, num2, denom) => {
     return (
       <Text>
         <Text style={{ color: Colors.dark, fontSize: 20 }}>
@@ -306,11 +307,13 @@ For iOS 15 and beyond, the PDF is where you have chosen to save it.`
     );
   };
 
+  const retroUploads = () => {
+    console.log(`Retroactive uploads for ${showYear}`);
+  };
+
   if (loading || !user) {
     return <CustomIndicator />;
   }
-
-  console.log('showYear: ', showYear);
 
   return (
     <Transitioning.View
@@ -321,7 +324,12 @@ For iOS 15 and beyond, the PDF is where you have chosen to save it.`
       <CustomScreenContainer>
         <CustomScrollView>
           <Pressable onPress={setYearSelectionCard} disabled={reportReady}>
-            <CustomTitle>Choose Year: {showYear} </CustomTitle>
+            <CustomRowSpace style={{ marginBottom: 0, marginTop: 10 }}>
+              <Text>
+                <CustomTextStats>Choose Year:{'  '}</CustomTextStats>
+                <CustomTitle>{showYear}</CustomTitle>
+              </Text>
+            </CustomRowSpace>
           </Pressable>
           <CustomGreyLine style={{ marginBottom: 0 }} />
           {userHours.map((elem, index) => (
@@ -348,20 +356,19 @@ For iOS 15 and beyond, the PDF is where you have chosen to save it.`
                         {elem.historic ? null : (
                           <View>
                             <CustomSubtitle>
-                              Your {elem.year} annual CPD Requiremet
+                              {elem.year} annual CPD Requirement
                             </CustomSubtitle>
                             <CustomThinGreyLine />
                           </View>
                         )}
-
                         <Pressable onPress={() => verifiableHoursDetails()}>
                           <CustomTextStats>
                             Verifiable Hours:{'  '}
                             {!elem.historic ? (
                               statsFraction(
                                 elem.verifiable,
-                                currentYearNeedVerHours,
-                                null
+                                null,
+                                currentYearNeedVerHours
                               )
                             ) : (
                               <Text style={{ color: Colors.dark }}>
@@ -384,9 +391,9 @@ For iOS 15 and beyond, the PDF is where you have chosen to save it.`
                             Total CPD Hours:{'  '}
                             {!elem.historic ? (
                               statsFraction(
+                                elem.verifiable,
                                 elem.nonVerifiable,
-                                currentYearNeedCPDHours,
-                                elem.verifiable
+                                currentYearNeedCPDHours
                               )
                             ) : (
                               <Text style={{ color: 'black' }}>
@@ -427,8 +434,8 @@ For iOS 15 and beyond, the PDF is where you have chosen to save it.`
                           {!elem.historic ? (
                             statsFraction(
                               elem.ethics,
-                              currentYearNeedEthicsHours,
-                              null
+                              null,
+                              currentYearNeedEthicsHours
                             )
                           ) : (
                             <Text style={{ color: 'black' }}>
@@ -448,7 +455,7 @@ For iOS 15 and beyond, the PDF is where you have chosen to save it.`
                             {elem.historic ? null : (
                               <View>
                                 <CustomSubtitle>
-                                  Your 3 Year Rolling CPD Requiremet
+                                  3 Year Rolling CPD Requirement
                                 </CustomSubtitle>
                               </View>
                             )}
@@ -459,8 +466,8 @@ For iOS 15 and beyond, the PDF is where you have chosen to save it.`
                                 {!elem.historic ? (
                                   statsFraction(
                                     pastVerHours,
-                                    totalRollingVerRequired,
-                                    null
+                                    elem.verifiable,
+                                    totalRollingVerRequired
                                   )
                                 ) : (
                                   <Text style={{ color: Colors.dark }}>
@@ -472,7 +479,7 @@ For iOS 15 and beyond, the PDF is where you have chosen to save it.`
                               {!elem.historic ? (
                                 <CustomAnimatedPie
                                   required={totalRollingVerRequired}
-                                  progress={pastVerHours}
+                                  progress={pastVerHours + elem.verifiable}
                                 />
                               ) : null}
                             </Pressable>
@@ -484,8 +491,10 @@ For iOS 15 and beyond, the PDF is where you have chosen to save it.`
                                 {!elem.historic ? (
                                   statsFraction(
                                     pastNonVerHours,
-                                    totalRollingCPDHoursRequired,
-                                    pastVerHours
+                                    pastVerHours +
+                                      elem.verifiable +
+                                      elem.nonVerifiable,
+                                    totalRollingCPDHoursRequired
                                   )
                                 ) : (
                                   <Text style={{ color: 'black' }}>
@@ -499,7 +508,12 @@ For iOS 15 and beyond, the PDF is where you have chosen to save it.`
                               {!elem.historic ? (
                                 <CustomAnimatedPie
                                   required={totalRollingCPDHoursRequired}
-                                  progress={pastNonVerHours + pastVerHours}
+                                  progress={
+                                    pastNonVerHours +
+                                    pastVerHours +
+                                    elem.verifiable +
+                                    elem.nonVerifiable
+                                  }
                                 />
                               ) : null}
                             </Pressable>
@@ -512,7 +526,9 @@ For iOS 15 and beyond, the PDF is where you have chosen to save it.`
                                   <Text
                                     style={{ color: 'black', fontSize: 20 }}
                                   >
-                                    {Number(pastNonVerHours).toFixed(1)}
+                                    {Number(
+                                      pastNonVerHours + elem.nonVerifiable
+                                    ).toFixed(1)}
                                   </Text>
                                 ) : (
                                   <Text style={{ color: 'black' }}>
@@ -528,8 +544,8 @@ For iOS 15 and beyond, the PDF is where you have chosen to save it.`
                               {!elem.historic ? (
                                 statsFraction(
                                   pastEthicsHours,
-                                  totalRollingEthicsRequired,
-                                  elem.ethics
+                                  elem.ethics,
+                                  totalRollingEthicsRequired
                                 )
                               ) : (
                                 <Text style={{ color: 'black' }}>
@@ -566,7 +582,9 @@ For iOS 15 and beyond, the PDF is where you have chosen to save it.`
                       {reportReady ? (
                         downloadingPDF ? (
                           <View style={styles.fullWidthCenter}>
-                            <CustomButton style={{ width: '100%' }}>
+                            <CustomButton
+                              style={{ alignSelf: 'center', width: '80%' }}
+                            >
                               Downloading Your Report {'   '}
                               <CustomSpinner />
                             </CustomButton>
@@ -582,7 +600,7 @@ For iOS 15 and beyond, the PDF is where you have chosen to save it.`
                           <View style={styles.fullWidthCenter}>
                             <CustomButton
                               onSelect={downloadPDFHandler}
-                              style={{ width: '100%' }}
+                              style={{ alignSelf: 'center', width: '80%' }}
                             >
                               Download Report
                             </CustomButton>
@@ -594,24 +612,7 @@ For iOS 15 and beyond, the PDF is where you have chosen to save it.`
                       ) : null}
                     </View>
                   )}
-                  <View style={styles.fullWidthCenter}>
-                    {isRefreshing ? (
-                      <CustomButton
-                        style={{ alignSelf: 'center', width: '100%' }}
-                      >
-                        Refreshing Data...{'   '}
-                        <CustomSpinner />
-                      </CustomButton>
-                    ) : (
-                      <CustomButton
-                        onSelect={refreshData}
-                        style={{ alignSelf: 'center', width: '100%' }}
-                      >
-                        Refresh Data
-                      </CustomButton>
-                    )}
-                  </View>
-                  {currentYear > showYear ? (
+                  {elem.historic ? (
                     <View style={styles.fullWidthCenter}>
                       <CustomButton
                         onSelect={
@@ -625,12 +626,45 @@ For iOS 15 and beyond, the PDF is where you have chosen to save it.`
                       </CustomButton>
                     </View>
                   ) : null}
+                  <View style={[styles.fullWidthCenter, { marginBottom: 20 }]}>
+                    {isRefreshing ? (
+                      <CustomButton
+                        style={{ alignSelf: 'center', width: '80%' }}
+                      >
+                        Refreshing Data...{'   '}
+                        <CustomSpinner />
+                      </CustomButton>
+                    ) : (
+                      <CustomButton
+                        onSelect={refreshData}
+                        style={{ alignSelf: 'center', width: '100%' }}
+                      >
+                        Refresh Data
+                      </CustomButton>
+                    )}
+                  </View>
+                  {elem.historic ? (
+                    <View style={[styles.fullWidthCenter, { marginTop: 30 }]}>
+                      <CustomButton
+                        onSelect={
+                          downloadingPDF || generatingPDF ? null : retroUploads
+                        }
+                        style={{ alignSelf: 'center', width: '100%' }}
+                      >
+                        Retroactive Courses Uploads
+                      </CustomButton>
+                      <CustomText>
+                        If you are getting audited, and you need to provide
+                        documents to your province for CPD year {showYear},
+                        click this and upload your previous verifiable and
+                        non-verifiable hours.
+                      </CustomText>
+                    </View>
+                  ) : null}
                 </CustomStatsInfoBox>
               ) : null}
             </CustomAccordionUnit>
           ))}
-
-          {/* <CustomButton onSelect={() => loadUser()}>Refresh Data</CustomButton> */}
         </CustomScrollView>
         {error !== '' ? (
           <CustomErrorCard error={error} toShow={setError} />

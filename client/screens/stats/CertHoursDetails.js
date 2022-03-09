@@ -1,27 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { Pressable } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useSelector, useDispatch } from 'react-redux';
-import { Ionicons } from '@expo/vector-icons';
 
 import * as certsActions from '../../store/actions/cert';
 import * as authActions from '../../store/actions/auth';
 
 import CustomTitle from '../../components/CustomTitle';
-import CustomText from '../../components/CustomText';
 import CustomGreyLine from '../../components/CustomGreyLine';
-import CustomFaintThinGreyLine from '../../components/CustomFaintThinGreyLine';
 import CustomErrorCard from '../../components/CustomErrorCard';
-import CustomStatsInfoBox from '../../components/CustomStatsInfoBox';
 import CustomIndicator from '../../components/CustomIndicator';
 import CustomScrollView from '../../components/CustomScrollView';
 import CustomConfirmActionCard from '../../components/CustomConfirmActionCard';
-import CustomFullWidthContainer from '../../components/CustomFullWidthContainer';
 import CustomScreenContainer from '../../components/CustomScreenContainer';
-import CustomRowSpace from '../../components/CustomRowSpace';
 import CustomCertHoursDetails from '../../components/CustomCertHoursDetails';
-
-import Colors from '../../constants/Colors';
 
 const CertHoursDetails = (props) => {
   const { year } = props.route.params;
