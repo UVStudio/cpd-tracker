@@ -1,13 +1,15 @@
 import React, { useEffect, useRef } from 'react';
-import { View, Easing, Animated } from 'react-native';
+import { View, Easing, Pressable, Animated } from 'react-native';
 import Svg, { G, Circle } from 'react-native-svg';
 import Colors from '../constants/Colors';
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
 const CustomAnimatedPie = (props) => {
-  let { required, progress } = props;
+  const { required, progress, CPDdetails } = props;
+
   if (progress > required) progress = required;
+
   const radius = 40;
   const strokeWidth = 20;
   const halfCircle = radius + strokeWidth;
@@ -45,35 +47,37 @@ const CustomAnimatedPie = (props) => {
 
   return (
     <View style={{ alignItems: 'center' }}>
-      <Svg
-        width={radius * 3}
-        height={radius * 3}
-        viewBox={`0 0 ${halfCircle * 2} ${halfCircle * 2}`}
-      >
-        <G rotation="-90" origin={(`${halfCircle}`, `${halfCircle}`)}>
-          <Circle
-            cy="50%"
-            cx="50%"
-            stroke={Colors.lightGrey}
-            strokeWidth={strokeWidth}
-            r={radius}
-            fill="transparent"
-            strokeOpacity={0.7}
-          />
-          <AnimatedCircle
-            ref={circleRef}
-            cy="50%"
-            cx="50%"
-            stroke={pieColor(required, progress)}
-            strokeWidth={strokeWidth}
-            r={radius}
-            fill="transparent"
-            strokeDasharray={circleCircumference}
-            strokeDashoffset={circleCircumference}
-            strokeLinecap="butt"
-          />
-        </G>
-      </Svg>
+      <Pressable onPress={CPDdetails}>
+        <Svg
+          width={radius * 3}
+          height={radius * 3}
+          viewBox={`0 0 ${halfCircle * 2} ${halfCircle * 2}`}
+        >
+          <G rotation="-90" origin={(`${halfCircle}`, `${halfCircle}`)}>
+            <Circle
+              cy="50%"
+              cx="50%"
+              stroke={Colors.lightGrey}
+              strokeWidth={strokeWidth}
+              r={radius}
+              fill="transparent"
+              strokeOpacity={0.7}
+            />
+            <AnimatedCircle
+              ref={circleRef}
+              cy="50%"
+              cx="50%"
+              stroke={pieColor(required, progress)}
+              strokeWidth={strokeWidth}
+              r={radius}
+              fill="transparent"
+              strokeDasharray={circleCircumference}
+              strokeDashoffset={circleCircumference}
+              strokeLinecap="butt"
+            />
+          </G>
+        </Svg>
+      </Pressable>
     </View>
   );
 };

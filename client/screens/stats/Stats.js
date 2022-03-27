@@ -377,13 +377,14 @@ For iOS 15 and beyond, the PDF is where you have chosen to save it.`
                             )}
                             {!elem.historic ? ' - Required' : null}
                           </CustomTextStats>
-                          {!elem.historic ? (
-                            <CustomAnimatedPie
-                              required={currentYearNeedVerHours}
-                              progress={elem.verifiable}
-                            />
-                          ) : null}
                         </Pressable>
+                        {!elem.historic ? (
+                          <CustomAnimatedPie
+                            required={currentYearNeedVerHours}
+                            progress={elem.verifiable}
+                            CPDdetails={verifiableHoursDetails}
+                          />
+                        ) : null}
                       </CustomStatsDivider>
                       <CustomStatsDivider>
                         <Pressable onPress={() => totalCPDHoursDetails()}>
@@ -404,13 +405,14 @@ For iOS 15 and beyond, the PDF is where you have chosen to save it.`
                             )}
                             {!elem.historic ? ' - Required' : null}
                           </CustomTextStats>
-                          {!elem.historic ? (
-                            <CustomAnimatedPie
-                              required={currentYearNeedCPDHours}
-                              progress={elem.nonVerifiable + elem.verifiable}
-                            />
-                          ) : null}
                         </Pressable>
+                        {!elem.historic ? (
+                          <CustomAnimatedPie
+                            required={currentYearNeedCPDHours}
+                            progress={elem.nonVerifiable + elem.verifiable}
+                            CPDdetails={totalCPDHoursDetails}
+                          />
+                        ) : null}
                       </CustomStatsDivider>
                       <CustomStatsDivider>
                         <Pressable onPress={() => nonVerHoursDetails()}>
@@ -476,13 +478,14 @@ For iOS 15 and beyond, the PDF is where you have chosen to save it.`
                                 )}
                                 {!elem.historic ? ' - Required' : null}
                               </CustomTextStats>
-                              {!elem.historic ? (
-                                <CustomAnimatedPie
-                                  required={totalRollingVerRequired}
-                                  progress={pastVerHours + elem.verifiable}
-                                />
-                              ) : null}
                             </Pressable>
+                            {!elem.historic ? (
+                              <CustomAnimatedPie
+                                required={totalRollingVerRequired}
+                                progress={pastVerHours + elem.verifiable}
+                                CPDdetails={verifiableHoursDetails}
+                              />
+                            ) : null}
                           </CustomStatsDivider>
                           <CustomStatsDivider>
                             <Pressable onPress={() => totalCPDHoursDetails()}>
@@ -505,18 +508,19 @@ For iOS 15 and beyond, the PDF is where you have chosen to save it.`
                                 )}
                                 {!elem.historic ? ' - Required' : null}
                               </CustomTextStats>
-                              {!elem.historic ? (
-                                <CustomAnimatedPie
-                                  required={totalRollingCPDHoursRequired}
-                                  progress={
-                                    pastNonVerHours +
-                                    pastVerHours +
-                                    elem.verifiable +
-                                    elem.nonVerifiable
-                                  }
-                                />
-                              ) : null}
                             </Pressable>
+                            {!elem.historic ? (
+                              <CustomAnimatedPie
+                                required={totalRollingCPDHoursRequired}
+                                progress={
+                                  pastNonVerHours +
+                                  pastVerHours +
+                                  elem.verifiable +
+                                  elem.nonVerifiable
+                                }
+                                CPDdetails={totalCPDHoursDetails}
+                              />
+                            ) : null}
                           </CustomStatsDivider>
                           <CustomStatsDivider>
                             <Pressable onPress={() => nonVerHoursDetails()}>
