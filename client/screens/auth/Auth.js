@@ -27,7 +27,7 @@ const Auth = () => {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isSignup, setIsSignup] = useState(false);
-  const [isLogging, setIsLogging] = useState(false);
+  const [isLogging, setIsLogging] = useState(true);
   const [isRegistering, setIsRegistering] = useState(false);
   const [provinceCard, setProvinceCard] = useState(false);
   const [province, setProvince] = useState('');
@@ -262,7 +262,7 @@ const Auth = () => {
                   )
                 ) : isLogging ? (
                   <Text>
-                    Login in {'  '}
+                    Loggin in {'  '}
                     <CustomSpinner />
                   </Text>
                 ) : (
@@ -328,7 +328,7 @@ const styles = StyleSheet.create({
   label: {
     marginVertical: 2,
     marginTop: 4,
-    fontFamily: ' avenir-medium',
+    fontFamily: 'avenir-medium',
   },
   rowSpaceBetween: {
     flexDirection: 'row',

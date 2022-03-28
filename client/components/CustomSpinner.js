@@ -1,14 +1,33 @@
-import React from 'react';
-import { View, Easing, Animated } from 'react-native';
+import { addListener } from 'expo-media-library';
+import React, { useEffect, useRef } from 'react';
+import { Platform, Easing, Animated } from 'react-native';
 import Svg, { G, Circle } from 'react-native-svg';
+
+const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
 const CustomSpinner = (props) => {
   const radius = 4;
   const strokeWidth = radius / 4;
   const halfCircle = radius + strokeWidth;
   const circleCircumference = 2 * Math.PI * radius;
+  const percentage = 80;
+  const max = 100;
+
+  const circleRef = useRef();
 
   const spinValue = new Animated.Value(0);
+  const lengthValue = useRef(new Animated.Value(0)).current;
+
+  const animation = (toValue) => {
+    return Animated.timing(lengthValue, {
+      toValue,
+      duration: 800,
+      easing: Easing.in.cubic,
+      useNativeDriver: true,
+    }).start(() => {
+      animation(toValue === 0 ? percentage : 0);
+    });
+  };
 
   Animated.loop(
     Animated.timing(spinValue, {
@@ -20,14 +39,29 @@ const CustomSpinner = (props) => {
 
   const spin = spinValue.interpolate({
     inputRange: [0, 1],
-    outputRange: [0, 6],
+    outputRange: ['0deg', '360deg'],
   });
+
+  useEffect(() => {
+    animation(percentage);
+    lengthValue.addListener((v) => {
+      const maxPerc = (100 * v.value) / max;
+      const strokeDashoffset =
+        circleCircumference - (circleCircumference * maxPerc) / 100;
+      if (circleRef?.current) {
+        circleRef.current.setNativeProps({
+          strokeDashoffset,
+        });
+      }
+    });
+  }, [percentage]);
 
   return (
     <Animated.View
       style={{
-        position: 'absolute',
-        transform: [{ translateY: 2, rotate: spin }],
+        transform: [
+          { translateY: Platform.OS === 'ios' ? 8 : 2, rotate: spin },
+        ],
       }}
     >
       <Svg
@@ -36,14 +70,18 @@ const CustomSpinner = (props) => {
         viewBox={`0 0 ${halfCircle * 2} ${halfCircle * 2}`}
       >
         <G>
-          <Circle
+          <AnimatedCircle
+            ref={circleRef}
             cy="50%"
             cx="50%"
             stroke="white"
             strokeWidth={strokeWidth}
             r={radius}
             fill="transparent"
-            strokeOpacity={0.3}
+            strokeDasharray={circleCircumference}
+            strokeDashoffset={circleCircumference}
+            strokeOpacity={1}
+            strokeLinecap="round"
           />
           <Circle
             cy="50%"
@@ -52,9 +90,7 @@ const CustomSpinner = (props) => {
             strokeWidth={strokeWidth}
             r={radius}
             fill="transparent"
-            strokeDasharray={circleCircumference}
-            strokeDashoffset={circleCircumference / 2}
-            strokeOpacity={1}
+            strokeOpacity={0}
           />
         </G>
       </Svg>
