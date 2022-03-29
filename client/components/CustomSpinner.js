@@ -1,4 +1,3 @@
-import { addListener } from 'expo-media-library';
 import React, { useEffect, useRef } from 'react';
 import { Platform, Easing, Animated } from 'react-native';
 import Svg, { G, Circle } from 'react-native-svg';

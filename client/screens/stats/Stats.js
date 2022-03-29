@@ -387,6 +387,22 @@ For iOS 15 and beyond, the PDF is where you have chosen to save it.`
                         ) : null}
                       </CustomStatsDivider>
                       <CustomStatsDivider>
+                        <Pressable onPress={() => nonVerHoursDetails()}>
+                          <CustomTextStats>
+                            Non-Verifiable Hours:{'  '}
+                            {!elem.historic ? (
+                              <Text style={{ color: 'black', fontSize: 20 }}>
+                                {Number(elem.nonVerifiable).toFixed(1)}
+                              </Text>
+                            ) : (
+                              <Text style={{ color: 'black' }}>
+                                {Number(elem.nonVerifiable).toFixed(1)}
+                              </Text>
+                            )}
+                          </CustomTextStats>
+                        </Pressable>
+                      </CustomStatsDivider>
+                      <CustomStatsDivider>
                         <Pressable onPress={() => totalCPDHoursDetails()}>
                           <CustomTextStats>
                             Total CPD Hours:{'  '}
@@ -413,22 +429,6 @@ For iOS 15 and beyond, the PDF is where you have chosen to save it.`
                             CPDdetails={totalCPDHoursDetails}
                           />
                         ) : null}
-                      </CustomStatsDivider>
-                      <CustomStatsDivider>
-                        <Pressable onPress={() => nonVerHoursDetails()}>
-                          <CustomTextStats>
-                            Non-Verifiable Hours:{'  '}
-                            {!elem.historic ? (
-                              <Text style={{ color: 'black', fontSize: 20 }}>
-                                {Number(elem.nonVerifiable).toFixed(1)}
-                              </Text>
-                            ) : (
-                              <Text style={{ color: 'black' }}>
-                                {Number(elem.nonVerifiable).toFixed(1)}
-                              </Text>
-                            )}
-                          </CustomTextStats>
-                        </Pressable>
                       </CustomStatsDivider>
                       <CustomStatsDivider>
                         <CustomTextStats style={{ marginBottom: 10 }}>
@@ -488,6 +488,26 @@ For iOS 15 and beyond, the PDF is where you have chosen to save it.`
                             ) : null}
                           </CustomStatsDivider>
                           <CustomStatsDivider>
+                            <Pressable onPress={() => nonVerHoursDetails()}>
+                              <CustomTextStats>
+                                Non-Verifiable Hours:{'  '}
+                                {!elem.historic ? (
+                                  <Text
+                                    style={{ color: 'black', fontSize: 20 }}
+                                  >
+                                    {Number(
+                                      pastNonVerHours + elem.nonVerifiable
+                                    ).toFixed(1)}
+                                  </Text>
+                                ) : (
+                                  <Text style={{ color: 'black' }}>
+                                    {Number(pastNonVerHours).toFixed(1)}
+                                  </Text>
+                                )}
+                              </CustomTextStats>
+                            </Pressable>
+                          </CustomStatsDivider>
+                          <CustomStatsDivider>
                             <Pressable onPress={() => totalCPDHoursDetails()}>
                               <CustomTextStats>
                                 Total CPD Hours:{'  '}
@@ -521,26 +541,6 @@ For iOS 15 and beyond, the PDF is where you have chosen to save it.`
                                 CPDdetails={totalCPDHoursDetails}
                               />
                             ) : null}
-                          </CustomStatsDivider>
-                          <CustomStatsDivider>
-                            <Pressable onPress={() => nonVerHoursDetails()}>
-                              <CustomTextStats>
-                                Non-Verifiable Hours:{'  '}
-                                {!elem.historic ? (
-                                  <Text
-                                    style={{ color: 'black', fontSize: 20 }}
-                                  >
-                                    {Number(
-                                      pastNonVerHours + elem.nonVerifiable
-                                    ).toFixed(1)}
-                                  </Text>
-                                ) : (
-                                  <Text style={{ color: 'black' }}>
-                                    {Number(pastNonVerHours).toFixed(1)}
-                                  </Text>
-                                )}
-                              </CustomTextStats>
-                            </Pressable>
                           </CustomStatsDivider>
                           <CustomStatsDivider>
                             <CustomTextStats>

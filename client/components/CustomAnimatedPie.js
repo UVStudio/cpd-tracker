@@ -6,7 +6,7 @@ import Colors from '../constants/Colors';
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
 const CustomAnimatedPie = (props) => {
-  const { required, progress, CPDdetails } = props;
+  let { required, progress, CPDdetails } = props;
 
   if (progress > required) progress = required;
 

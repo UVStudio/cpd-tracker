@@ -1,8 +1,9 @@
 import React, { useState, useReducer, useCallback } from 'react';
-import { StyleSheet } from 'react-native';
+import { Platform, StyleSheet } from 'react-native';
 import { useDispatch } from 'react-redux';
 
-import * as DocumentPicker from 'expo-document-picker';
+//import * as DocumentPicker from 'expo-document-picker';
+import * as DocumentPicker from 'react-native-document-picker';
 import * as certActions from '../../store/actions/cert';
 import * as authActions from '../../store/actions/auth';
 
@@ -62,13 +63,16 @@ const Records = () => {
   );
 
   const addCertHandler = async () => {
+    console.log('platform: ', Platform);
     try {
-      const file = await DocumentPicker.getDocumentAsync({
-        type: '*/*',
+      const file = await DocumentPicker.pickSingle({
+        type: Platform.OS === 'ios' ? 'public.item' : '*/*',
         copyToCacheDirectory: false,
       });
 
-      if (file.type === 'success') {
+      //console.log('file: ', file);
+
+      if (file.size > 0) {
         setCert(file);
       }
     } catch (err) {
