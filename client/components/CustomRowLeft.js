@@ -1,20 +1,20 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
 
-const CustomRowSpace = (props) => {
+const CustomRowLeft = (props) => {
   return (
-    <View style={{ ...styles.rowSpaceBetween, ...props.style }}>
+    <View style={{ ...styles.rowSpaceLeft, ...props.style }}>
       {props.children}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  rowSpaceBetween: {
+  rowSpaceLeft: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-start',
     marginVertical: 5,
   },
 });
 
-export default CustomRowSpace;
+export default CustomRowLeft;

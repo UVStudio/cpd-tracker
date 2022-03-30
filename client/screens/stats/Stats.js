@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import RNFS from 'react-native-fs';
 import { Transition, Transitioning } from 'react-native-reanimated';
+import { FontAwesome } from '@expo/vector-icons';
 
 import * as Sharing from 'expo-sharing';
 import * as authActions from '../../store/actions/auth';
@@ -35,6 +36,7 @@ import CustomThinGreyLine from '../../components/CustomThinGreyLine';
 import CustomScrollView from '../../components/CustomScrollView';
 import CustomScreenContainer from '../../components/CustomScreenContainer';
 import CustomDownloadProgressBar from '../../components/CustomDownloadProgressBar';
+import CustomRemainingHours from '../../components/CustomRemainingHours';
 
 import { provinceObjs } from '../../constants/Provinces';
 import Colors from '../../constants/Colors';
@@ -46,6 +48,7 @@ import {
   showThreeYearRolling,
 } from '../../utils/hoursRequiredLogic';
 import CustomRowSpace from '../../components/CustomRowSpace';
+import CustomRowLeft from '../../components/CustomRowLeft';
 
 const transition = (
   <Transition.Together>
@@ -62,13 +65,15 @@ const Stats = ({ navigation }) => {
   const [error, setError] = useState('');
   const [cardText, setCardText] = useState('');
   const [generatingPDF, setGeneratingPDF] = useState(false);
-  const [downloadingPDF, setDownloadingPDF] = useState(false);
+  const [downloadingPDF, setDownloadingPDF] = useState(true);
   const [dirPath, setDirPath] = useState(`${RNFS.DocumentDirectoryPath}`);
   const [downloadProgress, setDownloadProgress] = useState(0);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const authState = useSelector((state) => state.auth.user);
   const reportReady = useSelector((state) => state.report.report);
+
+  const dispatch = useDispatch();
   const ref = useRef();
 
   useEffect(() => {
@@ -95,8 +100,6 @@ const Stats = ({ navigation }) => {
     .filter((hours) => hours.historic)
     .filter((hours) => !hours.overriden);
 
-  const dispatch = useDispatch();
-
   const hoursRequired = hoursRequiredLogic(user, showYear);
 
   const {
@@ -114,6 +117,8 @@ const Stats = ({ navigation }) => {
     // pastShowYearNeedEthicsHours,
   } = hoursRequired;
 
+  // console.log(pastNonVerHours);
+
   useEffect(() => {
     if (yearsToOverride.length > 0) {
       navigation.navigate('CPD Hours Setup', { yearsToOverride });
@@ -121,7 +126,7 @@ const Stats = ({ navigation }) => {
     }
     if (currentYearNeedCPDHours === 20 && yearsToOverride.length === 0) {
       setCardText(
-        'While you are only required to obtain 20 CPD hours this year, 10 of which needs to be verifiable, you are encouraged to get 2x as many, so you will have an easier time meeting the CPD 3 year rolling requirement in the near future.'
+        'While you are only required to obtain 20 CPD hours this year, 10 of which needs to be verifiable, you are encouraged to get 2x as many, so you will have an easier time meeting the CPD 3-year rolling requirement in the near future.'
       );
     }
   }, [user]);
@@ -307,6 +312,39 @@ For iOS 15 and beyond, the PDF is where you have chosen to save it.`
     );
   };
 
+  const requiredVerRules = () => {
+    if (showThreeYearRolling(user.province, user.cpdYear, showYear)) {
+      setCardText(
+        `The annual Verifiable and total CPD hours requirements are calculated based on your hours for the previous 2 years, if the 3-year rolling requirement is applicable for ${showYear}.
+
+From the previous 2 years, you have earned a total of ${pastVerHours} verifiable hours, which means you will need to earn ${
+          60 - pastVerHours
+        } verifiable hours in ${showYear} to satisfy your 3-year rolling Verifiable hours requirement.`
+      );
+    } else {
+      setCardText(
+        'While you are only required to obtain 20 CPD hours this year, 10 of which needs to be verifiable, you are encouraged to get 2x as many, so you will have an easier time meeting the CPD 3-year rolling requirement in the near future.'
+      );
+    }
+  };
+
+  const requiredTotalCPDRules = () => {
+    if (showThreeYearRolling(user.province, user.cpdYear, showYear)) {
+      setCardText(`The annual Verifiable and total CPD hours requirements are calculated based on your hours for the previous 2 years, if the 3-year rolling requirement is applicable for ${showYear}.
+      
+From the previous 2 years, you have earned a total of ${
+        pastNonVerHours + pastVerHours
+      } CPD hours, which means you will need to earn ${
+        120 - pastNonVerHours - pastVerHours
+      } total CPD hours in ${showYear} to satisfy your total CPD hours requirements.
+    `);
+    } else {
+      setCardText(
+        'While you are only required to obtain 20 CPD hours this year, 10 of which needs to be verifiable, you are encouraged to get 2x as many, so you will have an easier time meeting the CPD 3-year rolling requirement in the near future.'
+      );
+    }
+  };
+
   const retroUploads = () => {
     console.log(`Retroactive uploads for ${showYear}`);
   };
@@ -326,7 +364,7 @@ For iOS 15 and beyond, the PDF is where you have chosen to save it.`
           <Pressable onPress={setYearSelectionCard} disabled={reportReady}>
             <CustomRowSpace style={{ marginBottom: 0, marginTop: 10 }}>
               <Text>
-                <CustomTextStats>Choose Year:{'  '}</CustomTextStats>
+                <CustomTextStats>View Year:{'  '}</CustomTextStats>
                 <CustomTitle>{showYear}</CustomTitle>
               </Text>
             </CustomRowSpace>
@@ -341,7 +379,7 @@ For iOS 15 and beyond, the PDF is where you have chosen to save it.`
                     <CustomText>
                       Looks like you did not use the CPD Tracker App for the
                       year of {showYear}. In order for the app to calculate how
-                      many hours you need for {currentYear}, and beyond,
+                      many hours you need for {currentYear} and beyond,
                       properly, please click on the 'Overwrite CPD Data' button
                       to manually input your CPD hours for {showYear}.
                     </CustomText>
@@ -361,23 +399,42 @@ For iOS 15 and beyond, the PDF is where you have chosen to save it.`
                             <CustomThinGreyLine />
                           </View>
                         )}
-                        <Pressable onPress={() => verifiableHoursDetails()}>
-                          <CustomTextStats>
-                            Verifiable Hours:{'  '}
-                            {!elem.historic ? (
-                              statsFraction(
-                                elem.verifiable,
-                                null,
-                                currentYearNeedVerHours
-                              )
-                            ) : (
-                              <Text style={{ color: Colors.dark }}>
-                                {Number(elem.verifiable).toFixed(1)}
-                              </Text>
-                            )}
-                            {!elem.historic ? ' - Required' : null}
-                          </CustomTextStats>
-                        </Pressable>
+                        <CustomRowLeft>
+                          <Pressable onPress={() => verifiableHoursDetails()}>
+                            <CustomTextStats>
+                              Verifiable Hours:{'  '}
+                              {!elem.historic ? (
+                                statsFraction(
+                                  elem.verifiable,
+                                  null,
+                                  currentYearNeedVerHours
+                                )
+                              ) : (
+                                <CustomTextStats style={{ color: Colors.dark }}>
+                                  {Number(elem.verifiable).toFixed(1)}
+                                </CustomTextStats>
+                              )}
+                            </CustomTextStats>
+                          </Pressable>
+                          {!elem.historic ? (
+                            <Pressable
+                              onPress={() => requiredVerRules()}
+                              style={{ flexDirection: 'row' }}
+                            >
+                              <CustomTextStats style={styles.required}>
+                                {' '}
+                                - Required
+                              </CustomTextStats>
+                              <FontAwesome
+                                name="exclamation-circle"
+                                size={20}
+                                color={Colors.darkOrange}
+                                style={styles.quotation}
+                              />
+                            </Pressable>
+                          ) : null}
+                        </CustomRowLeft>
+
                         {!elem.historic ? (
                           <CustomAnimatedPie
                             required={currentYearNeedVerHours}
@@ -403,25 +460,43 @@ For iOS 15 and beyond, the PDF is where you have chosen to save it.`
                         </Pressable>
                       </CustomStatsDivider>
                       <CustomStatsDivider>
-                        <Pressable onPress={() => totalCPDHoursDetails()}>
-                          <CustomTextStats>
-                            Total CPD Hours:{'  '}
-                            {!elem.historic ? (
-                              statsFraction(
-                                elem.verifiable,
-                                elem.nonVerifiable,
-                                currentYearNeedCPDHours
-                              )
-                            ) : (
-                              <Text style={{ color: 'black' }}>
-                                {Number(
-                                  elem.nonVerifiable + elem.verifiable
-                                ).toFixed(1)}
-                              </Text>
-                            )}
-                            {!elem.historic ? ' - Required' : null}
-                          </CustomTextStats>
-                        </Pressable>
+                        <CustomRowLeft>
+                          <Pressable onPress={() => totalCPDHoursDetails()}>
+                            <CustomTextStats>
+                              Total CPD Hours:{'  '}
+                              {!elem.historic ? (
+                                statsFraction(
+                                  elem.verifiable,
+                                  elem.nonVerifiable,
+                                  currentYearNeedCPDHours
+                                )
+                              ) : (
+                                <Text style={{ color: 'black' }}>
+                                  {Number(
+                                    elem.nonVerifiable + elem.verifiable
+                                  ).toFixed(1)}
+                                </Text>
+                              )}
+                            </CustomTextStats>
+                          </Pressable>
+                          {!elem.historic ? (
+                            <Pressable
+                              onPress={() => requiredTotalCPDRules()}
+                              style={{ flexDirection: 'row' }}
+                            >
+                              <CustomTextStats style={styles.required}>
+                                {' '}
+                                - Required
+                              </CustomTextStats>
+                              <FontAwesome
+                                name="exclamation-circle"
+                                size={20}
+                                color={Colors.darkOrange}
+                                style={styles.quotation}
+                              />
+                            </Pressable>
+                          ) : null}
+                        </CustomRowLeft>
                         {!elem.historic ? (
                           <CustomAnimatedPie
                             required={currentYearNeedCPDHours}
@@ -447,6 +522,24 @@ For iOS 15 and beyond, the PDF is where you have chosen to save it.`
                           {!elem.historic ? ethicsReqOrRec() : null}
                         </CustomTextStats>
                       </CustomStatsDivider>
+                      <CustomStatsDivider
+                        style={{ marginTop: 10, marginBottom: 25 }}
+                      >
+                        {!elem.historic ? (
+                          <CustomRemainingHours
+                            currentYearNeedVerHours={currentYearNeedVerHours}
+                            currentYearNeedCPDHours={currentYearNeedCPDHours}
+                            currentYearNeedEthicsHours={
+                              currentYearNeedEthicsHours
+                            }
+                            verifiable={elem.verifiable}
+                            nonVerifiable={elem.nonVerifiable}
+                            ethics={elem.ethics}
+                            showYear={showYear}
+                          />
+                        ) : null}
+                      </CustomStatsDivider>
+
                       {showThreeYearRolling(
                         user.province,
                         user.cpdYear,
@@ -595,10 +688,12 @@ For iOS 15 and beyond, the PDF is where you have chosen to save it.`
                             <CustomText style={{ alignSelf: 'center' }}>
                               {downloadProgress + ' %'}
                             </CustomText>
-                            <CustomDownloadProgressBar
-                              progress={downloadProgress}
-                              fileSize={100}
-                            />
+                            <View style={{ alignSelf: 'center' }}>
+                              <CustomDownloadProgressBar
+                                progress={downloadProgress}
+                                fileSize={100}
+                              />
+                            </View>
                           </View>
                         ) : (
                           <View style={styles.fullWidthCenter}>
@@ -697,6 +792,15 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
+  },
+  required: {
+    transform: [{ translateY: 4 }],
+    color: Colors.primary,
+  },
+  quotation: {
+    transform: [{ translateY: 3 }],
+    marginLeft: 5,
+    opacity: 0.6,
   },
 });
 

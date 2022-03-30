@@ -6,7 +6,7 @@ const CustomDownloadProgressBar = (props) => {
   const { width } = useWindowDimensions();
 
   //set total bar width at 75% of screen width
-  const barWidth = 0.75 * width;
+  const barWidth = 0.7 * width;
 
   const { progress, fileSize } = props;
 
