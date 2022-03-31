@@ -1,5 +1,5 @@
 import React from 'react';
-import { Text, View, StyleSheet, Platform } from 'react-native';
+import { Text, View, StyleSheet } from 'react-native';
 import CustomButton from './CustomButton';
 import Colors from '../constants/Colors';
 import delayButton from '../utils/delayButton';

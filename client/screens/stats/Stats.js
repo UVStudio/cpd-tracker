@@ -39,6 +39,11 @@ import CustomDownloadProgressBar from '../../components/CustomDownloadProgressBa
 import CustomRemainingHours from '../../components/CustomRemainingHours';
 
 import { provinceObjs } from '../../constants/Provinces';
+import statsFraction from '../../utils/statsFraction';
+import {
+  requiredVerRules,
+  requiredTotalCPDRules,
+} from '../../utils/requiredRulesCardText';
 import Colors from '../../constants/Colors';
 
 import currentYear from '../../utils/currentYear';
@@ -300,51 +305,6 @@ For iOS 15 and beyond, the PDF is where you have chosen to save it.`
     setDownloadingPDF(false);
   };
 
-  const statsFraction = (num, num2, denom) => {
-    return (
-      <Text>
-        <Text style={{ color: Colors.dark, fontSize: 20 }}>
-          {Number(num + num2).toFixed(1)}
-        </Text>
-        <Text>{'  /  '}</Text>
-        <Text>{Number(denom).toFixed(1)}</Text>
-      </Text>
-    );
-  };
-
-  const requiredVerRules = () => {
-    if (showThreeYearRolling(user.province, user.cpdYear, showYear)) {
-      setCardText(
-        `The annual Verifiable and total CPD hours requirements are calculated based on your hours for the previous 2 years, if the 3-year rolling requirement is applicable for ${showYear}.
-
-From the previous 2 years, you have earned a total of ${pastVerHours} verifiable hours, which means you will need to earn ${
-          60 - pastVerHours
-        } verifiable hours in ${showYear} to satisfy your 3-year rolling Verifiable hours requirement.`
-      );
-    } else {
-      setCardText(
-        'While you are only required to obtain 20 CPD hours this year, 10 of which needs to be verifiable, you are encouraged to get 2x as many, so you will have an easier time meeting the CPD 3-year rolling requirement in the near future.'
-      );
-    }
-  };
-
-  const requiredTotalCPDRules = () => {
-    if (showThreeYearRolling(user.province, user.cpdYear, showYear)) {
-      setCardText(`The annual Verifiable and total CPD hours requirements are calculated based on your hours for the previous 2 years, if the 3-year rolling requirement is applicable for ${showYear}.
-      
-From the previous 2 years, you have earned a total of ${
-        pastNonVerHours + pastVerHours
-      } CPD hours, which means you will need to earn ${
-        120 - pastNonVerHours - pastVerHours
-      } total CPD hours in ${showYear} to satisfy your total CPD hours requirements.
-    `);
-    } else {
-      setCardText(
-        'While you are only required to obtain 20 CPD hours this year, 10 of which needs to be verifiable, you are encouraged to get 2x as many, so you will have an easier time meeting the CPD 3-year rolling requirement in the near future.'
-      );
-    }
-  };
-
   const retroUploads = () => {
     console.log(`Retroactive uploads for ${showYear}`);
   };
@@ -418,7 +378,15 @@ From the previous 2 years, you have earned a total of ${
                           </Pressable>
                           {!elem.historic ? (
                             <Pressable
-                              onPress={() => requiredVerRules()}
+                              onPress={() =>
+                                requiredVerRules(
+                                  user.province,
+                                  user.cpdYear,
+                                  showYear,
+                                  pastVerHours,
+                                  setCardText
+                                )
+                              }
                               style={{ flexDirection: 'row' }}
                             >
                               <CustomTextStats style={styles.required}>
@@ -481,7 +449,16 @@ From the previous 2 years, you have earned a total of ${
                           </Pressable>
                           {!elem.historic ? (
                             <Pressable
-                              onPress={() => requiredTotalCPDRules()}
+                              onPress={() =>
+                                requiredTotalCPDRules(
+                                  user.province,
+                                  user.cpdYear,
+                                  showYear,
+                                  pastVerHours,
+                                  pastNonVerHours,
+                                  setCardText
+                                )
+                              }
                               style={{ flexDirection: 'row' }}
                             >
                               <CustomTextStats style={styles.required}>
