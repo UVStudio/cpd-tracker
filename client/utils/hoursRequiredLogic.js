@@ -29,7 +29,7 @@ const hoursRequiredLogic = (user, showYear) => {
       }
       return 20;
     } else {
-      return 20;
+      return 120;
     }
   };
 
@@ -40,7 +40,7 @@ const hoursRequiredLogic = (user, showYear) => {
       }
       return 3;
     } else {
-      return 3;
+      return 4;
     }
   };
 

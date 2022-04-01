@@ -15,6 +15,7 @@ import CustomIndicator from '../../components/CustomIndicator';
 import CustomButton from '../../components/CustomButton';
 import CustomInput from '../../components/CustomInput';
 import CustomTitle from '../../components/CustomTitle';
+import CustomText from '../../components/CustomText';
 import CustomErrorCard from '../../components/CustomErrorCard';
 import CustomSelectField from '../../components/CustomSelectField';
 import CustomMessageCard from '../../components/CustomMessageCard';
@@ -90,12 +91,6 @@ const Timer = () => {
   const hours = Number((seconds / 3600).toFixed(2));
 
   const saveTimedSession = async () => {
-    // console.log('session length second ', seconds);
-    // console.log('session length hours ', hours);
-    // console.log('typeof hours ', typeof hours);
-    // console.log('formatted todays date: ', today);
-    // console.log('current year: ', currentYear);
-    // console.log('formState: ', formState);
     setSavingTimed(true);
     const sessionName = formState.inputValues.sessionName;
 
@@ -169,8 +164,6 @@ const Timer = () => {
 
   const formattedDate = date.toDateString();
   const year = formattedDate.split(' ').pop();
-  //console.log('direct input date formatted: ', formattedDate);
-  //console.log('year: ', year);
 
   const saveDirectSession = async () => {
     setSavingDirect(true);
@@ -339,6 +332,12 @@ const Timer = () => {
                   Save Direct Session
                 </CustomButton>
               )}
+              <CustomText style={{ marginTop: 10 }}>
+                Please make every effort to ensure that the CPD data you upload
+                are correct. It is the sole responsibility of the user, you, to
+                present correct data to the provincial CPA governing bodies in
+                the event of an audit.
+              </CustomText>
             </CustomOperationalContainer>
           ) : null}
         </CustomScrollView>

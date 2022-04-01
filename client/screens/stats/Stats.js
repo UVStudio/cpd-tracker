@@ -26,6 +26,7 @@ import CustomButton from '../../components/CustomButton';
 import CustomAnimatedPie from '../../components/CustomAnimatedPie';
 import CustomErrorCard from '../../components/CustomErrorCard';
 import CustomMessageCard from '../../components/CustomMessageCard';
+import CustomConfirmActionCard from '../../components/CustomConfirmActionCard';
 import CustomYearSelectionCard from '../../components/CustomYearSelectionCard';
 import CustomAccordionUnit from '../../components/CustomAccordionUnit';
 import CustomStatsDivider from '../../components/CustomStatsDivider';
@@ -69,6 +70,8 @@ const Stats = ({ navigation }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [cardText, setCardText] = useState('');
+  const [erasePastCardText, setErasePastCardText] = useState('');
+  const [eraseLoading, setEraseLoading] = useState('');
   const [generatingPDF, setGeneratingPDF] = useState(false);
   const [downloadingPDF, setDownloadingPDF] = useState(true);
   const [dirPath, setDirPath] = useState(`${RNFS.DocumentDirectoryPath}`);
@@ -306,7 +309,13 @@ For iOS 15 and beyond, the PDF is where you have chosen to save it.`
   };
 
   const retroUploads = () => {
-    console.log(`Retroactive uploads for ${showYear}`);
+    setErasePastCardText(`Are you sure you want to erase Past CPD Hours data for ${showYear}? Please only do this if: 
+    
+1 - You are ready to upload all previous verifiable and non-verifiable sessions for ${showYear}, and
+
+2 - You are being audited and you need to show proof of your sessions for ${showYear}.
+
+Otherwise this is a lot of work for nothing.`);
   };
 
   if (loading || !user) {
@@ -384,6 +393,7 @@ For iOS 15 and beyond, the PDF is where you have chosen to save it.`
                                   user.cpdYear,
                                   showYear,
                                   pastVerHours,
+                                  totalRollingVerRequired,
                                   setCardText
                                 )
                               }
@@ -456,6 +466,7 @@ For iOS 15 and beyond, the PDF is where you have chosen to save it.`
                                   showYear,
                                   pastVerHours,
                                   pastNonVerHours,
+                                  totalRollingCPDHoursRequired,
                                   setCardText
                                 )
                               }
@@ -527,78 +538,70 @@ For iOS 15 and beyond, the PDF is where you have chosen to save it.`
                             {elem.historic ? null : (
                               <View>
                                 <CustomSubtitle>
-                                  3 Year Rolling CPD Requirement
+                                  3-Year Rolling CPD Requirement
                                 </CustomSubtitle>
                               </View>
                             )}
                             <CustomThinGreyLine />
-                            <Pressable onPress={() => verifiableHoursDetails()}>
-                              <CustomTextStats>
-                                Verifiable Hours:{'  '}
-                                {!elem.historic ? (
-                                  statsFraction(
-                                    pastVerHours,
-                                    elem.verifiable,
-                                    totalRollingVerRequired
-                                  )
-                                ) : (
-                                  <Text style={{ color: Colors.dark }}>
-                                    {Number(elem.verifiable).toFixed(1)}
-                                  </Text>
-                                )}
-                                {!elem.historic ? ' - Required' : null}
-                              </CustomTextStats>
-                            </Pressable>
+                            <CustomTextStats>
+                              Verifiable Hours:{'  '}
+                              {!elem.historic ? (
+                                statsFraction(
+                                  pastVerHours,
+                                  elem.verifiable,
+                                  totalRollingVerRequired
+                                )
+                              ) : (
+                                <Text style={{ color: Colors.dark }}>
+                                  {Number(elem.verifiable).toFixed(1)}
+                                </Text>
+                              )}
+                              {!elem.historic ? ' - Required' : null}
+                            </CustomTextStats>
                             {!elem.historic ? (
                               <CustomAnimatedPie
                                 required={totalRollingVerRequired}
                                 progress={pastVerHours + elem.verifiable}
-                                CPDdetails={verifiableHoursDetails}
+                                CPDdetails={null}
                               />
                             ) : null}
                           </CustomStatsDivider>
                           <CustomStatsDivider>
-                            <Pressable onPress={() => nonVerHoursDetails()}>
-                              <CustomTextStats>
-                                Non-Verifiable Hours:{'  '}
-                                {!elem.historic ? (
-                                  <Text
-                                    style={{ color: 'black', fontSize: 20 }}
-                                  >
-                                    {Number(
-                                      pastNonVerHours + elem.nonVerifiable
-                                    ).toFixed(1)}
-                                  </Text>
-                                ) : (
-                                  <Text style={{ color: 'black' }}>
-                                    {Number(pastNonVerHours).toFixed(1)}
-                                  </Text>
-                                )}
-                              </CustomTextStats>
-                            </Pressable>
+                            <CustomTextStats>
+                              Non-Verifiable Hours:{'  '}
+                              {!elem.historic ? (
+                                <Text style={{ color: 'black', fontSize: 20 }}>
+                                  {Number(
+                                    pastNonVerHours + elem.nonVerifiable
+                                  ).toFixed(1)}
+                                </Text>
+                              ) : (
+                                <Text style={{ color: 'black' }}>
+                                  {Number(pastNonVerHours).toFixed(1)}
+                                </Text>
+                              )}
+                            </CustomTextStats>
                           </CustomStatsDivider>
                           <CustomStatsDivider>
-                            <Pressable onPress={() => totalCPDHoursDetails()}>
-                              <CustomTextStats>
-                                Total CPD Hours:{'  '}
-                                {!elem.historic ? (
-                                  statsFraction(
-                                    pastNonVerHours,
-                                    pastVerHours +
-                                      elem.verifiable +
-                                      elem.nonVerifiable,
-                                    totalRollingCPDHoursRequired
-                                  )
-                                ) : (
-                                  <Text style={{ color: 'black' }}>
-                                    {Number(
-                                      elem.nonVerifiable + elem.verifiable
-                                    ).toFixed(1)}
-                                  </Text>
-                                )}
-                                {!elem.historic ? ' - Required' : null}
-                              </CustomTextStats>
-                            </Pressable>
+                            <CustomTextStats>
+                              Total CPD Hours:{'  '}
+                              {!elem.historic ? (
+                                statsFraction(
+                                  pastNonVerHours,
+                                  pastVerHours +
+                                    elem.verifiable +
+                                    elem.nonVerifiable,
+                                  totalRollingCPDHoursRequired
+                                )
+                              ) : (
+                                <Text style={{ color: 'black' }}>
+                                  {Number(
+                                    elem.nonVerifiable + elem.verifiable
+                                  ).toFixed(1)}
+                                </Text>
+                              )}
+                              {!elem.historic ? ' - Required' : null}
+                            </CustomTextStats>
                             {!elem.historic ? (
                               <CustomAnimatedPie
                                 required={totalRollingCPDHoursRequired}
@@ -608,7 +611,7 @@ For iOS 15 and beyond, the PDF is where you have chosen to save it.`
                                   elem.verifiable +
                                   elem.nonVerifiable
                                 }
-                                CPDdetails={totalCPDHoursDetails}
+                                CPDdetails={null}
                               />
                             ) : null}
                           </CustomStatsDivider>
@@ -722,9 +725,7 @@ For iOS 15 and beyond, the PDF is where you have chosen to save it.`
                   {elem.historic ? (
                     <View style={[styles.fullWidthCenter, { marginTop: 30 }]}>
                       <CustomButton
-                        onSelect={
-                          downloadingPDF || generatingPDF ? null : retroUploads
-                        }
+                        onSelect={() => retroUploads()}
                         style={{ alignSelf: 'center', width: '100%' }}
                       >
                         Retroactive Courses Uploads
@@ -748,6 +749,17 @@ For iOS 15 and beyond, the PDF is where you have chosen to save it.`
         {cardText !== '' ? (
           <CustomMessageCard text={cardText} toShow={setCardText} />
         ) : null}
+        {erasePastCardText !== '' ? (
+          <CustomConfirmActionCard
+            text={erasePastCardText}
+            actionLoading={eraseLoading}
+            toShow={setErasePastCardText}
+            buttonText={'Erase Past CPD data'}
+            savingButtonText="Erasing Past CPD data..."
+            confirmAction={() => console.log('confirm')}
+          />
+        ) : null}
+
         {yearSelectionCard ? (
           <CustomYearSelectionCard
             toShow={setYearSelectionCard}
@@ -782,58 +794,3 @@ const styles = StyleSheet.create({
 });
 
 export default Stats;
-
-//PDF report begins
-// const setNotificationChannel = async () => {
-//   const loadingChannel = await Notifications.getNotificationChannelAsync(
-//     channelId
-//   );
-
-//   // if we didn't find a notification channel set how we like it, then we create one
-//   if (loadingChannel == null) {
-//     const channelOptions = {
-//       name: channelId,
-//       importance: AndroidImportance.HIGH,
-//       lockscreenVisibility: AndroidNotificationVisibility.PUBLIC,
-//       sound: 'default',
-//       vibrationPattern: [250],
-//       enableVibrate: true,
-//     };
-//     await Notifications.setNotificationChannelAsync(
-//       channelId,
-//       channelOptions
-//     );
-//   }
-// };
-
-// import {
-//   AndroidImportance,
-//   AndroidNotificationVisibility,
-//   NotificationChannel,
-//   NotificationChannelInput,
-//   NotificationContentInput,
-// } from 'expo-notifications';
-
-// Notifications.setNotificationHandler({
-//   handleNotification: async () => ({
-//     shouldShowAlert: true,
-//     shouldPlaySound: false,
-//     shouldSetBadge: false,
-//   }),
-// });
-
-// const getNotificationPermissions = async () => {
-//   await Notifications.requestPermissionsAsync();
-// };
-
-// const getMediaLibraryPermissions = async () => {
-//   await MediaLibrary.requestPermissionsAsync();
-// };
-
-// useEffect(() => {
-//   getMediaLibraryPermissions();
-// });
-
-// useEffect(() => {
-//   getNotificationPermissions();
-// });

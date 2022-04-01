@@ -21,7 +21,7 @@ const CustomConfirmActionCard = (props) => {
     <View style={styles.container}>
       <View style={styles.innerContainer}>
         <Text style={styles.text}>{text}</Text>
-        <CustomButton onSelect={() => delayButton(toShow, '', 250)}>
+        <CustomButton onSelect={() => delayButton(toShow, '', 100)}>
           Nevermind!
         </CustomButton>
         {actionLoading ? (

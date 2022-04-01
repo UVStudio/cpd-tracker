@@ -48,8 +48,6 @@ const EditCertCourse = (props) => {
     formIsValid: false,
   });
 
-  console.log('formState: ', formState);
-
   const addCertHandler = async () => {
     try {
       const file = await DocumentPicker.getDocumentAsync({

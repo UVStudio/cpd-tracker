@@ -8,6 +8,7 @@ import * as certActions from '../../store/actions/cert';
 import * as authActions from '../../store/actions/auth';
 
 import CustomButton from '../../components/CustomButton';
+import CustomText from '../../components/CustomText';
 import CustomBoldText from '../../components/CustomBoldText';
 import CustomTitle from '../../components/CustomTitle';
 import CustomInput from '../../components/CustomInput';
@@ -63,14 +64,11 @@ const Records = () => {
   );
 
   const addCertHandler = async () => {
-    console.log('platform: ', Platform);
     try {
       const file = await DocumentPicker.pickSingle({
         type: Platform.OS === 'ios' ? 'public.item' : '*/*',
         copyToCacheDirectory: false,
       });
-
-      //console.log('file: ', file);
 
       if (file.size > 0) {
         setCert(file);
@@ -87,8 +85,6 @@ const Records = () => {
   const hours = Number(formState.inputValues.hours);
   const ethicsHours = Number(formState.inputValues.ethicsHours);
   const { courseName } = formState.inputValues;
-
-  // console.log('formState: ', formState);
 
   const saveVerifiableCourse = async () => {
     setSavingCourse(true);
@@ -202,6 +198,12 @@ const Records = () => {
               Save Verifiable Course
             </CustomButton>
           )}
+          <CustomText style={{ marginTop: 20 }}>
+            Please make every effort to ensure that the CPD data you upload are
+            correct. It is the sole responsibility of the user, you, to present
+            correct data to the provincial CPA governing bodies in the event of
+            an audit.
+          </CustomText>
         </CustomOperationalContainer>
       </CustomScrollView>
       {cardText !== '' ? (

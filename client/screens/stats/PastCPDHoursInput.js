@@ -73,8 +73,6 @@ const PastCPDHoursInput = (props) => {
     formIsValid: false,
   });
 
-  // console.log(formState);
-
   const inputChangeHandler = useCallback(
     (inputIdentifier, inputValue, inputValidity) => {
       dispatchFormState({
