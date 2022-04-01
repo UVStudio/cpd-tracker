@@ -154,6 +154,25 @@ export const deleteCertObjById = (id) => {
   };
 };
 
+export const deleteAllCertsByUserYear = (year) => {
+  return async (dispatch) => {
+    try {
+      console.log('deleteAllCertsByUserYear ran');
+      const response = await axios.delete(
+        `${CURRENT_IP}/api/cert/year/${year}`
+      );
+      const data = response.data.data;
+
+      dispatch({
+        type: DELETE_CERT_COURSE,
+        certs: data,
+      });
+    } catch (err) {
+      throw new Error(err.response.data.error);
+    }
+  };
+};
+
 export const deleteUploadByCertImgId = (id) => {
   return async () => {
     try {

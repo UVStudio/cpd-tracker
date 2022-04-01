@@ -71,7 +71,7 @@ const Stats = ({ navigation }) => {
   const [error, setError] = useState('');
   const [cardText, setCardText] = useState('');
   const [erasePastCardText, setErasePastCardText] = useState('');
-  const [eraseLoading, setEraseLoading] = useState('');
+  const [eraseLoading, setEraseLoading] = useState(false);
   const [generatingPDF, setGeneratingPDF] = useState(false);
   const [downloadingPDF, setDownloadingPDF] = useState(true);
   const [dirPath, setDirPath] = useState(`${RNFS.DocumentDirectoryPath}`);
@@ -132,7 +132,11 @@ const Stats = ({ navigation }) => {
       navigation.navigate('CPD Hours Setup', { yearsToOverride });
       return;
     }
-    if (currentYearNeedCPDHours === 20 && yearsToOverride.length === 0) {
+    if (
+      currentYearNeedCPDHours === 20 &&
+      yearsToOverride.length === 0 &&
+      currentYear === showYear
+    ) {
       setCardText(
         'While you are only required to obtain 20 CPD hours this year, 10 of which needs to be verifiable, you are encouraged to get 2x as many, so you will have an easier time meeting the CPD 3-year rolling requirement in the near future.'
       );
@@ -313,9 +317,22 @@ For iOS 15 and beyond, the PDF is where you have chosen to save it.`
     
 1 - You are ready to upload all previous verifiable and non-verifiable sessions for ${showYear}, and
 
-2 - You are being audited and you need to show proof of your sessions for ${showYear}.
+2 - You are being audited and you need to show proof of your sessions for ${showYear} to be produced on your CPD hours report.
 
-Otherwise this is a lot of work for nothing.`);
+Otherwise, this is going to be a lot of work for nothing.`);
+  };
+
+  const updateHistoric = async (showYear) => {
+    setEraseLoading(true);
+    try {
+      await dispatch(authActions.historicUpdate(showYear));
+      setEraseLoading(false);
+      setErasePastCardText('');
+    } catch (err) {
+      console.log(err.message);
+      setEraseLoading(false);
+      setErasePastCardText('');
+    }
   };
 
   if (loading || !user) {
@@ -345,13 +362,27 @@ Otherwise this is a lot of work for nothing.`);
                 <CustomStatsInfoBox>
                   {currentYear !== showYear &&
                   elem.verifiable + elem.nonVerifiable === 0 ? (
-                    <CustomText>
-                      Looks like you did not use the CPD Tracker App for the
-                      year of {showYear}. In order for the app to calculate how
-                      many hours you need for {currentYear} and beyond,
-                      properly, please click on the 'Overwrite CPD Data' button
-                      to manually input your CPD hours for {showYear}.
-                    </CustomText>
+                    <View>
+                      <View>
+                        <CustomText style={{ marginBottom: 10 }}>
+                          Looks like you did not use the CPD Tracker App for the
+                          year of {showYear}, or you have just erased the Past
+                          CPD data for this year. In order for the app to
+                          calculate how many hours you need for {currentYear}{' '}
+                          and beyond, please either:
+                        </CustomText>
+                        <CustomText style={{ marginBottom: 10 }}>
+                          1 - click on the 'Overwrite CPD Data' button to
+                          directly input your CPD hours for {showYear}.
+                        </CustomText>
+                        <CustomText style={{ marginBottom: 10 }}>
+                          2 - go to Verifiable and Non-Verifiable screens and
+                          upload each session for {showYear}. Use this approach
+                          especially if you are getting audited and need to show
+                          proof of sessions.
+                        </CustomText>
+                      </View>
+                    </View>
                   ) : (
                     <View style={styles.fullWidthCenter}>
                       {elem.historic ? (
@@ -532,7 +563,7 @@ Otherwise this is a lot of work for nothing.`);
                         user.province,
                         user.cpdYear,
                         showYear
-                      ) ? (
+                      ) && !elem.historic ? (
                         <View>
                           <CustomStatsDivider>
                             {elem.historic ? null : (
@@ -635,26 +666,24 @@ Otherwise this is a lot of work for nothing.`);
                         </View>
                       ) : null}
 
-                      {!elem.historic ? (
-                        reportReady ? null : generatingPDF ? (
-                          <View style={styles.fullWidthCenter}>
-                            <CustomButton
-                              style={{ marginTop: 15, width: '100%' }}
-                            >
-                              Generating Your PDF {'  '} <CustomSpinner />
-                            </CustomButton>
-                          </View>
-                        ) : (
-                          <View style={styles.fullWidthCenter}>
-                            <CustomButton
-                              style={{ marginTop: 15, width: '100%' }}
-                              onSelect={() => generatePDFHandler(showYear)}
-                            >
-                              Generate & Download PDF Report
-                            </CustomButton>
-                          </View>
-                        )
-                      ) : null}
+                      {reportReady ? null : generatingPDF ? (
+                        <View style={styles.fullWidthCenter}>
+                          <CustomButton
+                            style={{ marginTop: 15, width: '100%' }}
+                          >
+                            Generating Your PDF {'  '} <CustomSpinner />
+                          </CustomButton>
+                        </View>
+                      ) : (
+                        <View style={styles.fullWidthCenter}>
+                          <CustomButton
+                            style={{ marginTop: 15, width: '100%' }}
+                            onSelect={() => generatePDFHandler(showYear)}
+                          >
+                            Generate & Download PDF Report
+                          </CustomButton>
+                        </View>
+                      )}
 
                       {reportReady ? (
                         downloadingPDF ? (
@@ -694,11 +723,7 @@ Otherwise this is a lot of work for nothing.`);
                   {elem.historic ? (
                     <View style={styles.fullWidthCenter}>
                       <CustomButton
-                        onSelect={
-                          downloadingPDF || generatingPDF
-                            ? null
-                            : overwriteCPDHandler
-                        }
+                        onSelect={overwriteCPDHandler}
                         style={{ alignSelf: 'center', width: '100%' }}
                       >
                         Overwrite Data
@@ -723,20 +748,22 @@ Otherwise this is a lot of work for nothing.`);
                     )}
                   </View>
                   {elem.historic ? (
-                    <View style={[styles.fullWidthCenter, { marginTop: 30 }]}>
-                      <CustomButton
-                        onSelect={() => retroUploads()}
-                        style={{ alignSelf: 'center', width: '100%' }}
-                      >
-                        Retroactive Courses Uploads
-                      </CustomButton>
-                      <CustomText>
-                        If you are getting audited, and you need to provide
-                        documents to your province for CPD year {showYear},
-                        click this and upload your previous verifiable and
-                        non-verifiable hours.
-                      </CustomText>
-                    </View>
+                    elem.retro ? null : (
+                      <View style={[styles.fullWidthCenter, { marginTop: 30 }]}>
+                        <CustomButton
+                          onSelect={() => retroUploads()}
+                          style={{ alignSelf: 'center', width: '100%' }}
+                        >
+                          Erase Past CPD Data
+                        </CustomButton>
+                        <CustomText style={{ marginTop: 10 }}>
+                          If you are getting audited, and you need to provide
+                          documents to your province for CPD year {showYear},
+                          click this to erase this data and upload your previous
+                          verifiable and non-verifiable hours.
+                        </CustomText>
+                      </View>
+                    )
                   ) : null}
                 </CustomStatsInfoBox>
               ) : null}
@@ -754,9 +781,9 @@ Otherwise this is a lot of work for nothing.`);
             text={erasePastCardText}
             actionLoading={eraseLoading}
             toShow={setErasePastCardText}
-            buttonText={'Erase Past CPD data'}
-            savingButtonText="Erasing Past CPD data..."
-            confirmAction={() => console.log('confirm')}
+            buttonText={'Erase Past CPD Data'}
+            savingButtonText="Erasing Past CPD Data"
+            confirmAction={() => updateHistoric(showYear)}
           />
         ) : null}
 

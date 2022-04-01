@@ -320,6 +320,7 @@ exports.deleteCurrentUser = asyncHandler(async (req, res, next) => {
     .collection('uploads.files')
     .find({ 'metadata.userId': userId })
     .toArray();
+
   const filesToDeleteIds = filesToDelete.map((file) => file._id);
 
   const filesResult = await conn.db

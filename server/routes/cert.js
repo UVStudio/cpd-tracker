@@ -5,6 +5,7 @@ const {
   getAllCertObjsByYear,
   updateCertObjById,
   deleteCertObjById,
+  deleteAllCertsByUserYear,
 } = require('../controllers/cert');
 
 const router = express.Router();
@@ -16,5 +17,6 @@ router.get('/id/:id', protect, getCertObjById);
 router.get('/:year', protect, getAllCertObjsByYear);
 router.put('/:id', protect, updateCertObjById);
 router.delete('/:id', protect, deleteCertObjById);
+router.delete('/year/:year', protect, deleteAllCertsByUserYear);
 
 module.exports = router;

@@ -15,6 +15,7 @@ import CustomConfirmActionCard from '../../components/CustomConfirmActionCard';
 import CustomScreenContainer from '../../components/CustomScreenContainer';
 
 import * as authActions from '../../store/actions/auth';
+import * as certActions from '../../store/actions/cert';
 
 import { formReducer } from '../../utils/formReducer';
 import { FORM_INPUT_UPDATE } from '../../store/types';
@@ -30,11 +31,14 @@ const OverwriteCPDHours = (props) => {
   const dispatch = useDispatch();
 
   const authState = useSelector((state) => state.auth.user);
+  const certsYearState = useSelector((state) => state.cert.certs);
 
   const user = authState;
 
   const userHoursArr = user.hours;
   const thisYearHours = userHoursArr.find((elem) => elem.year === showYear);
+
+  //console.log('certsYearState: ', certsYearState);
 
   const [formState, dispatchFormState] = useReducer(formReducer, {
     inputValues: {
@@ -79,6 +83,7 @@ const OverwriteCPDHours = (props) => {
           formState.inputValues.EthicsHours
         )
       );
+      await dispatch(certActions.deleteAllCertsByUserYear(showYear));
       setSavingCPD(false);
       setConfirmCardText('');
       navigation.navigate('Your CPD Statistics');

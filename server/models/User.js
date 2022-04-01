@@ -88,6 +88,11 @@ const UserSchema = new mongoose.Schema({
         required: true,
         default: true,
       },
+      retro: {
+        type: Boolean,
+        required: true,
+        default: false,
+      },
     },
   ],
   createdAt: {

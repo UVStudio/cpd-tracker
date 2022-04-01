@@ -134,6 +134,35 @@ export const overrideHours = (year, certHours, nonVerHours, ethicsHours) => {
   };
 };
 
+export const historicUpdate = (year) => {
+  return async (dispatch) => {
+    const config = {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    };
+
+    const body = JSON.stringify({ year });
+
+    try {
+      const response = await axios.put(
+        `${CURRENT_IP}/api/user/historicupdate`,
+        body,
+        config
+      );
+      const user = response.data.data;
+
+      dispatch({
+        type: GET_USER,
+        user: user,
+      });
+    } catch (err) {
+      throw new Error('Unable to erase past CPD data.');
+      //throw new Error(err.response.data.error);
+    }
+  };
+};
+
 export const getUser = () => {
   return async (dispatch) => {
     try {

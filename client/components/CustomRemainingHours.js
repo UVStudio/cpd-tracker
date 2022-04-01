@@ -114,6 +114,17 @@ const CustomRemainingHours = (props) => {
       </View>
     );
   }
+
+  return (
+    <View style={styles.remainingHourscontainer}>
+      <CustomTextStats>
+        This data is being reflected by retro-actively uploaded sessions. The
+        CPD Tracker app cannot calculate your CPD requirements for this
+        particular year of {showYear}. It can only sum up how many hours from
+        sessions you have uploaded.
+      </CustomTextStats>
+    </View>
+  );
 };
 
 const styles = StyleSheet.create({

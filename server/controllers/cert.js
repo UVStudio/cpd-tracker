@@ -2,6 +2,12 @@ const Cert = require('../models/Cert');
 const User = require('../models/User');
 const ErrorResponse = require('../utils/errorResponse');
 const asyncHandler = require('../middleware/async');
+const mongoose = require('mongoose');
+
+const conn = mongoose.createConnection(process.env.MONGO_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
 
 //desc    GET Cert by ID
 //route   GET /api/cert/id/:id
@@ -148,4 +154,42 @@ exports.deleteCertObjById = asyncHandler(async (req, res, next) => {
 
   //returns all cert courses under the same year as the cert course being deleted
   res.status(200).json({ success: true, data: certsYear });
+});
+
+//desc    DELETE all cert Objs by userId and Year, including Files and Chunks
+//route   DELETE /api/cert/year/:year
+//access  private
+exports.deleteAllCertsByUserYear = asyncHandler(async (req, res, next) => {
+  const userId = req.user.id;
+  const year = req.params.year;
+  const yearNumber = Number(year);
+  //const year = '2020';
+
+  const filesToDelete = await conn.db
+    .collection('uploads.files')
+    .find({ 'metadata.userId': userId, 'metadata.year': year })
+    .toArray();
+
+  const filesToDeleteIds = filesToDelete.map((file) => file._id);
+  console.log('file IDs to delete: ', filesToDeleteIds);
+
+  await conn.db
+    .collection('uploads.files')
+    .deleteMany({ 'metadata.userId': userId, 'metadata.year': year });
+
+  await conn.db
+    .collection('uploads.chunks')
+    .deleteMany({ files_id: { $in: filesToDeleteIds } });
+
+  await Cert.deleteMany({ user: userId, year: yearNumber });
+
+  const user = await User.findById(req.user.id).populate('cert');
+
+  const certs = user.cert;
+  const certsYear = certs.filter((cert) => cert.year === yearNumber);
+
+  res.status(200).json({
+    success: true,
+    data: certsYear,
+  });
 });
