@@ -1,6 +1,6 @@
 import React, { useState, useReducer, useCallback } from 'react';
 import { Platform, StyleSheet } from 'react-native';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 //import * as DocumentPicker from 'expo-document-picker';
 import * as DocumentPicker from 'react-native-document-picker';
@@ -14,6 +14,7 @@ import CustomTitle from '../../components/CustomTitle';
 import CustomInput from '../../components/CustomInput';
 import CustomErrorCard from '../../components/CustomErrorCard';
 import CustomMessageCard from '../../components/CustomMessageCard';
+import CustomPieMessageCard from '../../components/CustomPieMessageCard';
 import CustomGreyLine from '../../components/CustomGreyLine';
 import CustomScrollView from '../../components/CustomScrollView';
 import CustomScreenContainer from '../../components/CustomScreenContainer';
@@ -25,11 +26,22 @@ import { formReducer } from '../../utils/formReducer';
 import { FORM_INPUT_UPDATE } from '../../store/types';
 import CustomSpinner from '../../components/CustomSpinner';
 
+import { hoursRequiredLogic } from '../../utils/hoursRequiredLogic';
+
 const Records = () => {
+  const [showYear, setShowYear] = useState(currentYear);
   const [cert, setCert] = useState(null); //if true, app uploads a cert. if not, app uploads default no-cert.jpg from S3
   const [cardText, setCardText] = useState('');
   const [error, setError] = useState('');
   const [savingCourse, setSavingCourse] = useState(false);
+  //const [earnedVerifiable, setEarnedVerifiable] = useState(null);
+
+  const authState = useSelector((state) => state.auth.user);
+
+  const user = authState;
+  const userHours = user.hours;
+
+  //console.log('userHours: ', userHours);
 
   const placeholderYear = currentYear.toString();
 
@@ -62,6 +74,34 @@ const Records = () => {
     },
     [dispatchFormState]
   );
+
+  //console.log('formState.inputValues.year: ', formState.inputValues.year);
+
+  const yearToShow = Number(formState.inputValues.year);
+  const yearToShowObj = userHours.filter((hours) => hours.year === yearToShow);
+
+  // console.log('yearToShowObj: ', yearToShowObj);
+
+  let earnedVerifiable;
+
+  // if (yearToShowObj.length > 1) {
+  //   setEarnedVerifiable(yearToShowObj[0].verifiable);
+  // }
+
+  earnedVerifiable = yearToShowObj[0].verifiable;
+
+  //console.log('earnedVerifiable: ', earnedVerifiable);
+
+  const hoursRequired = hoursRequiredLogic(user, currentYear);
+
+  const {
+    currentYearNeedVerHours,
+    // currentYearNeedEthicsHours,
+    // totalRollingVerRequired,
+    // totalRollingEthicsRequired,
+    // pastVerHours,
+    // pastEthicsHours,
+  } = hoursRequired;
 
   const addCertHandler = async () => {
     try {
@@ -119,8 +159,8 @@ const Records = () => {
         );
       }
       setCert(null);
-      setCardText('Verifiable session successfully saved');
       await dispatch(authActions.getUser());
+      setCardText('Verifiable session successfully saved');
       setSavingCourse(false);
     } catch (err) {
       console.log(err.message);
@@ -206,8 +246,17 @@ const Records = () => {
           </CustomText>
         </CustomOperationalContainer>
       </CustomScrollView>
-      {cardText !== '' ? (
+
+      {cardText !== '' && yearToShow !== currentYear ? (
         <CustomMessageCard text={cardText} toShow={setCardText} />
+      ) : null}
+      {cardText !== '' && yearToShow === currentYear ? (
+        <CustomPieMessageCard
+          text={cardText}
+          toShow={setCardText}
+          required={currentYearNeedVerHours}
+          progress={earnedVerifiable}
+        />
       ) : null}
       {error !== '' ? (
         <CustomErrorCard error={error} toShow={setError} />

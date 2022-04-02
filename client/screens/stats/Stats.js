@@ -77,6 +77,7 @@ const Stats = ({ navigation }) => {
   const [dirPath, setDirPath] = useState(`${RNFS.DocumentDirectoryPath}`);
   const [downloadProgress, setDownloadProgress] = useState(0);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [forcedRefresh, setForcedRefresh] = useState(false);
 
   const authState = useSelector((state) => state.auth.user);
   const reportReady = useSelector((state) => state.report.report);
@@ -120,12 +121,7 @@ const Stats = ({ navigation }) => {
     pastVerHours,
     pastNonVerHours,
     pastEthicsHours,
-    // pastShowYearNeedCPDHours,
-    // pastShowYearNeedVerHours,
-    // pastShowYearNeedEthicsHours,
   } = hoursRequired;
-
-  // console.log(pastNonVerHours);
 
   useEffect(() => {
     if (yearsToOverride.length > 0) {
@@ -142,6 +138,16 @@ const Stats = ({ navigation }) => {
       );
     }
   }, [user]);
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      // The screen is focused
+      refreshData();
+    });
+
+    // Return the function to unsubscribe from the event so it gets removed on unmount
+    return unsubscribe;
+  }, [navigation]);
 
   //Session details navigations
   const verifiableHoursDetails = () => {

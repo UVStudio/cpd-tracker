@@ -163,7 +163,6 @@ exports.deleteAllCertsByUserYear = asyncHandler(async (req, res, next) => {
   const userId = req.user.id;
   const year = req.params.year;
   const yearNumber = Number(year);
-  //const year = '2020';
 
   const filesToDelete = await conn.db
     .collection('uploads.files')
@@ -171,7 +170,6 @@ exports.deleteAllCertsByUserYear = asyncHandler(async (req, res, next) => {
     .toArray();
 
   const filesToDeleteIds = filesToDelete.map((file) => file._id);
-  console.log('file IDs to delete: ', filesToDeleteIds);
 
   await conn.db
     .collection('uploads.files')

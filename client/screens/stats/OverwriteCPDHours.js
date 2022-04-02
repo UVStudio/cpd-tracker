@@ -31,14 +31,11 @@ const OverwriteCPDHours = (props) => {
   const dispatch = useDispatch();
 
   const authState = useSelector((state) => state.auth.user);
-  const certsYearState = useSelector((state) => state.cert.certs);
 
   const user = authState;
 
   const userHoursArr = user.hours;
   const thisYearHours = userHoursArr.find((elem) => elem.year === showYear);
-
-  //console.log('certsYearState: ', certsYearState);
 
   const [formState, dispatchFormState] = useReducer(formReducer, {
     inputValues: {
