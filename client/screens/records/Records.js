@@ -19,13 +19,12 @@ import CustomGreyLine from '../../components/CustomGreyLine';
 import CustomScrollView from '../../components/CustomScrollView';
 import CustomScreenContainer from '../../components/CustomScreenContainer';
 import CustomOperationalContainer from '../../components/CustomOperationalContainer';
-import currentYear from '../../utils/currentYear';
-import Colors from '../../constants/Colors';
-
-import { formReducer } from '../../utils/formReducer';
-import { FORM_INPUT_UPDATE } from '../../store/types';
 import CustomSpinner from '../../components/CustomSpinner';
 
+import currentYear from '../../utils/currentYear';
+import Colors from '../../constants/Colors';
+import { formReducer } from '../../utils/formReducer';
+import { FORM_INPUT_UPDATE } from '../../store/types';
 import { hoursRequiredLogic } from '../../utils/hoursRequiredLogic';
 
 const Records = () => {
@@ -34,14 +33,11 @@ const Records = () => {
   const [cardText, setCardText] = useState('');
   const [error, setError] = useState('');
   const [savingCourse, setSavingCourse] = useState(false);
-  //const [earnedVerifiable, setEarnedVerifiable] = useState(null);
 
   const authState = useSelector((state) => state.auth.user);
 
   const user = authState;
   const userHours = user.hours;
-
-  //console.log('userHours: ', userHours);
 
   const placeholderYear = currentYear.toString();
 
@@ -75,32 +71,21 @@ const Records = () => {
     [dispatchFormState]
   );
 
-  //console.log('formState.inputValues.year: ', formState.inputValues.year);
+  const year = Number(formState.inputValues.year);
+  const hours = Number(formState.inputValues.hours);
+  const ethicsHours = Number(formState.inputValues.ethicsHours);
+  const { courseName } = formState.inputValues;
 
-  const yearToShow = Number(formState.inputValues.year);
-  const yearToShowObj = userHours.filter((hours) => hours.year === yearToShow);
-
-  // console.log('yearToShowObj: ', yearToShowObj);
+  const yearObj = userHours.filter((hours) => hours.year === year);
 
   let earnedVerifiable;
-
-  // if (yearToShowObj.length > 1) {
-  //   setEarnedVerifiable(yearToShowObj[0].verifiable);
-  // }
-
-  earnedVerifiable = yearToShowObj[0].verifiable;
-
-  //console.log('earnedVerifiable: ', earnedVerifiable);
+  earnedVerifiable = yearObj[0].verifiable;
 
   const hoursRequired = hoursRequiredLogic(user, currentYear);
 
   const {
     currentYearNeedVerHours,
     // currentYearNeedEthicsHours,
-    // totalRollingVerRequired,
-    // totalRollingEthicsRequired,
-    // pastVerHours,
-    // pastEthicsHours,
   } = hoursRequired;
 
   const addCertHandler = async () => {
@@ -120,11 +105,6 @@ const Records = () => {
       );
     }
   };
-
-  const year = Number(formState.inputValues.year);
-  const hours = Number(formState.inputValues.hours);
-  const ethicsHours = Number(formState.inputValues.ethicsHours);
-  const { courseName } = formState.inputValues;
 
   const saveVerifiableCourse = async () => {
     setSavingCourse(true);
@@ -247,15 +227,17 @@ const Records = () => {
         </CustomOperationalContainer>
       </CustomScrollView>
 
-      {cardText !== '' && yearToShow !== currentYear ? (
+      {cardText !== '' && year !== currentYear ? (
         <CustomMessageCard text={cardText} toShow={setCardText} />
       ) : null}
-      {cardText !== '' && yearToShow === currentYear ? (
+      {cardText !== '' && year === currentYear ? (
         <CustomPieMessageCard
           text={cardText}
           toShow={setCardText}
           required={currentYearNeedVerHours}
           progress={earnedVerifiable}
+          type={'verifiable'}
+          year={year}
         />
       ) : null}
       {error !== '' ? (

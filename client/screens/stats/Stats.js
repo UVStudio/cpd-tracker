@@ -139,15 +139,21 @@ const Stats = ({ navigation }) => {
     }
   }, [user]);
 
+  const historicOrNot = () => {
+    const showYearObj = userHours.filter((hours) => hours.year === showYear);
+    return showYearObj[0].historic;
+  };
+
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
       // The screen is focused
-      refreshData();
+      if (!historicOrNot()) {
+        refreshData();
+      }
     });
-
     // Return the function to unsubscribe from the event so it gets removed on unmount
     return unsubscribe;
-  }, [navigation]);
+  }, [navigation, showYear]);
 
   //Session details navigations
   const verifiableHoursDetails = () => {

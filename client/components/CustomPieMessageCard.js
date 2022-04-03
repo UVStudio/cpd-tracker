@@ -1,28 +1,24 @@
 import React from 'react';
 import { Text, View, StyleSheet } from 'react-native';
-import { useSelector, useDispatch } from 'react-redux';
 import { useNavigation } from '@react-navigation/native';
 
 import CustomButton from './CustomButton';
+import CustomText from './CustomText';
+import CustomSubtitle from './CustomSubtitle';
+import CustomBoldText from './CustomBoldText';
 import CustomAnimatedPie from './CustomAnimatedPie';
-
-import * as authActions from '../store/actions/auth';
 
 import Colors from '../constants/Colors';
 import delayButton from '../utils/delayButton';
 
 const CustomPieMessageCard = (props) => {
-  const { text, toShow, required, progress } = props;
-
-  //const authState = useSelector((state) => state.auth.user);
-  const dispatch = useDispatch();
+  const { text, toShow, required, progress, type, year } = props;
   const navigation = useNavigation();
 
   const toStats = async () => {
     try {
-      //await dispatch(authActions.getUser());
       delayButton(toShow, '', 100);
-      navigation.navigate('Your CPD Statistics');
+      //navigation.navigate('Your CPD Statistics');
     } catch (err) {
       console.log(err.message);
       setError(
@@ -34,11 +30,14 @@ const CustomPieMessageCard = (props) => {
   return (
     <View style={styles.container}>
       <View style={styles.innerContainer}>
-        <Text style={styles.text}>{text}</Text>
-        <Text style={styles.text}>
+        <CustomBoldText style={{ alignSelf: 'flex-start', marginBottom: 10 }}>
+          {text}
+        </CustomBoldText>
+        <CustomText style={{ marginBottom: 10 }}>
           Great job! You are one step closer from meeting your annual CPD
-          requirements!
-        </Text>
+          requirements! You now have earned {progress} {type} hours for {year}.
+          You still have {required - progress} hours to go.
+        </CustomText>
         <CustomAnimatedPie
           required={required}
           progress={progress}

@@ -24,15 +24,17 @@ import CustomGreyLine from '../../components/CustomGreyLine';
 import CustomThinGreyLine from '../../components/CustomThinGreyLine';
 import CustomScreenContainer from '../../components/CustomScreenContainer';
 import CustomOperationalContainer from '../../components/CustomOperationalContainer';
+import CustomSpinner from '../../components/CustomSpinner';
 
 import * as authActions from '../../store/actions/auth';
 import * as nonVerActions from '../../store/actions/nonVer';
+
 import { secondsToHms, secondsToTime } from '../../utils/timeConversions';
 import { formReducer } from '../../utils/formReducer';
 import currentYear from '../../utils/currentYear';
 import Colors from '../../constants/Colors';
 import { FORM_INPUT_UPDATE } from '../../store/types';
-import CustomSpinner from '../../components/CustomSpinner';
+import { hoursRequiredLogic } from '../../utils/hoursRequiredLogic';
 
 const Timer = () => {
   const [showInputType, setShowInputType] = useState('timer');
@@ -188,6 +190,10 @@ const Timer = () => {
       setError(err.message);
     }
   };
+
+  const hoursRequired = hoursRequiredLogic(user, currentYear);
+  const { currentYearNeedCPDHours } = hoursRequired;
+  console.log('currentYearNeedCPDHours: ', currentYearNeedCPDHours);
 
   if (!user) {
     return <CustomIndicator />;
