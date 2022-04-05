@@ -570,6 +570,14 @@ Otherwise, this is going to be a lot of work for nothing.`);
                           />
                         ) : null}
                       </CustomStatsDivider>
+                      {elem.retro ? (
+                        <View style={styles.fullWidthCenter}>
+                          <CustomText>
+                            This Past CPD Year has been set to allow retroactive
+                            session uploads.
+                          </CustomText>
+                        </View>
+                      ) : null}
 
                       {showThreeYearRolling(
                         user.province,

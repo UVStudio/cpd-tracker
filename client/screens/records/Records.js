@@ -79,7 +79,9 @@ const Records = () => {
   const yearObj = userHours.filter((hours) => hours.year === year);
 
   let earnedVerifiable;
-  earnedVerifiable = yearObj[0].verifiable;
+  if (yearObj.length > 0) {
+    earnedVerifiable = yearObj[0].verifiable;
+  }
 
   const hoursRequired = hoursRequiredLogic(user, currentYear);
 

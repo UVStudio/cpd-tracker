@@ -19,6 +19,7 @@ import CustomText from '../../components/CustomText';
 import CustomErrorCard from '../../components/CustomErrorCard';
 import CustomSelectField from '../../components/CustomSelectField';
 import CustomMessageCard from '../../components/CustomMessageCard';
+import CustomPieMessageCard from '../../components/CustomPieMessageCard';
 import CustomScrollView from '../../components/CustomScrollView';
 import CustomGreyLine from '../../components/CustomGreyLine';
 import CustomThinGreyLine from '../../components/CustomThinGreyLine';
@@ -53,6 +54,8 @@ const Timer = () => {
 
   const authState = useSelector((state) => state.auth.user);
   const user = authState;
+
+  const userHours = user.hours;
 
   const dispatch = useDispatch();
   const ref = useRef();
@@ -165,12 +168,26 @@ const Timer = () => {
   };
 
   const formattedDate = date.toDateString();
-  const year = formattedDate.split(' ').pop();
+  const year = Number(formattedDate.split(' ').pop());
+  const directHours = Number(formState.inputValues.directHours);
+
+  let yearObj;
+  if (seconds > 0) {
+    yearObj = userHours.filter((hours) => hours.year === currentYear);
+  } else {
+    yearObj = userHours.filter((hours) => hours.year === year);
+  }
+
+  let earnedVerifiable, earnedNonVerifiable;
+  if (yearObj.length > 0) {
+    earnedVerifiable = yearObj[0].verifiable;
+    earnedNonVerifiable = yearObj[0].nonVerifiable;
+  }
 
   const saveDirectSession = async () => {
     setSavingDirect(true);
+    setSeconds(0);
     const sessionName = formState.inputValues.sessionName;
-    const directHours = Number(formState.inputValues.directHours);
 
     try {
       await dispatch(
@@ -193,7 +210,12 @@ const Timer = () => {
 
   const hoursRequired = hoursRequiredLogic(user, currentYear);
   const { currentYearNeedCPDHours } = hoursRequired;
-  console.log('currentYearNeedCPDHours: ', currentYearNeedCPDHours);
+  //we have two types of earned-hours under nonVer: either hours or directHours
+  //we need year only for CustomPieMessageCard
+  // console.log('hours:', hours);
+  // console.log('year', typeof year);
+  // console.log('currentYear:', typeof currentYear);
+  // console.log('directHours:', directHours);
 
   if (!user) {
     return <CustomIndicator />;
@@ -347,8 +369,19 @@ const Timer = () => {
             </CustomOperationalContainer>
           ) : null}
         </CustomScrollView>
-        {cardText !== '' ? (
+        {cardText !== '' && year !== currentYear ? (
           <CustomMessageCard text={cardText} toShow={setCardText} />
+        ) : null}
+        {(cardText !== '' && year === currentYear) ||
+        (cardText !== '' && seconds > 0) ? (
+          <CustomPieMessageCard
+            text={cardText}
+            toShow={setCardText}
+            required={currentYearNeedCPDHours}
+            progress={earnedVerifiable + earnedNonVerifiable}
+            type={'non-verifiable'}
+            year={year}
+          />
         ) : null}
         {error !== '' ? (
           <CustomErrorCard error={error} toShow={setError} />
