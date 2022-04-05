@@ -1,4 +1,4 @@
-import React, { useState, useReducer, useCallback } from 'react';
+import React, { useState, useReducer, useCallback, useEffect } from 'react';
 import { Platform, StyleSheet } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -33,6 +33,7 @@ const Records = () => {
   const [cardText, setCardText] = useState('');
   const [error, setError] = useState('');
   const [savingCourse, setSavingCourse] = useState(false);
+  const [noUpload, setNoUpload] = useState(false);
 
   const authState = useSelector((state) => state.auth.user);
 
@@ -78,10 +79,18 @@ const Records = () => {
 
   const yearObj = userHours.filter((hours) => hours.year === year);
 
-  let earnedVerifiable;
-  if (yearObj.length > 0) {
-    earnedVerifiable = yearObj[0].verifiable;
-  }
+  useEffect(() => {
+    let earnedVerifiable;
+    if (yearObj.length > 0) {
+      earnedVerifiable = yearObj[0].verifiable;
+      if (yearObj[0].historic === true && yearObj[0].retro === false) {
+        setNoUpload(true);
+        setError(
+          `Uploading to ${year} is not allowed for you at the moment. If you are being audited and you need to show proof of CPD hours for ${year}, please go to Statistics page for ${year} and click 'Erase Past CPD Data.`
+        );
+      }
+    }
+  }, [year]);
 
   const hoursRequired = hoursRequiredLogic(user, currentYear);
 
@@ -109,6 +118,12 @@ const Records = () => {
   };
 
   const saveVerifiableCourse = async () => {
+    if (noUpload) {
+      setError(
+        `Uploading to ${year} is not allowed for you at the moment. If you are being audited and you need to show proof of CPD hours for ${year}, please go to Statistics page for ${year} and click 'Erase Past CPD Data.`
+      );
+      return;
+    }
     setSavingCourse(true);
 
     if (!year || !hours || !courseName) {

@@ -1,10 +1,9 @@
 import React from 'react';
-import { Text, View, StyleSheet } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
 import CustomButton from './CustomButton';
 import CustomText from './CustomText';
-import CustomSubtitle from './CustomSubtitle';
 import CustomBoldText from './CustomBoldText';
 import CustomAnimatedPie from './CustomAnimatedPie';
 
@@ -36,7 +35,8 @@ const CustomPieMessageCard = (props) => {
         <CustomText style={{ marginBottom: 10 }}>
           Great job! You are one step closer from meeting your annual CPD
           requirements! You now have earned {progress} {type} hours for {year}.
-          You still have {required - progress} hours to go.
+          You still have {required - progress}{' '}
+          {type === 'non-verifiable' ? 'CPD' : null} hours to go.
         </CustomText>
         <CustomAnimatedPie
           required={required}
