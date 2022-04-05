@@ -9,7 +9,7 @@ import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 import { activateKeepAwake, deactivateKeepAwake } from 'expo-keep-awake';
 import { Transition, Transitioning } from 'react-native-reanimated';
-import DateTimePicker from '@react-native-community/datetimepicker';
+import DateTimePickerModal from 'react-native-modal-datetime-picker';
 
 import CustomIndicator from '../../components/CustomIndicator';
 import CustomButton from '../../components/CustomButton';
@@ -50,7 +50,7 @@ const Timer = () => {
 
   //for direct Input only
   const [date, setDate] = useState(new Date(Date.now()));
-  const [show, setShow] = useState(false);
+  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
 
   const authState = useSelector((state) => state.auth.user);
   const user = authState;
@@ -94,6 +94,13 @@ const Timer = () => {
 
   const today = new Date(Date.now()).toDateString(); //watch this line in production
   const hours = Number((seconds / 3600).toFixed(2));
+
+  const handleConfirm = (selectedDate) => {
+    const currentDate = selectedDate || date;
+    //setShow(Platform.OS === 'ios' ? false : null);
+    setDate(currentDate);
+    setDatePickerVisibility(false);
+  };
 
   const saveTimedSession = async () => {
     setSavingTimed(true);
@@ -160,12 +167,6 @@ const Timer = () => {
       setStartButton('Start');
     };
   }, [isActive, seconds]);
-
-  const onChange = (event, selectedDate) => {
-    const currentDate = selectedDate || date;
-    setShow(Platform.OS === 'ios');
-    setDate(currentDate);
-  };
 
   const formattedDate = date.toDateString();
   const year = Number(formattedDate.split(' ').pop());
@@ -301,7 +302,7 @@ const Timer = () => {
           {showInputType === 'direct' ? (
             <CustomOperationalContainer>
               <View style={{ width: '100%' }}>
-                <Pressable onPress={() => setShow(true)}>
+                <Pressable onPress={() => setDatePickerVisibility(true)}>
                   <CustomSelectField
                     id="directDate"
                     label="Session Date"
@@ -314,16 +315,12 @@ const Timer = () => {
                   />
                 </Pressable>
               </View>
-              {show && (
-                <DateTimePicker
-                  testID="dateTimePicker"
-                  value={date}
-                  mode={'date'}
-                  is24Hour={true}
-                  display="default"
-                  onChange={onChange}
-                />
-              )}
+              <DateTimePickerModal
+                isVisible={isDatePickerVisible}
+                mode="date"
+                onConfirm={handleConfirm}
+                onCancel={() => setDatePickerVisibility(false)}
+              />
               <CustomInput
                 id="sessionName"
                 label="Session Name"
