@@ -34,9 +34,8 @@ const CustomPieMessageCard = (props) => {
         </CustomBoldText>
         <CustomText style={{ marginBottom: 10 }}>
           Great job! You are one step closer from meeting your annual CPD
-          requirements! You now have earned {progress} {type} hours for {year}.
-          You still have {required - progress}{' '}
-          {type === 'non-verifiable' ? 'CPD' : null} hours to go.
+          requirements! You now have earned {progress}{' '}
+          {type === 'non-verifiable' ? 'CPD' : null} hours for {year}.
         </CustomText>
         <CustomAnimatedPie
           required={required}

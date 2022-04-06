@@ -33,6 +33,7 @@ const Records = () => {
   const [cardText, setCardText] = useState('');
   const [error, setError] = useState('');
   const [savingCourse, setSavingCourse] = useState(false);
+  const [earnedVerifiable, setEarnedVerifiable] = useState(null);
   const [noUpload, setNoUpload] = useState(false);
 
   const authState = useSelector((state) => state.auth.user);
@@ -80,9 +81,9 @@ const Records = () => {
   const yearObj = userHours.filter((hours) => hours.year === year);
 
   useEffect(() => {
-    let earnedVerifiable;
     if (yearObj.length > 0) {
-      earnedVerifiable = yearObj[0].verifiable;
+      setNoUpload(false);
+      setEarnedVerifiable(yearObj[0].verifiable);
       if (yearObj[0].historic === true && yearObj[0].retro === false) {
         setNoUpload(true);
         setError(
@@ -90,7 +91,7 @@ const Records = () => {
         );
       }
     }
-  }, [year]);
+  }, [user, year, earnedVerifiable]);
 
   const hoursRequired = hoursRequiredLogic(user, currentYear);
 

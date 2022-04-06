@@ -47,6 +47,9 @@ const Timer = () => {
   const [error, setError] = useState('');
   const [savingDirect, setSavingDirect] = useState(false);
   const [savingTimed, setSavingTimed] = useState(false);
+  const [earnedVerifiable, setEarnedVerifiable] = useState(null);
+  const [earnedNonVerifiable, setEarnedNonVerifiable] = useState(null);
+  const [noUpload, setNoUpload] = useState(false);
 
   //for direct Input only
   const [date, setDate] = useState(new Date(Date.now()));
@@ -172,6 +175,8 @@ const Timer = () => {
   const year = Number(formattedDate.split(' ').pop());
   const directHours = Number(formState.inputValues.directHours);
 
+  //using seconds > 0 might not be the best way to identify Timer usage.
+  //rethink and refactor later
   let yearObj;
   if (seconds > 0) {
     yearObj = userHours.filter((hours) => hours.year === currentYear);
@@ -179,13 +184,31 @@ const Timer = () => {
     yearObj = userHours.filter((hours) => hours.year === year);
   }
 
-  let earnedVerifiable, earnedNonVerifiable;
-  if (yearObj.length > 0) {
-    earnedVerifiable = yearObj[0].verifiable;
-    earnedNonVerifiable = yearObj[0].nonVerifiable;
-  }
+  useEffect(() => {
+    if (yearObj.length > 0) {
+      setNoUpload(false);
+      setEarnedVerifiable(yearObj[0].verifiable);
+      setEarnedNonVerifiable(yearObj[0].nonVerifiable);
+      if (yearObj[0].historic === true && yearObj[0].retro === false) {
+        setNoUpload(true);
+        setError(
+          `Uploading to ${year} is not allowed for you at the moment. If you are being audited and you need to show proof of CPD hours for ${year}, please go to Statistics page for ${year} and click 'Erase Past CPD Data.`
+        );
+      }
+    }
+  }, [user, year, earnedVerifiable, earnedNonVerifiable]);
+
+  console.log('earnedVerifiable: ', earnedVerifiable);
+  console.log('earnedNonVerifiable: ', earnedNonVerifiable);
 
   const saveDirectSession = async () => {
+    if (noUpload) {
+      setError(
+        `Uploading to ${year} is not allowed for you at the moment. If you are being audited and you need to show proof of CPD hours for ${year}, please go to Statistics page for ${year} and click 'Erase Past CPD Data.`
+      );
+      return;
+    }
+
     setSavingDirect(true);
     setSeconds(0);
     const sessionName = formState.inputValues.sessionName;
@@ -213,10 +236,10 @@ const Timer = () => {
   const { currentYearNeedCPDHours } = hoursRequired;
   //we have two types of earned-hours under nonVer: either hours or directHours
   //we need year only for CustomPieMessageCard
-  // console.log('hours:', hours);
+  //console.log('hours:', hours);
   // console.log('year', typeof year);
   // console.log('currentYear:', typeof currentYear);
-  // console.log('directHours:', directHours);
+  //console.log('directHours:', directHours);
 
   if (!user) {
     return <CustomIndicator />;

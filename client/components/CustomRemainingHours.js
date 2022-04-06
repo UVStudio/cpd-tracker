@@ -34,8 +34,10 @@ const CustomRemainingHours = (props) => {
     return (
       <View style={styles.remainingHourscontainer}>
         <CustomTextStats>
-          You still need {remainingEthics.toFixed(1)} Ethics hours to complete{' '}
-          {showYear}'s CPD requirements'.
+          You have enough Verifiable hours and your earned total CPD hours is
+          same as the required amount, but you still need{' '}
+          {remainingEthics.toFixed(1)} Ethics hours to complete {showYear}'s CPD
+          requirement.
         </CustomTextStats>
       </View>
     );
@@ -47,7 +49,7 @@ const CustomRemainingHours = (props) => {
         <CustomTextStats>
           You have satisfied your Ethics and your Verifiable hours requirement
           for {showYear}, but you still need {remainingTotalCPD.toFixed(1)}{' '}
-          hours of total CPD hours.
+          hours of total CPD hours to satisfy your province's CPD requirement.
         </CustomTextStats>
       </View>
     );
@@ -58,9 +60,10 @@ const CustomRemainingHours = (props) => {
     return (
       <View style={styles.remainingHourscontainer}>
         <CustomTextStats>
-          You have satisfied your Ethics and your total CPD hours requirement
-          for {showYear}, but you still need {remainingVer.toFixed(1)} hours of
-          Verifiable hours.
+          You have satisfied your Ethics requirement. While your total CPD hours
+          for {showYear} is same as the required amount, you still need to earn
+          {remainingVer.toFixed(1)} hours of Verifiable hours to completely
+          satisfy your province's CPD requirement.
         </CustomTextStats>
       </View>
     );
@@ -71,8 +74,8 @@ const CustomRemainingHours = (props) => {
       <View style={styles.remainingHourscontainer}>
         <CustomTextStats>
           You have satisfied the Verifiable hours requirement for {showYear},
-          but you still need {remainingTotalCPD.toFixed(1)} hours of total CPD
-          hours, as well as {remainingEthics.toFixed(1)} Ethics hours.
+          but you still need {remainingEthics.toFixed(1)} Ethics hours. You also
+          need to earn {remainingTotalCPD.toFixed(1)} hours of total CPD hours.
         </CustomTextStats>
       </View>
     );
@@ -83,8 +86,9 @@ const CustomRemainingHours = (props) => {
       <View style={styles.remainingHourscontainer}>
         <CustomTextStats>
           You have satisfied your Ethics requirement for {showYear}, but you
-          still need {remainingVer.toFixed(1)} hours of Verifiable hours, as
-          well as {remainingTotalCPD.toFixed(1)} hours of total CPD hours.
+          still need {remainingTotalCPD.toFixed(1)} hours of total CPD hours,
+          and {remainingVer.toFixed(1)} of these hours need to be Verifiable
+          hours.
         </CustomTextStats>
       </View>
     );
@@ -95,9 +99,11 @@ const CustomRemainingHours = (props) => {
     return (
       <View style={styles.remainingHourscontainer}>
         <CustomTextStats>
-          You have satisfied the CPD hours requirement for {showYear}, but you
-          still need {remainingVer.toFixed(1)} hours of Verifiable hours, as
-          well as {remainingEthics.toFixed(1)} Ethics hours.
+          Your amount of total earned CPD hours for {showYear} is same as the
+          required amount, but you still need {remainingVer.toFixed(1)}{' '}
+          Verifiable hours, and {remainingEthics.toFixed(1)} of these Verifiable
+          hours need to be Ethics hours, to completely satisfy your province's
+          requirement.
         </CustomTextStats>
       </View>
     );
@@ -107,9 +113,10 @@ const CustomRemainingHours = (props) => {
     return (
       <View style={styles.remainingHourscontainer}>
         <CustomTextStats>
-          For {showYear}, you still need {remainingEthics.toFixed(1)} Ethics
-          hours, {remainingVer.toFixed(1)} hours of Verifiable hours, as well as{' '}
-          {remainingTotalCPD.toFixed(1)} hours of total CPD hours.
+          For {showYear}, you still need {remainingTotalCPD.toFixed(1)} hours of
+          total CPD hours, {remainingVer.toFixed(1)} of which need to be
+          Verifiable. {remainingEthics.toFixed(1)} of these Verifiable hours
+          need to be Ethics hours.
         </CustomTextStats>
       </View>
     );
