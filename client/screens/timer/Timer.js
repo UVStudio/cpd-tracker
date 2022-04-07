@@ -44,6 +44,7 @@ const Timer = () => {
   const [startButton, setStartButton] = useState('Start');
   const [sessionLength, setSessionLength] = useState('');
   const [cardText, setCardText] = useState('');
+  const [pieCardText, setPieCardText] = useState('');
   const [error, setError] = useState('');
   const [savingDirect, setSavingDirect] = useState(false);
   const [savingTimed, setSavingTimed] = useState(false);
@@ -115,7 +116,7 @@ const Timer = () => {
       );
       await dispatch(authActions.getUser());
       setSavingTimed(false);
-      setCardText('Non-Verifiable session successfully saved');
+      setPieCardText('Non-Verifiable session successfully saved');
       setSeconds(0);
       setSessionLength('');
       formState.inputValues.sessionName = '';
@@ -175,10 +176,8 @@ const Timer = () => {
   const year = Number(formattedDate.split(' ').pop());
   const directHours = Number(formState.inputValues.directHours);
 
-  //using seconds > 0 might not be the best way to identify Timer usage.
-  //rethink and refactor later
   let yearObj;
-  if (seconds > 0) {
+  if (showInputType === 'timer') {
     yearObj = userHours.filter((hours) => hours.year === currentYear);
   } else {
     yearObj = userHours.filter((hours) => hours.year === year);
@@ -197,9 +196,6 @@ const Timer = () => {
       }
     }
   }, [user, year, earnedVerifiable, earnedNonVerifiable]);
-
-  console.log('earnedVerifiable: ', earnedVerifiable);
-  console.log('earnedNonVerifiable: ', earnedNonVerifiable);
 
   const saveDirectSession = async () => {
     if (noUpload) {
@@ -224,7 +220,11 @@ const Timer = () => {
       );
       await dispatch(authActions.getUser());
       setSavingDirect(false);
-      setCardText('Non-Verifiable session successfully saved');
+      if (yearObj[0].retro === true) {
+        setCardText('Non-Verifiable session successfully saved');
+      } else {
+        setPieCardText('Non-Verifiable session successfully saved');
+      }
     } catch (err) {
       setSavingDirect(false);
       console.log(err.message);
@@ -235,11 +235,6 @@ const Timer = () => {
   const hoursRequired = hoursRequiredLogic(user, currentYear);
   const { currentYearNeedCPDHours } = hoursRequired;
   //we have two types of earned-hours under nonVer: either hours or directHours
-  //we need year only for CustomPieMessageCard
-  //console.log('hours:', hours);
-  // console.log('year', typeof year);
-  // console.log('currentYear:', typeof currentYear);
-  //console.log('directHours:', directHours);
 
   if (!user) {
     return <CustomIndicator />;
@@ -389,14 +384,14 @@ const Timer = () => {
             </CustomOperationalContainer>
           ) : null}
         </CustomScrollView>
-        {cardText !== '' && year !== currentYear ? (
+        {cardText !== '' ? (
           <CustomMessageCard text={cardText} toShow={setCardText} />
         ) : null}
-        {(cardText !== '' && year === currentYear) ||
-        (cardText !== '' && seconds > 0) ? (
+        {(pieCardText !== '' && year === currentYear) ||
+        (pieCardText !== '' && showInputType === 'timer') ? (
           <CustomPieMessageCard
-            text={cardText}
-            toShow={setCardText}
+            text={pieCardText}
+            toShow={setPieCardText}
             required={currentYearNeedCPDHours}
             progress={earnedVerifiable + earnedNonVerifiable}
             type={'non-verifiable'}

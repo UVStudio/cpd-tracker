@@ -4,7 +4,7 @@ import Colors from '../constants/Colors';
 
 const CustomSubtitle = (props) => {
   return (
-    <View style={{ alignSelf: 'flex-start' }}>
+    <View style={[{ alignSelf: 'flex-start' }, { ...props.style }]}>
       <Text style={{ ...styles.subtitle, ...props.style }}>
         {props.children}
       </Text>

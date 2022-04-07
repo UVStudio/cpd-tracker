@@ -17,7 +17,7 @@ const CustomErrorCard = (props) => {
         <Text style={styles.text}>{error}</Text>
         <CustomButton
           style={{ marginTop: 15 }}
-          onSelect={() => delayButton(toShow, '', 200)}
+          onSelect={() => delayButton(toShow, '', 100)}
         >
           Okay
         </CustomButton>

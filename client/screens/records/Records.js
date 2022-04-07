@@ -31,6 +31,7 @@ const Records = () => {
   const [showYear, setShowYear] = useState(currentYear);
   const [cert, setCert] = useState(null); //if true, app uploads a cert. if not, app uploads default no-cert.jpg from S3
   const [cardText, setCardText] = useState('');
+  const [pieCardText, setPieCardText] = useState('');
   const [error, setError] = useState('');
   const [savingCourse, setSavingCourse] = useState(false);
   const [earnedVerifiable, setEarnedVerifiable] = useState(null);
@@ -111,10 +112,17 @@ const Records = () => {
         setCert(file);
       }
     } catch (err) {
-      console.log(err.message);
-      setError(
-        'There is something wrong with our network. Please try again later.'
-      );
+      console.log('err: ', err.message);
+      if (
+        err.message ===
+        'RNCPromiseWrapper: user canceled the document picker, Error Domain=NSCocoaErrorDomain Code=3072 "The operation was cancelled."'
+      ) {
+        setError('Please pick a certificate from your mobile device.');
+      } else {
+        setError(
+          'There is something wrong with our network. Please try again later.'
+        );
+      }
     }
   };
 
@@ -158,7 +166,11 @@ const Records = () => {
       }
       setCert(null);
       await dispatch(authActions.getUser());
-      setCardText('Verifiable session successfully saved');
+      if (yearObj[0].retro === true) {
+        setCardText('Verifiable session successfully saved');
+      } else {
+        setPieCardText('Verifiable session successfully saved');
+      }
       setSavingCourse(false);
     } catch (err) {
       console.log(err.message);
@@ -248,10 +260,10 @@ const Records = () => {
       {cardText !== '' && year !== currentYear ? (
         <CustomMessageCard text={cardText} toShow={setCardText} />
       ) : null}
-      {cardText !== '' && year === currentYear ? (
+      {pieCardText !== '' && year === currentYear ? (
         <CustomPieMessageCard
-          text={cardText}
-          toShow={setCardText}
+          text={pieCardText}
+          toShow={setPieCardText}
           required={currentYearNeedVerHours}
           progress={earnedVerifiable}
           type={'verifiable'}
