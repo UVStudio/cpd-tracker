@@ -116,13 +116,11 @@ const Records = () => {
       if (
         err.message ===
         'RNCPromiseWrapper: user canceled the document picker, Error Domain=NSCocoaErrorDomain Code=3072 "The operation was cancelled."'
-      ) {
-        setError('Please pick a certificate from your mobile device.');
-      } else {
-        setError(
-          'There is something wrong with our network. Please try again later.'
-        );
-      }
+      )
+        return;
+      setError(
+        'There is something wrong with our network. Please try again later.'
+      );
     }
   };
 

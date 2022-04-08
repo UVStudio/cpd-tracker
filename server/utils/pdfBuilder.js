@@ -45,6 +45,9 @@ const buildPDF = async (
   const titleSize = 20;
   const subTitleSize = 16;
   const textSize = 12;
+  const avenirBold = './fonts/AvenirNextCondensed-Bold.ttf';
+  const avenirDemiBold = './fonts/AvenirNextCondensed-DemiBold.ttf';
+  const avenirMedium = './fonts/AvenirNextCondensed-Medium.ttf';
 
   const userHours = user.hours;
   const chosenYear = userHours.find((userHour) => userHour.year === year);
@@ -53,6 +56,38 @@ const buildPDF = async (
     (nonVerSession) => nonVerSession.year === year
   );
   const totalCPDHours = chosenYear.verifiable + chosenYear.nonVerifiable;
+
+  const prevYear = userHours.find((userHour) => userHour.year === year - 1);
+  const twoYearsAgo = userHours.find((userHour) => userHour.year === year - 2);
+
+  console.log('twoYearsAgo: ', twoYearsAgo);
+
+  const chosenYearVer = chosenYear.verifiable;
+  const chosenYearNonVer = chosenYear.nonVerifiable;
+  const chosenYearEthics = chosenYear.ethics;
+  const chosenYearCPD = chosenYearVer + chosenYearNonVer;
+  const prevYearVer = prevYear.verifiable;
+  const prevYearNonVer = prevYear.nonVerifiable;
+  const prevYearEthics = prevYear.ethics;
+  const prevYearCPD = prevYearVer + prevYearNonVer;
+  const twoYearsAgoVer = twoYearsAgo.verifiable;
+  const twoYearsAgoNonVer = twoYearsAgo.nonVerifiable;
+  const twoYearsAgoEthics = twoYearsAgo.ethics;
+  const twoYearsAgoCPD = twoYearsAgoVer + twoYearsAgoNonVer;
+
+  console.log('chosenYearEthics: ', chosenYearEthics);
+  console.log('prevYearEthics: ', prevYearEthics);
+  console.log('2YearsEthics: ', twoYearsAgoEthics);
+
+  const totalVer = chosenYearVer + prevYearVer + twoYearsAgoVer;
+  const totalNonVer = chosenYearNonVer + prevYearNonVer + twoYearsAgoNonVer;
+  const totalEthics = chosenYearEthics + prevYearEthics + twoYearsAgoEthics;
+  const totalCPD = totalVer + totalNonVer;
+
+  console.log('totalVer: ', totalVer);
+  console.log('totalNonVer: ', totalNonVer);
+  console.log('totalEthics: ', totalEthics);
+  console.log('totalCPD: ', totalCPD);
 
   let writeStream = fs.createWriteStream(`./uploads/${CPDFileName}`);
   doc.pipe(writeStream);
@@ -63,37 +98,124 @@ const buildPDF = async (
     })
     .moveDown(1);
 
+  //Doc Title
   doc.fontSize(titleSize).text('CPD Tracker').moveDown(0);
   doc.fontSize(textSize).text('By Sheriff Consulting').moveDown(2);
   doc.fontSize(subTitleSize).text(`CPA Name: ${user.name}`);
-  doc.fontSize(textSize).text(`CPD Report for ${year}`).moveDown(2);
+  doc
+    .fontSize(textSize)
+    .text(`CPD Report ${twoYearsAgo.year} - ${year}`)
+    .moveDown(2);
 
-  doc.fontSize(subTitleSize).text(`Summary:`).moveDown(0.5);
+  // 3 year rolling summary bolded
   doc
     .fontSize(textSize)
-    .text(`Verifiable Hours: ${Number(chosenYear.verifiable).toFixed(1)}`);
-  doc
-    .fontSize(textSize)
+    .font(avenirBold)
     .text(
-      `Non-Verifiable Hours: ${Number(chosenYear.nonVerifiable).toFixed(1)}`
+      `3-Year Rolling Period ${twoYearsAgo.year} - ${year} CPD Hours Summary:`,
+      {
+        underline: true,
+      }
     );
 
+  doc.fontSize(textSize).font(avenirBold).text(`Verifiable Hours: ${totalVer}`);
+
   doc
     .fontSize(textSize)
-    .text(`Ethics Hours: ${Number(chosenYear.ethics).toFixed(1)}`)
-    .moveDown(1);
+    .font(avenirBold)
+    .text(`Non-Verifiable Hours: ${totalNonVer}`);
+
+  doc.fontSize(textSize).font(avenirBold).text(`Ethics Hours: ${totalEthics}`);
+
   doc
     .fontSize(textSize)
-    .text(`Total CPD Hours: ${Number(totalCPDHours).toFixed(1)}`)
+    .font(avenirBold)
+    .text(`Total CPD Hours: ${totalCPD}`)
     .moveDown(2);
-  doc.fontSize(subTitleSize).text(`Non-Verifiable Sessions:`).moveDown(0.5);
-  for (const i of nonVerSessionsYear) {
-    doc
-      .fontSize(textSize)
-      .text(
-        `Name: ${i.sessionName} - Date: ${i.date} - Duration: ${i.hours} Hour(s)`
-      );
-  }
+
+  //chosen year summary
+  doc.fontSize(textSize).font(avenirMedium).text(`${year} CPD Hours Summary:`, {
+    underline: true,
+  });
+
+  doc
+    .fontSize(textSize)
+    .font(avenirMedium)
+    .text(`Verifiable Hours: ${chosenYearVer}`);
+
+  doc
+    .fontSize(textSize)
+    .font(avenirMedium)
+    .text(`Non-Verifiable Hours: ${chosenYearNonVer}`);
+
+  doc
+    .fontSize(textSize)
+    .font(avenirMedium)
+    .text(`Ethics Hours: ${chosenYearEthics}`);
+
+  doc
+    .fontSize(textSize)
+    .font(avenirMedium)
+    .text(`Total CPD Hours: ${chosenYearCPD}`)
+    .moveDown(2);
+
+  //previous year summary
+  doc
+    .fontSize(textSize)
+    .font(avenirMedium)
+    .text(`${prevYear.year} CPD Hours Summary:`, {
+      underline: true,
+    });
+
+  doc
+    .fontSize(textSize)
+    .font(avenirMedium)
+    .text(`Verifiable Hours: ${prevYearVer}`);
+
+  doc
+    .fontSize(textSize)
+    .font(avenirMedium)
+    .text(`Non-Verifiable Hours: ${prevYearNonVer}`);
+
+  doc
+    .fontSize(textSize)
+    .font(avenirMedium)
+    .text(`Ethics Hours: ${prevYearEthics}`);
+
+  doc
+    .fontSize(textSize)
+    .font(avenirMedium)
+    .text(`Total CPD Hours: ${prevYearCPD}`)
+    .moveDown(2);
+
+  //two years ago year summary
+  doc
+    .fontSize(textSize)
+    .font(avenirMedium)
+    .text(`${twoYearsAgo.year} CPD Hours Summary:`, {
+      underline: true,
+    });
+
+  doc
+    .fontSize(textSize)
+    .font(avenirMedium)
+    .text(`Verifiable Hours: ${twoYearsAgoVer}`);
+
+  doc
+    .fontSize(textSize)
+    .font(avenirMedium)
+    .text(`Non-Verifiable Hours: ${twoYearsAgoNonVer}`);
+
+  doc
+    .fontSize(textSize)
+    .font(avenirMedium)
+    .text(`Ethics Hours: ${twoYearsAgoEthics}`);
+
+  doc
+    .fontSize(textSize)
+    .font(avenirMedium)
+    .text(`Total CPD Hours: ${twoYearsAgoCPD}`)
+    .moveDown(2);
 
   doc.addPage();
 
