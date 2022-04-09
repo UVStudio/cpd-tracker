@@ -1,6 +1,7 @@
 const PDFDocument = require('pdfkit');
 const fs = require('fs');
 const mongoose = require('mongoose');
+const ObjectId = require('mongodb').ObjectId;
 const aws = require('aws-sdk');
 const { GridFsStorage } = require('multer-gridfs-storage');
 const ErrorResponse = require('../utils/errorResponse');
@@ -228,7 +229,7 @@ const buildPDF = async (
   doc
     .fontSize(subTitleSize)
     .font(avenirMedium)
-    .text(`Total Hours: ${chosenYearVer} hours earned`)
+    .text(`Total Verifiable Hours: ${chosenYearVer} hours earned`)
     .moveDown(0.5);
 
   //Chosen year verifiable courses and certs
@@ -238,6 +239,13 @@ const buildPDF = async (
       filename: searchTerm,
     })
     .toArray(async (err, files) => {
+      if (files.length === 0) {
+        doc
+          .fontSize(textSize)
+          .font(avenirDemiBold)
+          .text(`No certificates were uploaded for ${chosenYear.year}`);
+        doc.addPage();
+      }
       for (let i = 0; i < files.length; i++) {
         doc
           .fontSize(textSize)
@@ -266,62 +274,292 @@ const buildPDF = async (
           doc.addPage();
         }
       }
-      //Previous Year CPD details
-      doc
-        .fontSize(titleSize)
-        .font(avenirMedium)
-        .text(`${prevYear.year} CPD Details:`)
-        .moveDown(0.5);
 
+      //Chosen year's Non-Verifiable Summary
       doc
         .fontSize(subTitleSize)
         .font(avenirMedium)
-        .text(`Verifiable Hours - ${prevYear.year}:`, {
+        .text(`Non-Verifiable Hours - ${chosenYear.year}:`, {
           underline: true,
         });
 
       doc
         .fontSize(subTitleSize)
         .font(avenirMedium)
-        .text(`Total Hours: ${prevYearVer} hours earned`)
+        .text(`Total Non-Verifiable Hours: ${chosenYearNonVer} hours earned`)
         .moveDown(0.5);
 
-      //Previous year verifiable courses and certs
+      //Chosen year's Non-Verifiable Details
       conn.db
-        .collection('uploads.files')
+        .collection('nonvers')
         .find({
-          filename: prevYearSearchTerm,
+          user: ObjectId(userId),
+          year: chosenYear.year,
         })
         .toArray(async (err, files) => {
+          if (files.length === 0) {
+            doc
+              .fontSize(textSize)
+              .font(avenirDemiBold)
+              .text(
+                `No non-verifiable sessions were uploaded for ${chosenYear.year}`
+              );
+            doc.addPage();
+          }
           for (let i = 0; i < files.length; i++) {
             doc
               .fontSize(textSize)
               .font(avenirDemiBold)
-              .text(`${i + 1} - ${files[i].metadata.courseName}`);
+              .text(`${i + 1} - ${files[i].sessionName}`);
             doc
               .fontSize(textSize)
               .font(avenirMedium)
-              .text(`Duration: ${files[i].metadata.hours} hour(s) earned`);
+              .text(`Date: ${files[i].date}`);
             doc
               .fontSize(textSize)
               .font(avenirMedium)
-              .text(`Ethics Hour(s): ${files[i].metadata.ethicsHours}`)
-              .moveDown(0.5);
-
-            let tempCertFile = await downloadFile(files[i]._id, gfsCerts);
-
-            doc
-              .image(tempCertFile, {
-                fit: [330, 220],
-                align: 'center',
-              })
-              .moveDown(1);
-
-            if (i === 1 || i % 2 === 1) {
-              doc.addPage();
-            }
+              .text(`Duration: ${files[i].hours} hour(s) earned`);
           }
-          doc.end();
+          doc.addPage();
+
+          //Previous Year CPD details
+          doc
+            .fontSize(titleSize)
+            .font(avenirMedium)
+            .text(`${prevYear.year} CPD Details:`)
+            .moveDown(0.5);
+
+          doc
+            .fontSize(subTitleSize)
+            .font(avenirMedium)
+            .text(`Verifiable Hours - ${prevYear.year}:`, {
+              underline: true,
+            });
+
+          doc
+            .fontSize(subTitleSize)
+            .font(avenirMedium)
+            .text(`Total Verifiable Hours: ${prevYearVer} hours earned`)
+            .moveDown(0.5);
+
+          //Previous year verifiable courses and certs
+          conn.db
+            .collection('uploads.files')
+            .find({
+              filename: prevYearSearchTerm,
+            })
+            .toArray(async (err, files) => {
+              if (files.length === 0) {
+                doc
+                  .fontSize(textSize)
+                  .font(avenirDemiBold)
+                  .text(`No certificates were uploaded for ${prevYear.year}`);
+                doc.addPage();
+              }
+              for (let i = 0; i < files.length; i++) {
+                doc
+                  .fontSize(textSize)
+                  .font(avenirDemiBold)
+                  .text(`${i + 1} - ${files[i].metadata.courseName}`);
+                doc
+                  .fontSize(textSize)
+                  .font(avenirMedium)
+                  .text(`Duration: ${files[i].metadata.hours} hour(s) earned`);
+                doc
+                  .fontSize(textSize)
+                  .font(avenirMedium)
+                  .text(`Ethics Hour(s): ${files[i].metadata.ethicsHours}`)
+                  .moveDown(0.5);
+
+                let tempCertFile = await downloadFile(files[i]._id, gfsCerts);
+
+                doc
+                  .image(tempCertFile, {
+                    fit: [330, 220],
+                    align: 'center',
+                  })
+                  .moveDown(1);
+
+                if (i === 1 || i % 2 === 1) {
+                  doc.addPage();
+                }
+              }
+              //Previous year's Non-Verifiable Summary
+              doc
+                .fontSize(subTitleSize)
+                .font(avenirMedium)
+                .text(`Non-Verifiable Hours - ${prevYear.year}:`, {
+                  underline: true,
+                });
+
+              doc
+                .fontSize(subTitleSize)
+                .font(avenirMedium)
+                .text(
+                  `Total Non-Verifiable Hours: ${prevYearNonVer} hours earned`
+                )
+                .moveDown(0.5);
+
+              //Previous year's Non-Verifiable Details
+              conn.db
+                .collection('nonvers')
+                .find({
+                  user: ObjectId(userId),
+                  year: prevYear.year,
+                })
+                .toArray(async (err, files) => {
+                  if (files.length === 0) {
+                    doc
+                      .fontSize(textSize)
+                      .font(avenirDemiBold)
+                      .text(
+                        `No non-verifiable sessions were uploaded for ${prevYear.year}`
+                      );
+                    doc.addPage();
+                  }
+                  for (let i = 0; i < files.length; i++) {
+                    doc
+                      .fontSize(textSize)
+                      .font(avenirDemiBold)
+                      .text(`${i + 1} - ${files[i].sessionName}`);
+                    doc
+                      .fontSize(textSize)
+                      .font(avenirMedium)
+                      .text(`Date: ${files[i].date}`);
+                    doc
+                      .fontSize(textSize)
+                      .font(avenirMedium)
+                      .text(`Duration: ${files[i].hours} hour(s) earned`);
+                  }
+                  doc.addPage();
+
+                  //Two years ago CPD details
+                  doc
+                    .fontSize(titleSize)
+                    .font(avenirMedium)
+                    .text(`${twoYearsAgo.year} CPD Details:`)
+                    .moveDown(0.5);
+
+                  doc
+                    .fontSize(subTitleSize)
+                    .font(avenirMedium)
+                    .text(`Verifiable Hours - ${twoYearsAgo.year}:`, {
+                      underline: true,
+                    });
+
+                  doc
+                    .fontSize(subTitleSize)
+                    .font(avenirMedium)
+                    .text(
+                      `Total Verifiable Hours: ${twoYearsAgoVer} hours earned`
+                    )
+                    .moveDown(0.5);
+
+                  //Two years ago verifiable courses and certs
+                  conn.db
+                    .collection('uploads.files')
+                    .find({
+                      filename: twoYearsAgoSearchTerm,
+                    })
+                    .toArray(async (err, files) => {
+                      if (files.length === 0) {
+                        doc
+                          .fontSize(textSize)
+                          .font(avenirDemiBold)
+                          .text(
+                            `No certificates were uploaded for ${twoYearsAgo.year}`
+                          );
+                        doc.addPage();
+                      }
+                      for (let i = 0; i < files.length; i++) {
+                        doc
+                          .fontSize(textSize)
+                          .font(avenirDemiBold)
+                          .text(`${i + 1} - ${files[i].metadata.courseName}`);
+                        doc
+                          .fontSize(textSize)
+                          .font(avenirMedium)
+                          .text(
+                            `Duration: ${files[i].metadata.hours} hour(s) earned`
+                          );
+                        doc
+                          .fontSize(textSize)
+                          .font(avenirMedium)
+                          .text(
+                            `Ethics Hour(s): ${files[i].metadata.ethicsHours}`
+                          )
+                          .moveDown(0.5);
+
+                        let tempCertFile = await downloadFile(
+                          files[i]._id,
+                          gfsCerts
+                        );
+
+                        doc
+                          .image(tempCertFile, {
+                            fit: [330, 220],
+                            align: 'center',
+                          })
+                          .moveDown(1);
+
+                        if (i === 1 || i % 2 === 1) {
+                          doc.addPage();
+                        }
+                      }
+                      //Two years ago Non-Verifiable Summary
+                      doc
+                        .fontSize(subTitleSize)
+                        .font(avenirMedium)
+                        .text(`Non-Verifiable Hours - ${twoYearsAgo.year}:`, {
+                          underline: true,
+                        });
+
+                      doc
+                        .fontSize(subTitleSize)
+                        .font(avenirMedium)
+                        .text(
+                          `Total Non-Verifiable Hours: ${twoYearsAgoNonVer} hours earned`
+                        )
+                        .moveDown(0.5);
+
+                      //Previous year's Non-Verifiable Details
+                      conn.db
+                        .collection('nonvers')
+                        .find({
+                          user: ObjectId(userId),
+                          year: twoYearsAgo.year,
+                        })
+                        .toArray(async (err, files) => {
+                          if (files.length === 0) {
+                            doc
+                              .fontSize(textSize)
+                              .font(avenirDemiBold)
+                              .text(
+                                `No non-verifiable sessions were uploaded for ${twoYearsAgo.year}`
+                              );
+                            doc.addPage();
+                          }
+                          for (let i = 0; i < files.length; i++) {
+                            doc
+                              .fontSize(textSize)
+                              .font(avenirDemiBold)
+                              .text(`${i + 1} - ${files[i].sessionName}`);
+                            doc
+                              .fontSize(textSize)
+                              .font(avenirMedium)
+                              .text(`Date: ${files[i].date}`);
+                            doc
+                              .fontSize(textSize)
+                              .font(avenirMedium)
+                              .text(
+                                `Duration: ${files[i].hours} hour(s) earned`
+                              );
+                          }
+                          doc.end();
+                        });
+                    });
+                });
+            });
         });
     });
 
