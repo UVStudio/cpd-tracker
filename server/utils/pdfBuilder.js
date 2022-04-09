@@ -42,8 +42,8 @@ const buildPDF = async (
 ) => {
   const doc = new PDFDocument();
 
-  const titleSize = 20;
-  const subTitleSize = 16;
+  const titleSize = 16;
+  const subTitleSize = 14;
   const textSize = 12;
   const avenirBold = './fonts/AvenirNextCondensed-Bold.ttf';
   const avenirDemiBold = './fonts/AvenirNextCondensed-DemiBold.ttf';
@@ -51,16 +51,17 @@ const buildPDF = async (
 
   const userHours = user.hours;
   const chosenYear = userHours.find((userHour) => userHour.year === year);
-  const nonVerSessions = user.nonver;
-  const nonVerSessionsYear = nonVerSessions.filter(
-    (nonVerSession) => nonVerSession.year === year
-  );
-  const totalCPDHours = chosenYear.verifiable + chosenYear.nonVerifiable;
-
   const prevYear = userHours.find((userHour) => userHour.year === year - 1);
   const twoYearsAgo = userHours.find((userHour) => userHour.year === year - 2);
 
-  console.log('twoYearsAgo: ', twoYearsAgo);
+  const prevYearSearchTerm = searchTerm
+    .slice(0, -8)
+    .concat(prevYear.year)
+    .concat('.jpg');
+  const twoYearsAgoSearchTerm = searchTerm
+    .slice(0, -8)
+    .concat(twoYearsAgo.year)
+    .concat('.jpg');
 
   const chosenYearVer = chosenYear.verifiable;
   const chosenYearNonVer = chosenYear.nonVerifiable;
@@ -75,19 +76,10 @@ const buildPDF = async (
   const twoYearsAgoEthics = twoYearsAgo.ethics;
   const twoYearsAgoCPD = twoYearsAgoVer + twoYearsAgoNonVer;
 
-  console.log('chosenYearEthics: ', chosenYearEthics);
-  console.log('prevYearEthics: ', prevYearEthics);
-  console.log('2YearsEthics: ', twoYearsAgoEthics);
-
   const totalVer = chosenYearVer + prevYearVer + twoYearsAgoVer;
   const totalNonVer = chosenYearNonVer + prevYearNonVer + twoYearsAgoNonVer;
   const totalEthics = chosenYearEthics + prevYearEthics + twoYearsAgoEthics;
   const totalCPD = totalVer + totalNonVer;
-
-  console.log('totalVer: ', totalVer);
-  console.log('totalNonVer: ', totalNonVer);
-  console.log('totalEthics: ', totalEthics);
-  console.log('totalCPD: ', totalCPD);
 
   let writeStream = fs.createWriteStream(`./uploads/${CPDFileName}`);
   doc.pipe(writeStream);
@@ -105,7 +97,7 @@ const buildPDF = async (
   doc
     .fontSize(textSize)
     .text(`CPD Report ${twoYearsAgo.year} - ${year}`)
-    .moveDown(2);
+    .moveDown(1.5);
 
   // 3 year rolling summary bolded
   doc
@@ -131,7 +123,7 @@ const buildPDF = async (
     .fontSize(textSize)
     .font(avenirBold)
     .text(`Total CPD Hours: ${totalCPD}`)
-    .moveDown(2);
+    .moveDown(1.5);
 
   //chosen year summary
   doc.fontSize(textSize).font(avenirMedium).text(`${year} CPD Hours Summary:`, {
@@ -186,7 +178,7 @@ const buildPDF = async (
     .fontSize(textSize)
     .font(avenirMedium)
     .text(`Total CPD Hours: ${prevYearCPD}`)
-    .moveDown(2);
+    .moveDown(1.5);
 
   //two years ago year summary
   doc
@@ -215,12 +207,31 @@ const buildPDF = async (
     .fontSize(textSize)
     .font(avenirMedium)
     .text(`Total CPD Hours: ${twoYearsAgoCPD}`)
-    .moveDown(2);
+    .moveDown(1.5);
 
   doc.addPage();
 
-  doc.fontSize(subTitleSize).text(`Verifiable Sessions:`).moveDown(0.5);
+  //Chosen Year CPD details
+  doc
+    .fontSize(titleSize)
+    .font(avenirMedium)
+    .text(`${chosenYear.year} CPD Details:`)
+    .moveDown(0.5);
 
+  doc
+    .fontSize(subTitleSize)
+    .font(avenirMedium)
+    .text(`Verifiable Hours - ${chosenYear.year}:`, {
+      underline: true,
+    });
+
+  doc
+    .fontSize(subTitleSize)
+    .font(avenirMedium)
+    .text(`Total Hours: ${chosenYearVer} hours earned`)
+    .moveDown(0.5);
+
+  //Chosen year verifiable courses and certs
   conn.db
     .collection('uploads.files')
     .find({
@@ -230,23 +241,88 @@ const buildPDF = async (
       for (let i = 0; i < files.length; i++) {
         doc
           .fontSize(textSize)
-          .text(`Course Name: ${files[i].metadata.courseName}`);
-        doc.fontSize(textSize).text(`Year: ${files[i].metadata.year}`);
+          .font(avenirDemiBold)
+          .text(`${i + 1} - ${files[i].metadata.courseName}`);
+        doc
+          .fontSize(textSize)
+          .font(avenirMedium)
+          .text(`Duration: ${files[i].metadata.hours} hour(s) earned`);
+        doc
+          .fontSize(textSize)
+          .font(avenirMedium)
+          .text(`Ethics Hour(s): ${files[i].metadata.ethicsHours}`)
+          .moveDown(0.5);
+
         let tempCertFile = await downloadFile(files[i]._id, gfsCerts);
 
         doc
           .image(tempCertFile, {
-            fit: [384, 256],
+            fit: [330, 220],
             align: 'center',
           })
-          .moveDown(2);
+          .moveDown(1);
 
         if (i === 1 || i % 2 === 1) {
           doc.addPage();
         }
       }
+      //Previous Year CPD details
+      doc
+        .fontSize(titleSize)
+        .font(avenirMedium)
+        .text(`${prevYear.year} CPD Details:`)
+        .moveDown(0.5);
 
-      doc.end();
+      doc
+        .fontSize(subTitleSize)
+        .font(avenirMedium)
+        .text(`Verifiable Hours - ${prevYear.year}:`, {
+          underline: true,
+        });
+
+      doc
+        .fontSize(subTitleSize)
+        .font(avenirMedium)
+        .text(`Total Hours: ${prevYearVer} hours earned`)
+        .moveDown(0.5);
+
+      //Previous year verifiable courses and certs
+      conn.db
+        .collection('uploads.files')
+        .find({
+          filename: prevYearSearchTerm,
+        })
+        .toArray(async (err, files) => {
+          for (let i = 0; i < files.length; i++) {
+            doc
+              .fontSize(textSize)
+              .font(avenirDemiBold)
+              .text(`${i + 1} - ${files[i].metadata.courseName}`);
+            doc
+              .fontSize(textSize)
+              .font(avenirMedium)
+              .text(`Duration: ${files[i].metadata.hours} hour(s) earned`);
+            doc
+              .fontSize(textSize)
+              .font(avenirMedium)
+              .text(`Ethics Hour(s): ${files[i].metadata.ethicsHours}`)
+              .moveDown(0.5);
+
+            let tempCertFile = await downloadFile(files[i]._id, gfsCerts);
+
+            doc
+              .image(tempCertFile, {
+                fit: [330, 220],
+                align: 'center',
+              })
+              .moveDown(1);
+
+            if (i === 1 || i % 2 === 1) {
+              doc.addPage();
+            }
+          }
+          doc.end();
+        });
     });
 
   //Stream to S3 and create the URL

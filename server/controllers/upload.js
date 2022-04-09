@@ -31,7 +31,14 @@ exports.uploadCert = asyncHandler(async (req, res, next) => {
     );
   }
 
-  const certData = await certUploadHelper(userId, year, courseName, file);
+  const certData = await certUploadHelper(
+    userId,
+    year,
+    courseName,
+    hours,
+    ethicsHours,
+    file
+  );
   const uploadFile = certData.uploadFile;
   const storage = certData.storage;
   const newFileName = certData.newFileName;
@@ -97,7 +104,7 @@ exports.updateCertByObjId = asyncHandler(async (req, res, next) => {
   const newFile = req.file;
   const certId = req.params.id;
   const userId = req.user.id;
-  const { courseName } = req.body;
+  const { courseName, hours } = req.body;
   let cert = await Cert.findById(certId);
   const existingCertImgId = cert.img;
   const { year } = cert;
@@ -112,7 +119,13 @@ exports.updateCertByObjId = asyncHandler(async (req, res, next) => {
     );
   }
 
-  const certData = await certUploadHelper(userId, year, courseName, newFile);
+  const certData = await certUploadHelper(
+    userId,
+    year,
+    courseName,
+    hours,
+    newFile
+  );
   const uploadFile = certData.uploadFile;
   const storage = certData.storage;
   const newFileName = certData.newFileName;

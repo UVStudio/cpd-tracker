@@ -4,7 +4,14 @@ const { GridFsStorage } = require('multer-gridfs-storage');
 const { fromPath } = require('pdf2pic');
 const Jimp = require('jimp');
 
-const certUploadHelper = async (userId, year, courseName, file) => {
+const certUploadHelper = async (
+  userId,
+  year,
+  courseName,
+  hours,
+  ethicsHours,
+  file
+) => {
   let uploadFile;
 
   //clean file name
@@ -29,6 +36,8 @@ const certUploadHelper = async (userId, year, courseName, file) => {
         metadata: {
           userId,
           courseName,
+          hours,
+          ethicsHours,
           year,
         },
         bucketName: 'uploads',

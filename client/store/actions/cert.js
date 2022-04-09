@@ -81,10 +81,10 @@ export const getAllCertObjsByYear = (year) => {
   };
 };
 
-export const editCertCourseById = (courseName, hours, id) => {
+export const editCertCourseById = (courseName, hours, ethicsHours, id) => {
   return async (dispatch) => {
     try {
-      const body = { courseName, hours };
+      const body = { courseName, hours, ethicsHours };
 
       const response = await axios.put(`${CURRENT_IP}/api/cert/${id}`, body);
       const data = response.data.data;
@@ -104,6 +104,8 @@ export const certUpdateById = (courseName, cert, id) => {
     try {
       const certName = cert.name;
       const uri = cert.uri;
+      const hours = cert.hours;
+      const ethicsHours = cert.ethicsHours;
 
       let formData = new FormData();
 
@@ -112,6 +114,8 @@ export const certUpdateById = (courseName, cert, id) => {
         uri: `${uri}`,
         type: '*/*',
         name: `${certName}`,
+        hours: `${hours}`,
+        ethicsHours: `${ethicsHours}`,
       });
 
       const config = {
@@ -157,7 +161,6 @@ export const deleteCertObjById = (id) => {
 export const deleteAllCertsByUserYear = (year) => {
   return async (dispatch) => {
     try {
-      console.log('deleteAllCertsByUserYear ran');
       const response = await axios.delete(
         `${CURRENT_IP}/api/cert/year/${year}`
       );

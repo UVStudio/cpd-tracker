@@ -77,7 +77,7 @@ exports.updateCertObjById = asyncHandler(async (req, res, next) => {
 
   const prevHours = cert.hours;
   const certYear = cert.year;
-  const { courseName, hours } = req.body;
+  const { courseName, hours, ethicsHours } = req.body;
   const hoursDiff = hours - prevHours;
 
   if (hoursDiff !== 0) {
@@ -95,7 +95,7 @@ exports.updateCertObjById = asyncHandler(async (req, res, next) => {
 
   cert = await Cert.findOneAndUpdate(
     { _id: certId },
-    { courseName, hours },
+    { courseName, hours, ethicsHours },
     { new: true }
   );
 

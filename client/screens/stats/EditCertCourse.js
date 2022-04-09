@@ -33,17 +33,23 @@ const EditCertCourse = (props) => {
 
   const dispatch = useDispatch();
 
+  console.log('cert: ', cert);
+
   const certHours = cert.hours;
   const certHoursString = certHours.toString();
+  const ethicsHours = cert.ethicsHours;
+  const ethicsHoursString = ethicsHours.toString();
 
   const [formState, dispatchFormState] = useReducer(formReducer, {
     inputValues: {
       courseName: cert.courseName,
       hours: certHoursString,
+      ethicsHours: ethicsHoursString,
     },
     inputValidities: {
       courseName: true,
       hours: true,
+      ethicsHours: true,
     },
     formIsValid: false,
   });
@@ -78,17 +84,27 @@ const EditCertCourse = (props) => {
     [dispatchFormState]
   );
 
+  //also need to update uploads.files metadata
   const editCourse = async (id) => {
     setUpdatingCourse(true);
     const courseName = formState.inputValues.courseName;
     const hours = formState.inputValues.hours;
+    const ethicsHours = formState.inputValues.ethicsHours;
     try {
       if (certUpload) {
         await dispatch(
-          certActions.certUpdateById(courseName, certUpload, hours, id)
+          certActions.certUpdateById(
+            courseName,
+            certUpload,
+            hours,
+            ethicsHours,
+            id
+          )
         );
       } else {
-        await dispatch(certActions.editCertCourseById(courseName, hours, id));
+        await dispatch(
+          certActions.editCertCourseById(courseName, hours, ethicsHours, id)
+        );
       }
       await dispatch(authActions.getUser());
       setCardText('Verifiable course successfully updated');
@@ -125,6 +141,15 @@ const EditCertCourse = (props) => {
             autoCapitalize="none"
             onInputChange={inputChangeHandler}
             initialValue={certHoursString}
+            required
+          />
+          <CustomInput
+            id="ethics"
+            label="Edit Ethics Hours"
+            keyboardType="numeric"
+            autoCapitalize="none"
+            onInputChange={inputChangeHandler}
+            initialValue={ethicsHoursString}
             required
           />
           <CustomButton
