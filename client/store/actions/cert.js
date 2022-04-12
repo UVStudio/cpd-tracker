@@ -26,6 +26,8 @@ export const saveVerCourse = (year, hours, ethicsHours, courseName, cert) => {
         name: `${certName}`,
       });
 
+      console.log('upload formData: ', formData);
+
       const config = {
         headers: {
           Accept: 'application/json',
@@ -81,6 +83,7 @@ export const getAllCertObjsByYear = (year) => {
   };
 };
 
+//this action only updates the cert course object
 export const editCertCourseById = (courseName, hours, ethicsHours, id) => {
   return async (dispatch) => {
     try {
@@ -99,23 +102,22 @@ export const editCertCourseById = (courseName, hours, ethicsHours, id) => {
   };
 };
 
-export const certUpdateById = (courseName, cert, id) => {
+//this action updates cert object and img as well
+export const certUpdateById = (courseName, cert, hours, ethicsHours, id) => {
   return async (dispatch) => {
     try {
       const certName = cert.name;
       const uri = cert.uri;
-      const hours = cert.hours;
-      const ethicsHours = cert.ethicsHours;
 
       let formData = new FormData();
 
       formData.append('courseName', courseName);
+      formData.append('hours', hours);
+      formData.append('ethicsHours', ethicsHours);
       formData.append('cert', {
         uri: `${uri}`,
         type: '*/*',
         name: `${certName}`,
-        hours: `${hours}`,
-        ethicsHours: `${ethicsHours}`,
       });
 
       const config = {
@@ -124,6 +126,8 @@ export const certUpdateById = (courseName, cert, id) => {
           'Content-Type': 'multipart/form-data',
         },
       };
+
+      console.log('update formData: ', formData);
 
       const response = await axios.put(
         `${CURRENT_IP}/api/upload/${id}`,

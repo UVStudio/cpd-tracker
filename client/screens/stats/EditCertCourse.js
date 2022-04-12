@@ -1,8 +1,9 @@
 import React, { useState, useReducer, useCallback } from 'react';
+import { Platform } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 
 import CustomIndicator from '../../components/CustomIndicator';
-import CustomText from '../../components/CustomText';
+import CustomBoldText from '../../components/CustomBoldText';
 import CustomButton from '../../components/CustomButton';
 import CustomInput from '../../components/CustomInput';
 import CustomTitle from '../../components/CustomTitle';
@@ -13,7 +14,8 @@ import CustomGreyLine from '../../components/CustomGreyLine';
 import CustomScreenContainer from '../../components/CustomScreenContainer';
 import CustomOperationalContainer from '../../components/CustomOperationalContainer';
 
-import * as DocumentPicker from 'expo-document-picker';
+// import * as DocumentPicker from 'expo-document-picker';
+import * as DocumentPicker from 'react-native-document-picker';
 import * as authActions from '../../store/actions/auth';
 import * as certActions from '../../store/actions/cert';
 import { formReducer } from '../../utils/formReducer';
@@ -32,8 +34,6 @@ const EditCertCourse = (props) => {
   const user = authState;
 
   const dispatch = useDispatch();
-
-  console.log('cert: ', cert);
 
   const certHours = cert.hours;
   const certHoursString = certHours.toString();
@@ -56,16 +56,21 @@ const EditCertCourse = (props) => {
 
   const addCertHandler = async () => {
     try {
-      const file = await DocumentPicker.getDocumentAsync({
-        type: '*/*',
+      const file = await DocumentPicker.pickSingle({
+        type: Platform.OS === 'ios' ? 'public.item' : '*/*',
         copyToCacheDirectory: false,
       });
 
-      if (file.type === 'success') {
+      if (file.size > 0) {
         setCertUpload(file);
       }
     } catch (err) {
-      console.log(err.message);
+      console.log('err: ', err.message);
+      if (
+        err.message ===
+        'RNCPromiseWrapper: user canceled the document picker, Error Domain=NSCocoaErrorDomain Code=3072 "The operation was cancelled."'
+      )
+        return;
       setError(
         'There is something wrong with our network. Please try again later.'
       );
@@ -90,6 +95,8 @@ const EditCertCourse = (props) => {
     const courseName = formState.inputValues.courseName;
     const hours = formState.inputValues.hours;
     const ethicsHours = formState.inputValues.ethicsHours;
+
+    //console.log('formState: ', formState);
     try {
       if (certUpload) {
         await dispatch(
@@ -158,9 +165,9 @@ const EditCertCourse = (props) => {
           >
             Select Course Certificate
           </CustomButton>
-          <CustomText>
+          <CustomBoldText>
             {certUpload !== null ? 'file: ' + certUpload.name : null}
-          </CustomText>
+          </CustomBoldText>
           {updatingCourse ? (
             <CustomButton style={{ marginVertical: 20 }}>
               Updating Course {'  '} <CustomSpinner />

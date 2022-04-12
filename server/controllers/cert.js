@@ -3,6 +3,7 @@ const User = require('../models/User');
 const ErrorResponse = require('../utils/errorResponse');
 const asyncHandler = require('../middleware/async');
 const mongoose = require('mongoose');
+const ObjectId = require('mongodb').ObjectId;
 
 const conn = mongoose.createConnection(process.env.MONGO_URI, {
   useNewUrlParser: true,
@@ -68,6 +69,7 @@ exports.updateCertObjById = asyncHandler(async (req, res, next) => {
   const certId = req.params.id;
   let cert = await Cert.findById(certId);
   const userId = req.user.id;
+  const certImgId = cert.img;
 
   if (userId !== cert.user.toString()) {
     return next(
@@ -96,6 +98,20 @@ exports.updateCertObjById = asyncHandler(async (req, res, next) => {
   cert = await Cert.findOneAndUpdate(
     { _id: certId },
     { courseName, hours, ethicsHours },
+    { new: true }
+  );
+
+  conn.db.collection('uploads.files').findOneAndUpdate(
+    {
+      _id: ObjectId(certImgId),
+    },
+    {
+      $set: {
+        'metadata.courseName': courseName,
+        'metadata.hours': hours,
+        'metadata.ethicsHours': ethicsHours,
+      },
+    },
     { new: true }
   );
 

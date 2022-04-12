@@ -77,7 +77,6 @@ const Stats = ({ navigation }) => {
   const [dirPath, setDirPath] = useState(`${RNFS.DocumentDirectoryPath}`);
   const [downloadProgress, setDownloadProgress] = useState(0);
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [forcedRefresh, setForcedRefresh] = useState(false);
 
   const authState = useSelector((state) => state.auth.user);
   const reportReady = useSelector((state) => state.report.report);
@@ -686,7 +685,7 @@ Otherwise, this is going to be a lot of work for nothing.`);
                         </View>
                       ) : null}
 
-                      {reportReady ? null : generatingPDF ? (
+                      {elem.historic ? null : reportReady ? null : generatingPDF ? (
                         <View style={styles.fullWidthCenter}>
                           <CustomButton
                             style={{ marginTop: 15, width: '100%' }}
@@ -727,7 +726,6 @@ Otherwise, this is going to be a lot of work for nothing.`);
                         ) : (
                           <View style={styles.fullWidthCenter}>
                             <CustomButton
-                              onSelect={downloadPDFHandler}
                               style={{ alignSelf: 'center', width: '80%' }}
                             >
                               Download Report
@@ -740,6 +738,7 @@ Otherwise, this is going to be a lot of work for nothing.`);
                       ) : null}
                     </View>
                   )}
+
                   {elem.historic ? (
                     <View style={styles.fullWidthCenter}>
                       <CustomButton

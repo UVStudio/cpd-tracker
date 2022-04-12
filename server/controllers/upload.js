@@ -104,10 +104,11 @@ exports.updateCertByObjId = asyncHandler(async (req, res, next) => {
   const newFile = req.file;
   const certId = req.params.id;
   const userId = req.user.id;
-  const { courseName, hours } = req.body;
+  const { hours, ethicsHours, courseName } = req.body;
   let cert = await Cert.findById(certId);
   const existingCertImgId = cert.img;
-  const { year } = cert;
+  const prevHours = cert.hours;
+  const certYear = cert.year;
 
   if (!newFile) {
     return next(new ErrorResponse('Please upload new certificate', 400));
@@ -121,9 +122,10 @@ exports.updateCertByObjId = asyncHandler(async (req, res, next) => {
 
   const certData = await certUploadHelper(
     userId,
-    year,
+    certYear,
     courseName,
     hours,
+    ethicsHours,
     newFile
   );
   const uploadFile = certData.uploadFile;
@@ -143,9 +145,24 @@ exports.updateCertByObjId = asyncHandler(async (req, res, next) => {
     uploadFile.path ? uploadFile.path : `./uploads/${newFileName}.jpg`
   );
 
+  const hoursDiff = hours - prevHours;
+
+  if (hoursDiff !== 0) {
+    const query = { _id: userId, 'hours.year': certYear };
+    const update = {
+      $inc: {
+        'hours.$.verifiable': hoursDiff,
+      },
+      $set: {
+        lastModifiedAt: Date.now(),
+      },
+    };
+    await User.updateOne(query, update);
+  }
+
   cert = await Cert.findOneAndUpdate(
     { _id: certId },
-    { img: response.id, courseName },
+    { img: response.id, courseName, hours, ethicsHours },
     { new: true }
   );
 
@@ -176,9 +193,10 @@ exports.updateCertByObjId = asyncHandler(async (req, res, next) => {
 
   const user = await User.findById(req.user.id).populate('cert');
 
-  const certYear = cert.year;
   const certs = user.cert;
   const certsYear = certs.filter((cert) => cert.year === certYear);
+
+  console.log('replace cert fully completed');
 
   res.status(200).json({
     success: true,
