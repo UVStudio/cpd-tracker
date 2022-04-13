@@ -1,11 +1,18 @@
 import { Text } from 'react-native';
 import Colors from '../constants/Colors';
+import { CountUp } from 'use-count-up';
 
 const statsFraction = (num, num2, denom) => {
   return (
     <Text>
       <Text style={{ color: Colors.dark, fontSize: 20 }}>
-        {Number(num + num2).toFixed(1)}
+        <CountUp
+          isCounting
+          start={0.0}
+          end={num + num2}
+          decimalPlaces={1}
+          duration={1.5}
+        />
       </Text>
       <Text>{'  /  '}</Text>
       <Text>{Number(denom).toFixed(1)}</Text>

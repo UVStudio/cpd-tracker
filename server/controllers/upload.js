@@ -196,8 +196,6 @@ exports.updateCertByObjId = asyncHandler(async (req, res, next) => {
   const certs = user.cert;
   const certsYear = certs.filter((cert) => cert.year === certYear);
 
-  console.log('replace cert fully completed');
-
   res.status(200).json({
     success: true,
     data: certsYear,

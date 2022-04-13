@@ -43,6 +43,10 @@ const CustomAnimatedPie = (props) => {
         });
       }
     });
+
+    return () => {
+      animatedValue.removeAllListeners();
+    };
   }, []);
 
   return (

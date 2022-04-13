@@ -127,8 +127,6 @@ export const certUpdateById = (courseName, cert, hours, ethicsHours, id) => {
         },
       };
 
-      console.log('update formData: ', formData);
-
       const response = await axios.put(
         `${CURRENT_IP}/api/upload/${id}`,
         formData,

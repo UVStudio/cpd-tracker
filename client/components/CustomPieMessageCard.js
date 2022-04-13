@@ -1,14 +1,17 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { CountUp } from 'use-count-up';
 
 import CustomButton from './CustomButton';
 import CustomText from './CustomText';
 import CustomBoldText from './CustomBoldText';
 import CustomAnimatedPie from './CustomAnimatedPie';
+import CustomRowSpace from './CustomRowSpace';
 
 import Colors from '../constants/Colors';
 import delayButton from '../utils/delayButton';
+import statsFraction from '../utils/statsFraction';
 
 const CustomPieMessageCard = (props) => {
   const { text, toShow, required, progress, type, year } = props;
@@ -35,13 +38,18 @@ const CustomPieMessageCard = (props) => {
         <CustomText style={{ marginBottom: 10 }}>
           Great job! You are one step closer from meeting your annual CPD
           requirements! You now have earned {progress}{' '}
-          {type === 'non-verifiable' ? 'CPD' : null} hours for {year}.
+          {type === 'non-verifiable' ? 'CPD' : null}hours for {year}.
         </CustomText>
         <CustomAnimatedPie
           required={required}
           progress={progress}
           CPDdetails={null}
         />
+        <CustomRowSpace>
+          <CustomText>{statsFraction(progress, null, required)}</CustomText>
+          <CustomText style={styles.required}> hours</CustomText>
+        </CustomRowSpace>
+
         <CustomButton style={{ marginTop: 15 }} onSelect={() => toStats()}>
           Okay
         </CustomButton>
@@ -81,6 +89,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginBottom: 10,
     fontFamily: 'avenir-medium',
+  },
+  required: {
+    transform: [{ translateY: 4 }],
   },
 });
 
