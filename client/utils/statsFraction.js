@@ -1,6 +1,6 @@
 import { Text } from 'react-native';
-import Colors from '../constants/Colors';
 import { CountUp } from 'use-count-up';
+import Colors from '../constants/Colors';
 
 const statsFraction = (num, num2, denom) => {
   return (

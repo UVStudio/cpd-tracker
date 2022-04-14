@@ -53,9 +53,6 @@ const CustomSpinner = (props) => {
         });
       }
     });
-    return () => {
-      lengthValue.removeAllListeners();
-    };
   }, [percentage]);
 
   return (

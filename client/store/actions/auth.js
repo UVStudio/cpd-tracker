@@ -174,8 +174,12 @@ export const getUser = () => {
         user: user,
       });
     } catch (err) {
-      throw new Error('Unable to get user info.');
-      //throw new Error(err.response.data.error);
+      //If getUser does not work for whatever reason, it's best to log user off immediately
+      //to avoid endless spinner error
+      clearLogoutTimer();
+      AsyncStorage.removeItem('userData');
+      return { type: LOGOUT };
+      //throw new Error('Unable to get user info.');
     }
   };
 };
