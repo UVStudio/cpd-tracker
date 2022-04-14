@@ -3,8 +3,6 @@ const fs = require('fs');
 const mongoose = require('mongoose');
 const ObjectId = require('mongodb').ObjectId;
 const aws = require('aws-sdk');
-const { GridFsStorage } = require('multer-gridfs-storage');
-const ErrorResponse = require('../utils/errorResponse');
 
 //create mongo connection
 const conn = mongoose.createConnection(process.env.MONGO_URI, {
@@ -22,14 +20,11 @@ conn.once('open', (req, res) => {
   });
 });
 
-// let gfsReports;
-// conn.once('open', (req, res) => {
-//   //Init stream
-//   //"mongoose": "^5.13.7",
-//   gfsReports = new mongoose.mongo.GridFSBucket(conn.db, {
-//     bucketName: 'reports',
-//   });
-// });
+const pageBreakers = [8, 17, 26, 35, 44];
+
+const pageBreakFn = (num) => {
+  return pageBreakers.find((breaker) => breaker === num);
+};
 
 const buildPDF = async (
   res,
@@ -318,9 +313,12 @@ const buildPDF = async (
             doc
               .fontSize(textSize)
               .font(avenirMedium)
-              .text(`Duration: ${files[i].hours} hour(s) earned`);
+              .text(`Duration: ${files[i].hours} hour(s) earned`)
+              .moveDown(0.4);
+            if (pageBreakFn(i) || i === files.length - 1) {
+              doc.addPage();
+            }
           }
-          doc.addPage();
 
           //Previous Year CPD details
           doc
@@ -429,9 +427,12 @@ const buildPDF = async (
                     doc
                       .fontSize(textSize)
                       .font(avenirMedium)
-                      .text(`Duration: ${files[i].hours} hour(s) earned`);
+                      .text(`Duration: ${files[i].hours} hour(s) earned`)
+                      .moveDown(0.4);
+                    if (pageBreakFn(i) || i === files.length - 1) {
+                      doc.addPage();
+                    }
                   }
-                  doc.addPage();
 
                   //Two years ago CPD details
                   doc
@@ -553,7 +554,11 @@ const buildPDF = async (
                               .font(avenirMedium)
                               .text(
                                 `Duration: ${files[i].hours} hour(s) earned`
-                              );
+                              )
+                              .moveDown(0.4);
+                            if (pageBreakFn(i) || i === files.length - 1) {
+                              doc.addPage();
+                            }
                           }
                           doc.end();
                         });
