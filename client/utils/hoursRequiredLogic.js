@@ -1,7 +1,11 @@
 import { provinceObjs } from '../constants/Provinces';
 
 const showThreeYearRolling = (province, cpdYear, showYear) => {
+  //returns false if user is a recent CPA and 3 year rolling does not apply
   if (cpdYear > showYear - 2) return false;
+
+  // returns true if CPA year is 2 years ago which 3 year rolling applies, except...
+  // Alberta and Northwest Territories, where 1st year does not count for 3 year count
   if (cpdYear === showYear - 2) {
     switch (province) {
       case provinceObjs.alberta.name:
@@ -11,6 +15,7 @@ const showThreeYearRolling = (province, cpdYear, showYear) => {
         return true;
     }
   }
+  //returns true is CPA year is over 2 years ago
   if (cpdYear < showYear - 2) return true;
 };
 
