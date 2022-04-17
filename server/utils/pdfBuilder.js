@@ -51,9 +51,9 @@ const buildPDF = async (
 
   //user CPD recors
   const userHours = user.hours;
-  const chosenYear = userHours[0];
-  const prevYear = userHours[1];
-  const twoYearsAgo = userHours[2];
+  const chosenYear = userHours.find((hour) => hour.year === year);
+  const prevYear = userHours.find((hour) => hour.year === year - 1);
+  const twoYearsAgo = userHours.find((hour) => hour.year === year - 2);
 
   const chosenYearVer = chosenYear.verifiable;
   const chosenYearNonVer = chosenYear.nonVerifiable;
@@ -110,6 +110,15 @@ const buildPDF = async (
     })
     .moveDown(1);
 
+  //Footer: Add page number
+  let pageNumber = 2;
+  doc.on('pageAdded', () => {
+    //Add page number to the bottom of the every page
+    doc.fontSize(textSize).text(pageNumber, {
+      align: 'right',
+    });
+  });
+
   //Doc Title
   doc.fontSize(titleSize).text('CPD Tracker').moveDown(0);
   doc.fontSize(textSize).text('By Sheriff Consulting').moveDown(2);
@@ -120,7 +129,7 @@ const buildPDF = async (
     .moveDown(1.5);
 
   // 3 year rolling summary bolded, if 3 year rolling applies to user
-  if (userHours.length === 3) {
+  if (userHours.length >= 3) {
     doc
       .fontSize(textSize)
       .font(avenirBold)
@@ -180,6 +189,7 @@ const buildPDF = async (
 
   if (userHours.length === 1) {
     doc.addPage();
+    pageNumber++;
   }
 
   if (userHours.length >= 2) {
@@ -214,6 +224,7 @@ const buildPDF = async (
   }
   if (userHours.length === 2) {
     doc.addPage();
+    pageNumber++;
   }
 
   //two years ago year summary
@@ -247,6 +258,7 @@ const buildPDF = async (
       .moveDown(1.5);
 
     doc.addPage();
+    pageNumber++;
   }
 
   //Chosen Year begins
@@ -283,6 +295,7 @@ const buildPDF = async (
           .font(avenirDemiBold)
           .text(`No certificates were uploaded for ${chosenYear.year}`);
         doc.addPage();
+        pageNumber++;
       }
       for (let i = 0; i < files.length; i++) {
         doc
@@ -308,8 +321,9 @@ const buildPDF = async (
           })
           .moveDown(1);
 
-        if (i === 1 || i % 2 === 1) {
+        if (i === 1 || i % 2 === 1 || i === files.length - 1) {
           doc.addPage();
+          pageNumber++;
         }
       }
 
@@ -343,6 +357,7 @@ const buildPDF = async (
                 `No non-verifiable sessions were uploaded for ${chosenYear.year}`
               );
             doc.addPage();
+            pageNumber++;
           }
           for (let i = 0; i < files.length; i++) {
             doc
@@ -360,6 +375,7 @@ const buildPDF = async (
               .moveDown(0.4);
             if (pageBreakFn(i) || i === files.length - 1) {
               doc.addPage();
+              pageNumber++;
             }
           }
 
@@ -368,6 +384,7 @@ const buildPDF = async (
               .fontSize(textSize)
               .font(avenirBold)
               .text(endDocText, { align: 'center' });
+
             doc.end();
           }
 
@@ -406,6 +423,7 @@ const buildPDF = async (
                     .font(avenirDemiBold)
                     .text(`No certificates were uploaded for ${prevYear.year}`);
                   doc.addPage();
+                  pageNumber++;
                 }
                 for (let i = 0; i < files.length; i++) {
                   doc
@@ -433,8 +451,9 @@ const buildPDF = async (
                     })
                     .moveDown(1);
 
-                  if (i === 1 || i % 2 === 1) {
+                  if (i === 1 || i % 2 === 1 || i === files.length - 1) {
                     doc.addPage();
+                    pageNumber++;
                   }
                 }
 
@@ -470,6 +489,7 @@ const buildPDF = async (
                           `No non-verifiable sessions were uploaded for ${prevYear.year}`
                         );
                       doc.addPage();
+                      pageNumber++;
                     }
                     for (let i = 0; i < files.length; i++) {
                       doc
@@ -487,6 +507,7 @@ const buildPDF = async (
                         .moveDown(0.4);
                       if (pageBreakFn(i) || i === files.length - 1) {
                         doc.addPage();
+                        pageNumber++;
                       }
                     }
 
@@ -495,6 +516,7 @@ const buildPDF = async (
                         .fontSize(textSize)
                         .font(avenirBold)
                         .text(endDocText, { align: 'center' });
+
                       doc.end();
                     }
 
@@ -537,6 +559,7 @@ const buildPDF = async (
                                 `No certificates were uploaded for ${twoYearsAgo.year}`
                               );
                             doc.addPage();
+                            pageNumber++;
                           }
                           for (let i = 0; i < files.length; i++) {
                             doc
@@ -571,8 +594,13 @@ const buildPDF = async (
                               })
                               .moveDown(1);
 
-                            if (i === 1 || i % 2 === 1) {
+                            if (
+                              i === 1 ||
+                              i % 2 === 1 ||
+                              i === files.length - 1
+                            ) {
                               doc.addPage();
+                              pageNumber++;
                             }
                           }
                           //Two years ago Non-Verifiable Summary
@@ -610,6 +638,7 @@ const buildPDF = async (
                                     `No non-verifiable sessions were uploaded for ${twoYearsAgo.year}`
                                   );
                                 doc.addPage();
+                                pageNumber++;
                               }
                               for (let i = 0; i < files.length; i++) {
                                 doc
@@ -629,6 +658,7 @@ const buildPDF = async (
                                   .moveDown(0.4);
                                 if (pageBreakFn(i) || i === files.length - 1) {
                                   doc.addPage();
+                                  pageNumber++;
                                 }
                               }
                               doc
@@ -685,3 +715,24 @@ const buildPDF = async (
 };
 
 module.exports = { buildPDF };
+
+// //Global Edits to All Pages (Header/Footer, etc)
+// let pages = doc.bufferedPageRange();
+
+// const pageNumbers = () => {
+//   for (let i = 0; i < pages.count; i++) {
+//     doc.switchToPage(i);
+//     console.log('page number: ', i);
+
+//     //Footer: Add page number
+//     let oldBottomMargin = doc.page.margins.bottom;
+//     doc.page.margins.bottom = 0; //Dumb: Have to remove bottom margin in order to write into it
+//     doc.text(
+//       `Page: ${i + 1} of ${pages.count}`,
+//       0,
+//       doc.page.height - oldBottomMargin / 2, // Centered vertically in bottom margin
+//       { align: 'center' }
+//     );
+//     doc.page.margins.bottom = oldBottomMargin; // ReProtect bottom margin
+//   }
+// };
