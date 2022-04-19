@@ -271,6 +271,7 @@ All data and certificates will be erased permanently. The app does not keep any 
                   onInputChange={inputChangeHandler}
                   initialValue={user.cpdYear.toString()}
                   initiallyValid="true"
+                  editable={false}
                   required
                 />
               </View>
