@@ -15,9 +15,12 @@ import CustomInput from '../../components/CustomInput';
 import CustomSpinner from '../../components/CustomSpinner';
 import CustomButton from '../../components/CustomButton';
 import CustomErrorCard from '../../components/CustomErrorCard';
+import CustomMessageCard from '../../components/CustomMessageCard';
 import CustomSelectField from '../../components/CustomSelectField';
 import CustomIndicator from '../../components/CustomIndicator';
 import CustomProvinceSelectionCard from '../../components/CustomProvinceSelectionCard';
+
+import Colors from '../../constants/Colors';
 
 import * as authActions from '../../store/actions/auth';
 import { formReducer } from '../../utils/formReducer';
@@ -30,6 +33,7 @@ const Auth = () => {
   const [isLogging, setIsLogging] = useState(false);
   const [isRegistering, setIsRegistering] = useState(false);
   const [provinceCard, setProvinceCard] = useState(false);
+  const [messageCard, setMessageCard] = useState('');
   const [province, setProvince] = useState('');
 
   const dispatch = useDispatch();
@@ -250,6 +254,12 @@ const Auth = () => {
               />
             ) : null}
             <View style={styles.buttonGroupContainer}>
+              {isSignup ? (
+                <Text style={styles.warning}>
+                  Please make sure your CPA join year is correct, as you will
+                  not be able to change it after you've registered.
+                </Text>
+              ) : null}
               <CustomButton onSelect={authHandler}>
                 {isSignup ? (
                   isRegistering ? (
@@ -290,6 +300,9 @@ const Auth = () => {
         ) : null}
         {error !== '' ? (
           <CustomErrorCard error={error} toShow={setError} />
+        ) : null}
+        {messageCard !== '' ? (
+          <CustomMessageCard text={messageCard} toShow={setMessageCard} />
         ) : null}
       </ImageBackground>
     </View>
@@ -340,6 +353,12 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: 'white',
     fontFamily: 'avenir-demibold',
+  },
+  warning: {
+    marginBottom: 10,
+    marginTop: 2,
+    color: Colors.secondary,
+    fontFamily: 'avenir-medium',
   },
 });
 

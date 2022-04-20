@@ -16,13 +16,14 @@ import CustomRedCard from '../../components/CustomRedCard';
 import CustomErrorCard from '../../components/CustomErrorCard';
 import CustomMessageCard from '../../components/CustomMessageCard';
 import CustomScrollView from '../../components/CustomScrollView';
+import CustomSpinner from '../../components/CustomSpinner';
 import CustomScreenContainer from '../../components/CustomScreenContainer';
 import CustomOperationalContainer from '../../components/CustomOperationalContainer';
 import CustomProvinceSelectionCard from '../../components/CustomProvinceSelectionCard';
 
+import Colors from '../../constants/Colors';
 import { formReducer } from '../../utils/formReducer';
 import { FORM_INPUT_UPDATE, PASSWORD_INPUT_UPDATE } from '../../store/types';
-import CustomSpinner from '../../components/CustomSpinner';
 
 const Profile = () => {
   const [cardText, setCardText] = useState('');
@@ -262,7 +263,9 @@ All data and certificates will be erased permanently. The app does not keep any 
                   required
                 />
               </View>
-              <View style={{ width: '49%' }}>
+              <View
+                style={{ width: '49%', backgroundColor: Colors.veryLightGrey }}
+              >
                 <CustomInput
                   id="cpdYear"
                   keyboardType="numeric"
