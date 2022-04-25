@@ -115,7 +115,8 @@ const Records = () => {
       console.log('err: ', err.message);
       if (
         err.message ===
-        'RNCPromiseWrapper: user canceled the document picker, Error Domain=NSCocoaErrorDomain Code=3072 "The operation was cancelled."'
+          'RNCPromiseWrapper: user canceled the document picker, Error Domain=NSCocoaErrorDomain Code=3072 "The operation was cancelled."' ||
+        err.message === 'User canceled document picker'
       )
         return;
       setError(
