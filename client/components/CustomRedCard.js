@@ -14,9 +14,10 @@ const CustomRedCard = (props) => {
   const dispatch = useDispatch();
 
   const deleteUserHandler = async () => {
-    setTimeout(() => {
-      toShow('');
-    }, 400);
+    // setTimeout(() => {
+    //   toShow('');
+    // }, 400);
+    toShow(''); //avoid the 'Can't perform a React state update on an unmounted component'
     try {
       await dispatch(authActions.deleteCurrentUser());
     } catch (err) {

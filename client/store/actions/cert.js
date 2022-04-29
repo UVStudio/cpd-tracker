@@ -26,8 +26,6 @@ export const saveVerCourse = (year, hours, ethicsHours, courseName, cert) => {
         name: `${certName}`,
       });
 
-      console.log('upload formData: ', formData);
-
       const config = {
         headers: {
           Accept: 'application/json',

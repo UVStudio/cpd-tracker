@@ -11,9 +11,19 @@ const { GridFsStorage } = require('multer-gridfs-storage');
 const ObjectId = require('mongodb').ObjectId;
 const { certUploadHelper } = require('../utils/certUpload');
 
+const aws = require('aws-sdk');
+const { PutObjectCommand, S3Client } = require('@aws-sdk/client-s3');
+
 const conn = mongoose.createConnection(process.env.MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
+});
+
+const s3 = new aws.S3({
+  accessKeyId: process.env.ACCESSKEYID,
+  secretAccessKey: process.env.SECRETACCESSKEY,
+  Bucket: process.env.BUCKET_NAME,
+  region: process.env.REGION,
 });
 
 //@route   POST /api/upload
@@ -22,6 +32,7 @@ const conn = mongoose.createConnection(process.env.MONGO_URI, {
 exports.uploadCert = asyncHandler(async (req, res, next) => {
   const file = req.file;
   const userId = req.user.id;
+  const bucket = req.user.bucket;
   let user = await User.findById(userId);
   const { year, hours, ethicsHours, courseName } = req.body;
 
@@ -48,6 +59,24 @@ exports.uploadCert = asyncHandler(async (req, res, next) => {
     uploadFile.path ? uploadFile.path : `./uploads/${newFileName}.jpg`
   );
 
+  console.log('certData: ', certData);
+  console.log('bucket: ', bucket);
+  console.log('newFileName: ', newFileName);
+  console.log('uploadFile.path: ', uploadFile.path);
+
+  const uploadParams = {
+    Bucket: process.env.BUCKET_NAME,
+    Key: `${bucket}${newFileName}.jpg`,
+    Body: stream,
+  };
+
+  await s3
+    .upload(uploadParams, (err, data) => {
+      if (err) console.error('upload err: ', err);
+      if (data) console.log('upload success: ', data);
+    })
+    .promise();
+
   //upload file to MongoDB, uploadFile is the file object to upload
   const response = await storage.fromStream(stream, req, uploadFile);
 
@@ -64,6 +93,7 @@ exports.uploadCert = asyncHandler(async (req, res, next) => {
     ethicsHours,
     courseName,
     img: response.id,
+    s3Img: `${bucket}${newFileName}`,
   });
 
   //push cert Obj's ID to user's cert array

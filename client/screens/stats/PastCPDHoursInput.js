@@ -55,12 +55,12 @@ const PastCPDHoursInput = (props) => {
 
   const [formState, dispatchFormState] = useReducer(formReducer, {
     inputValues: {
-      '0CertHours': null,
-      '0NonVerHours': null,
-      '0EthicsHours': null,
-      '1CertHours': null,
-      '1NonVerHours': null,
-      '1EthicsHours': null,
+      '0CertHours': 0,
+      '0NonVerHours': 0,
+      '0EthicsHours': 0,
+      '1CertHours': 0,
+      '1NonVerHours': 0,
+      '1EthicsHours': 0,
     },
     inputValidities: {
       '0CertHours': false,
@@ -160,7 +160,7 @@ const PastCPDHoursInput = (props) => {
                     keyboardType="numeric"
                     autoCapitalize="none"
                     onInputChange={inputChangeHandler}
-                    initialValue=""
+                    initialValue="0"
                     required
                     style={styles.textInput}
                   />
@@ -178,7 +178,7 @@ const PastCPDHoursInput = (props) => {
                     keyboardType="numeric"
                     autoCapitalize="none"
                     onInputChange={inputChangeHandler}
-                    initialValue=""
+                    initialValue="0"
                     required
                     style={styles.textInput}
                   />
@@ -194,7 +194,7 @@ const PastCPDHoursInput = (props) => {
                     keyboardType="numeric"
                     autoCapitalize="none"
                     onInputChange={inputChangeHandler}
-                    initialValue=""
+                    initialValue="0"
                     required
                     style={styles.textInput}
                   />

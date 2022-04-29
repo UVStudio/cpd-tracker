@@ -24,6 +24,9 @@ const CertSchema = new mongoose.Schema({
   img: {
     type: mongoose.Schema.ObjectId,
   },
+  s3Img: {
+    type: String,
+  },
   createdAt: {
     type: Date,
     default: Date.now,

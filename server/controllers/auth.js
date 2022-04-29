@@ -5,6 +5,8 @@ const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 const sgMail = require('@sendgrid/mail');
 const mongoose = require('mongoose');
+const ObjectId = require('mongodb').ObjectId;
+const aws = require('aws-sdk');
 const ErrorResponse = require('../utils/errorResponse');
 const asyncHandler = require('../middleware/async');
 const { currentYear } = require('../utils/currentYear');
@@ -12,6 +14,13 @@ const { currentYear } = require('../utils/currentYear');
 const conn = mongoose.createConnection(process.env.MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
+});
+
+const s3 = new aws.S3({
+  accessKeyId: process.env.ACCESSKEYID,
+  secretAccessKey: process.env.SECRETACCESSKEY,
+  Bucket: process.env.BUCKET_NAME,
+  region: process.env.REGION,
 });
 
 //desc    CREATE user
@@ -65,6 +74,22 @@ exports.createUser = asyncHandler(async (req, res, next) => {
     hours,
     role,
   });
+
+  const bucketParam = {
+    Bucket: process.env.BUCKET_NAME,
+    Key: `users/${user.name}-${user._id.toString()}/`,
+  };
+
+  await s3
+    .putObject(bucketParam, (err, data) => {
+      if (err) console.error('auth err: ', err);
+      if (data) console.log('folder created successfully: ', data);
+    })
+    .promise();
+
+  user.bucket = bucketParam.Key;
+
+  await user.save();
 
   sendTokenResponse(user, 200, res);
 });
@@ -151,6 +176,7 @@ exports.updateUser = asyncHandler(async (req, res, next) => {
       },
     }
   );
+
   const userUpdated = await User.findById(req.user.id);
 
   res.status(200).json({ success: true, data: userUpdated });

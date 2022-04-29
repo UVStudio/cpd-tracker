@@ -69,14 +69,17 @@ const UserSchema = new mongoose.Schema({
       verifiable: {
         type: Number,
         required: true,
+        default: 0,
       },
       nonVerifiable: {
         type: Number,
         required: true,
+        default: 0,
       },
       ethics: {
         type: Number,
         required: true,
+        default: 0,
       },
       overriden: {
         type: Boolean,
@@ -95,6 +98,9 @@ const UserSchema = new mongoose.Schema({
       },
     },
   ],
+  bucket: {
+    type: String,
+  },
   createdAt: {
     type: Date,
     default: Date.now,
