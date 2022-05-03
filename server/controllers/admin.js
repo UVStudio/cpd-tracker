@@ -1,8 +1,17 @@
 const User = require('../models/User');
+const fs = require('fs');
 const mongoose = require('mongoose');
 const ErrorResponse = require('../utils/errorResponse');
 const asyncHandler = require('../middleware/async');
 const { buildPDF } = require('../utils/pdfBuilder');
+const aws = require('aws-sdk');
+
+const s3 = new aws.S3({
+  accessKeyId: process.env.ACCESSKEYID,
+  secretAccessKey: process.env.SECRETACCESSKEY,
+  Bucket: process.env.BUCKET_NAME,
+  region: process.env.REGION,
+});
 
 //create mongo connection
 const conn = mongoose.createConnection(process.env.MONGO_URI, {
@@ -202,4 +211,29 @@ exports.removeUserField = asyncHandler(async (req, res, next) => {
   const user = await User.findById(userId);
 
   res.status(200).json({ success: true, data: user });
+});
+
+//desc    Download individual S3 object
+//route   GET /api/admin/downloadobject
+//access  admin
+exports.downloadObjectByKey = asyncHandler(async (req, res, next) => {
+  const params = {
+    Bucket: process.env.BUCKET_NAME,
+    Key: 'users/Bran-6271a6fb97d12314520d7b83/6271a6fb97d12314520d7b83-2022-garth-cert-1651616668289.pdf.jpg',
+  };
+
+  const { Body } = await s3.getObject(params).promise();
+  //downloads to root server folder
+  // await fs.writeFile('testS3download.jpg', Body, () => {
+  //   console.log('success');
+  // });
+
+  console.log('Body: ', Body);
+  //console.log('Type of Body: ', typeof Body);
+
+  //converting from Buffer to string, PDFKit only accepts string as input for .image()
+  const img = `data:image/jpg;base64,${Buffer.from(Body).toString('base64')}`;
+  console.log('typeof img: ', typeof img);
+
+  res.status(200).json({ success: true });
 });

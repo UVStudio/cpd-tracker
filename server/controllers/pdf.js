@@ -1,8 +1,16 @@
 const mongoose = require('mongoose');
 const User = require('../models/User');
+const fs = require('fs');
 const aws = require('aws-sdk');
 const asyncHandler = require('../middleware/async');
 const { buildPDF } = require('../utils/pdfBuilder');
+
+const s3 = new aws.S3({
+  accessKeyId: process.env.ACCESSKEYID,
+  secretAccessKey: process.env.SECRETACCESSKEY,
+  Bucket: process.env.BUCKET_NAME,
+  region: process.env.REGION,
+});
 
 //create mongo connection
 const conn = mongoose.createConnection(process.env.MONGO_URI, {
@@ -21,14 +29,6 @@ conn.once('open', (req, res) => {
   });
 });
 
-// conn.once('open', (req, res) => {
-//   //Init stream
-//   //"mongoose": "^5.13.7",
-//   gfsReports = new mongoose.mongo.GridFSBucket(conn.db, {
-//     bucketName: 'reports',
-//   });
-// });
-
 const downloadFile = (file_id, gfs) => {
   return new Promise((resolve, reject) => {
     const read_stream = gfs.openDownloadStream(file_id);
@@ -45,9 +45,21 @@ const downloadFile = (file_id, gfs) => {
       const img = `data:image/jpg;base64,${Buffer.from(file).toString(
         'base64'
       )}`;
+      //img is type string
       resolve(img);
     });
   });
+};
+
+//downloadFileS3
+const downloadFileS3 = async () => {
+  const params = {
+    Bucket: process.env.BUCKET_NAME,
+    Key: 'users/Bran-6271a6fb97d12314520d7b83/6271a6fb97d12314520d7b83-2022-garth-cert-1651616668289.pdf.jpg',
+  };
+
+  const { Body } = await s3.getObject(params).promise();
+  return `data:image/jpg;base64,${Buffer.from(Body).toString('base64')}`;
 };
 
 //desc    POST pdf
@@ -70,7 +82,8 @@ exports.producePDF = asyncHandler(async (req, res, next) => {
     user,
     searchTerm,
     CPDFileName,
-    downloadFile
+    downloadFile,
+    downloadFileS3
   );
 });
 

@@ -59,31 +59,37 @@ exports.uploadCert = asyncHandler(async (req, res, next) => {
     uploadFile.path ? uploadFile.path : `./uploads/${newFileName}.jpg`
   );
 
-  console.log('certData: ', certData);
-  console.log('bucket: ', bucket);
-  console.log('newFileName: ', newFileName);
-  console.log('uploadFile.path: ', uploadFile.path);
+  //Need to make a separate object for streaming to S3
+  const streamS3 = fs.createReadStream(
+    uploadFile.path ? uploadFile.path : `./uploads/${newFileName}.jpg`
+  );
+
+  //upload file to MongoDB, uploadFile is the file object to upload
+  const response = await storage.fromStream(stream, req, uploadFile);
 
   const uploadParams = {
     Bucket: process.env.BUCKET_NAME,
     Key: `${bucket}${newFileName}.jpg`,
-    Body: stream,
+    Body: streamS3,
   };
 
   await s3
     .upload(uploadParams, (err, data) => {
       if (err) console.error('upload err: ', err);
-      if (data) console.log('upload success: ', data);
+      if (data) console.log('upload success');
     })
     .promise();
-
-  //upload file to MongoDB, uploadFile is the file object to upload
-  const response = await storage.fromStream(stream, req, uploadFile);
 
   fs.unlinkSync(file.path);
   fs.unlinkSync(
     uploadFile.path ? uploadFile.path : `./uploads/${newFileName}.jpg`
   );
+
+  // console.log('certData: ', certData);
+  // console.log('bucket: ', bucket);
+  // console.log('newFileName: ', newFileName);
+  // console.log('uploadFile.path: ', uploadFile.path);
+  // console.log('response: ', response);
 
   //create MongoDB object with the response given from successful stream upload of cert
   const certObj = await Cert.create({

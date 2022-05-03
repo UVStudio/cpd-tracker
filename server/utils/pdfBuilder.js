@@ -34,7 +34,8 @@ const buildPDF = async (
   user,
   searchTerm,
   CPDFileName,
-  downloadFile
+  downloadFile,
+  downloadFileS3
 ) => {
   const doc = new PDFDocument();
 
@@ -312,7 +313,9 @@ const buildPDF = async (
           .text(`Ethics Hour(s): ${files[i].metadata.ethicsHours}`)
           .moveDown(0.5);
 
-        let tempCertFile = await downloadFile(files[i]._id, gfsCerts);
+        //let tempCertFile = await downloadFile(files[i]._id, gfsCerts);
+        let tempCertFile = await downloadFileS3();
+        //console.log('tempCertFile: ', typeof tempCertFile);
 
         doc
           .image(tempCertFile, {

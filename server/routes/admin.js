@@ -1,5 +1,6 @@
 const express = require('express');
 const {
+  downloadObjectByKey,
   getUserById,
   addUserField,
   removeUserField,
@@ -14,6 +15,7 @@ const router = express.Router();
 
 const { protect, authorize } = require('../middleware/auth');
 
+router.get('/downloadobject', protect, authorize('admin'), downloadObjectByKey);
 router.get('/user/:id', protect, authorize('admin'), getUserById);
 router.put('/user/:id', protect, authorize('admin'), addUserField);
 router.put('/user/remove/:id', protect, authorize('admin'), removeUserField);
