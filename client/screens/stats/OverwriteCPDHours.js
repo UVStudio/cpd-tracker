@@ -16,6 +16,7 @@ import CustomScreenContainer from '../../components/CustomScreenContainer';
 
 import * as authActions from '../../store/actions/auth';
 import * as certActions from '../../store/actions/cert';
+import * as nonVerActions from '../../store/actions/nonVer';
 
 import { formReducer } from '../../utils/formReducer';
 import { FORM_INPUT_UPDATE } from '../../store/types';
@@ -81,6 +82,7 @@ const OverwriteCPDHours = (props) => {
         )
       );
       await dispatch(certActions.deleteAllCertsByUserYear(showYear));
+      await dispatch(nonVerActions.deleteAllNonVersByUserYear(showYear));
       setSavingCPD(false);
       setConfirmCardText('');
       navigation.navigate('Your CPD Statistics');
@@ -100,10 +102,9 @@ const OverwriteCPDHours = (props) => {
       <CustomGreyLine />
       <CustomText>
         You can overwrite your CPD Hours for {showYear} here. Please be careful,
-        as once overwritten, your CPD Hours in Statistics will no longer match
-        the data from your Verifiable and Non-Verifiable sessions. If you have
-        entered session data incorrectly, we advise that you update those
-        session records instead.
+        as once overwritten, your Verifiable and Non-Verifiable sessions for{' '}
+        {showYear} will be deleted. If you have entered session data
+        incorrectly, we advise that you update those session records instead.
       </CustomText>
       <CustomStatsInfoBox>
         <View style={{ width: '100%' }}>

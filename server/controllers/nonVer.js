@@ -203,3 +203,24 @@ exports.deleteNonVerObjById = asyncHandler(async (req, res, next) => {
 
   res.status(200).json({ success: true, data: nonVersYear });
 });
+
+//desc    DELETE all non-Ver Objs by userId and Year
+//route   DELETE /api/nonver/year/:year
+//access  private
+exports.deleteNonVersByUserYear = asyncHandler(async (req, res, next) => {
+  const userId = req.user.id;
+  const year = req.params.year;
+  const yearNumber = Number(year);
+
+  await NonVer.deleteMany({ user: userId, year: yearNumber });
+
+  const user = await User.findById(req.user.id).populate('nonver');
+
+  const nonvers = user.nonver;
+  const nonversYear = nonvers.filter((cert) => cert.year === yearNumber);
+
+  res.status(200).json({
+    success: true,
+    data: nonversYear,
+  });
+});

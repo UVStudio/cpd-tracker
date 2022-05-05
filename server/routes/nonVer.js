@@ -6,6 +6,7 @@ const {
   getAllNonVerObjsByYear,
   updateNonVerObjById,
   deleteNonVerObjById,
+  deleteNonVersByUserYear,
 } = require('../controllers/nonVer');
 
 const router = express.Router();
@@ -18,5 +19,6 @@ router.get('/:year', protect, getAllNonVerObjsByYear);
 router.get('/id/:id', protect, getNonVerObjById);
 router.put('/:id', protect, updateNonVerObjById);
 router.delete('/:id', protect, deleteNonVerObjById);
+router.delete('/year/:year', protect, deleteNonVersByUserYear);
 
 module.exports = router;

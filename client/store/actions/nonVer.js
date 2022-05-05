@@ -91,3 +91,21 @@ export const deleteNonVerSession = (id) => {
     }
   };
 };
+
+export const deleteAllNonVersByUserYear = (year) => {
+  return async (dispatch) => {
+    try {
+      const response = await axios.delete(
+        `${CURRENT_IP}/api/nonver/year/${year}`
+      );
+      const data = response.data.data;
+
+      dispatch({
+        type: DELETE_NONVER_SESSION,
+        certs: data,
+      });
+    } catch (err) {
+      throw new Error(err.response.data.error);
+    }
+  };
+};

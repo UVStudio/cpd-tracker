@@ -145,6 +145,11 @@ const Stats = ({ navigation }) => {
     return showYearObj[0].historic;
   };
 
+  const retroOrNot = () => {
+    const showYearObj = userHours.filter((hours) => hours.year === showYear);
+    return showYearObj[0].retro;
+  };
+
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
       // The screen is focused
@@ -158,15 +163,33 @@ const Stats = ({ navigation }) => {
 
   //Session details navigations
   const verifiableHoursDetails = () => {
-    navigation.navigate('Verifiable Details', { year: showYear });
+    if (!historicOrNot()) {
+      navigation.navigate('Verifiable Details', { year: showYear });
+    }
+    if (historicOrNot() && retroOrNot()) {
+      navigation.navigate('Verifiable Details', { year: showYear });
+    }
+    return;
   };
 
   const totalCPDHoursDetails = () => {
-    navigation.navigate('Total CPD Details', { year: showYear });
+    if (!historicOrNot()) {
+      navigation.navigate('Total CPD Details', { year: showYear });
+    }
+    if (historicOrNot() && retroOrNot()) {
+      navigation.navigate('Total CPD Details', { year: showYear });
+    }
+    return;
   };
 
   const nonVerHoursDetails = () => {
-    navigation.navigate('Non-Verifiable Details', { year: showYear });
+    if (!historicOrNot()) {
+      navigation.navigate('Non-Verifiable Details', { year: showYear });
+    }
+    if (historicOrNot() && retroOrNot()) {
+      navigation.navigate('Non-Verifiable Details', { year: showYear });
+    }
+    return;
   };
 
   //Ethics Required vs Recommended
