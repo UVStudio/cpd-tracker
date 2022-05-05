@@ -3,7 +3,7 @@ const User = require('../models/User');
 const fs = require('fs');
 const aws = require('aws-sdk');
 const asyncHandler = require('../middleware/async');
-const { buildPDF } = require('../utils/pdfBuilder');
+const { buildPDF } = require('../utils/pdfBuilderS3');
 
 const s3 = new aws.S3({
   accessKeyId: process.env.ACCESSKEYID,
@@ -52,10 +52,11 @@ const downloadFile = (file_id, gfs) => {
 };
 
 //downloadFileS3
-const downloadFileS3 = async () => {
+const downloadFileS3 = async (s3Img) => {
   const params = {
     Bucket: process.env.BUCKET_NAME,
-    Key: 'users/Bran-6271a6fb97d12314520d7b83/6271a6fb97d12314520d7b83-2022-garth-cert-1651616668289.pdf.jpg',
+    //Key: 'users/Bran-6271a6fb97d12314520d7b83/6271a6fb97d12314520d7b83-2022-garth-cert-1651616668289.pdf.jpg',
+    Key: `${s3Img}.jpg`,
   };
 
   const { Body } = await s3.getObject(params).promise();
@@ -70,7 +71,7 @@ exports.producePDF = asyncHandler(async (req, res, next) => {
   const year = req.body.year;
   const searchTerm = `${userId}-${year}.jpg`;
 
-  const user = await User.findById(userId).populate('nonver');
+  const user = await User.findById(userId).populate(['cert', 'nonver']);
 
   // write report to PDF
   const CPDFileName = `${userId}-${year}-CPD-report.pdf`;

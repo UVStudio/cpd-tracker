@@ -32,10 +32,9 @@ const buildPDF = async (
   userId,
   year,
   user,
-  searchTerm,
+  searchTerm, //for mongo files only
   CPDFileName,
-  downloadFile,
-  downloadFileS3
+  downloadFile
 ) => {
   const doc = new PDFDocument();
 
@@ -50,7 +49,7 @@ const buildPDF = async (
   //End doc text
   const endDocText = 'This is the end of the CPD Report';
 
-  //user CPD recors
+  //user CPD records
   const userHours = user.hours;
   const chosenYear = userHours.find((hour) => hour.year === year);
   const prevYear = userHours.find((hour) => hour.year === year - 1);
@@ -313,9 +312,7 @@ const buildPDF = async (
           .text(`Ethics Hour(s): ${files[i].metadata.ethicsHours}`)
           .moveDown(0.5);
 
-        //let tempCertFile = await downloadFile(files[i]._id, gfsCerts);
-        let tempCertFile = await downloadFileS3();
-        //console.log('tempCertFile: ', typeof tempCertFile);
+        let tempCertFile = await downloadFile(files[i]._id, gfsCerts);
 
         doc
           .image(tempCertFile, {
