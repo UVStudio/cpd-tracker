@@ -144,6 +144,7 @@ const Records = () => {
 
     try {
       if (cert) {
+        console.log('cert: ', cert);
         await dispatch(
           certActions.saveVerCourse(year, hours, ethicsHours, courseName, cert)
         );

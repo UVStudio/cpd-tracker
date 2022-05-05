@@ -44,6 +44,8 @@ import statsFraction from '../../utils/statsFraction';
 import {
   requiredVerRules,
   requiredTotalCPDRules,
+  rollingVerRules,
+  rollingTotalCPDRules,
 } from '../../utils/requiredRulesCardText';
 import Colors from '../../constants/Colors';
 
@@ -441,7 +443,12 @@ Otherwise, this is going to be a lot of work for nothing.`);
                               }
                               style={{ flexDirection: 'row' }}
                             >
-                              <CustomTextStats style={styles.required}>
+                              <CustomTextStats
+                                style={{
+                                  ...styles.required,
+                                  transform: [{ translateY: 4 }],
+                                }}
+                              >
                                 {' '}
                                 - Required
                               </CustomTextStats>
@@ -514,7 +521,12 @@ Otherwise, this is going to be a lot of work for nothing.`);
                               }
                               style={{ flexDirection: 'row' }}
                             >
-                              <CustomTextStats style={styles.required}>
+                              <CustomTextStats
+                                style={{
+                                  ...styles.required,
+                                  transform: [{ translateY: 4 }],
+                                }}
+                              >
                                 {' '}
                                 - Required
                               </CustomTextStats>
@@ -593,21 +605,53 @@ Otherwise, this is going to be a lot of work for nothing.`);
                               </View>
                             )}
                             <CustomThinGreyLine />
-                            <CustomTextStats>
-                              Verifiable Hours:{'  '}
-                              {!elem.historic ? (
-                                statsFraction(
-                                  pastVerHours,
-                                  elem.verifiable,
-                                  totalRollingVerRequired
-                                )
-                              ) : (
-                                <Text style={{ color: Colors.dark }}>
-                                  {Number(elem.verifiable).toFixed(1)}
-                                </Text>
-                              )}
-                              {!elem.historic ? ' - Required' : null}
-                            </CustomTextStats>
+                            <CustomRowLeft>
+                              <CustomTextStats>
+                                Verifiable Hours:{'  '}
+                                {!elem.historic ? (
+                                  statsFraction(
+                                    pastVerHours,
+                                    elem.verifiable,
+                                    totalRollingVerRequired
+                                  )
+                                ) : (
+                                  <Text style={{ color: Colors.dark }}>
+                                    {Number(elem.verifiable).toFixed(1)}
+                                  </Text>
+                                )}
+                                {!elem.historic ? (
+                                  <Pressable
+                                    onPress={() =>
+                                      rollingVerRules(
+                                        user.province,
+                                        totalRollingVerRequired,
+                                        setCardText
+                                      )
+                                    }
+                                    style={{ flexDirection: 'row' }}
+                                  >
+                                    <CustomTextStats
+                                      style={{
+                                        ...styles.required,
+                                        transform: [{ translateY: 1 }],
+                                      }}
+                                    >
+                                      {' '}
+                                      - Required
+                                    </CustomTextStats>
+                                    <FontAwesome
+                                      name="exclamation-circle"
+                                      size={20}
+                                      color={Colors.darkOrange}
+                                      style={{
+                                        ...styles.quotation,
+                                        transform: [{ translateY: 1 }],
+                                      }}
+                                    />
+                                  </Pressable>
+                                ) : null}
+                              </CustomTextStats>
+                            </CustomRowLeft>
                             {!elem.historic ? (
                               <CustomAnimatedPie
                                 required={totalRollingVerRequired}
@@ -633,25 +677,57 @@ Otherwise, this is going to be a lot of work for nothing.`);
                             </CustomTextStats>
                           </CustomStatsDivider>
                           <CustomStatsDivider>
-                            <CustomTextStats>
-                              Total CPD Hours:{'  '}
-                              {!elem.historic ? (
-                                statsFraction(
-                                  pastNonVerHours,
-                                  pastVerHours +
-                                    elem.verifiable +
-                                    elem.nonVerifiable,
-                                  totalRollingCPDHoursRequired
-                                )
-                              ) : (
-                                <Text style={{ color: 'black' }}>
-                                  {Number(
-                                    elem.nonVerifiable + elem.verifiable
-                                  ).toFixed(1)}
-                                </Text>
-                              )}
-                              {!elem.historic ? ' - Required' : null}
-                            </CustomTextStats>
+                            <CustomRowLeft>
+                              <CustomTextStats>
+                                Total CPD Hours:{'  '}
+                                {!elem.historic ? (
+                                  statsFraction(
+                                    pastNonVerHours,
+                                    pastVerHours +
+                                      elem.verifiable +
+                                      elem.nonVerifiable,
+                                    totalRollingCPDHoursRequired
+                                  )
+                                ) : (
+                                  <Text style={{ color: 'black' }}>
+                                    {Number(
+                                      elem.nonVerifiable + elem.verifiable
+                                    ).toFixed(1)}
+                                  </Text>
+                                )}
+                                {!elem.historic ? (
+                                  <Pressable
+                                    onPress={() =>
+                                      rollingTotalCPDRules(
+                                        user.province,
+                                        totalRollingCPDHoursRequired,
+                                        setCardText
+                                      )
+                                    }
+                                    style={{ flexDirection: 'row' }}
+                                  >
+                                    <CustomTextStats
+                                      style={{
+                                        ...styles.required,
+                                        transform: [{ translateY: 1 }],
+                                      }}
+                                    >
+                                      {' '}
+                                      - Required
+                                    </CustomTextStats>
+                                    <FontAwesome
+                                      name="exclamation-circle"
+                                      size={20}
+                                      color={Colors.darkOrange}
+                                      style={{
+                                        ...styles.quotation,
+                                        transform: [{ translateY: 1 }],
+                                      }}
+                                    />
+                                  </Pressable>
+                                ) : null}
+                              </CustomTextStats>
+                            </CustomRowLeft>
                             {!elem.historic ? (
                               <CustomAnimatedPie
                                 required={totalRollingCPDHoursRequired}
@@ -829,7 +905,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   required: {
-    transform: [{ translateY: 4 }],
     color: Colors.primary,
   },
   quotation: {

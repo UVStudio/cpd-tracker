@@ -55,7 +55,6 @@ const downloadFile = (file_id, gfs) => {
 const downloadFileS3 = async (s3Img) => {
   const params = {
     Bucket: process.env.BUCKET_NAME,
-    //Key: 'users/Bran-6271a6fb97d12314520d7b83/6271a6fb97d12314520d7b83-2022-garth-cert-1651616668289.pdf.jpg',
     Key: `${s3Img}.jpg`,
   };
 
@@ -75,17 +74,7 @@ exports.producePDF = asyncHandler(async (req, res, next) => {
 
   // write report to PDF
   const CPDFileName = `${userId}-${year}-CPD-report.pdf`;
-  await buildPDF(
-    res,
-    conn,
-    userId,
-    year,
-    user,
-    searchTerm,
-    CPDFileName,
-    downloadFile,
-    downloadFileS3
-  );
+  await buildPDF(res, conn, userId, year, user, CPDFileName, downloadFileS3);
 });
 
 //desc    DELETE pdf

@@ -32,16 +32,10 @@ const buildPDF = async (
   userId,
   year,
   user,
-  searchTerm, //for mongo files only
   CPDFileName,
-  downloadFile,
   downloadFileS3
 ) => {
   const doc = new PDFDocument();
-
-  // console.log('userId: ', userId);
-  console.log('user: ', user);
-  // console.log('year: ', year);
 
   //Text styling
   const titleSize = 16;
@@ -65,7 +59,6 @@ const buildPDF = async (
   const chosenYearEthics = chosenYear.ethics;
   const chosenYearCPD = chosenYearVer + chosenYearNonVer;
 
-  let prevYearSearchTerm, twoYearsAgoSearchTerm;
   let prevYearVer = 0;
   let prevYearNonVer = 0;
   let prevYearEthics = 0;
@@ -74,6 +67,20 @@ const buildPDF = async (
   let twoYearsAgoNonVer = 0;
   let twoYearsAgoEthics = 0;
   let twoYearsAgoCPD = 0;
+
+  if (prevYear) {
+    prevYearVer = prevYear.verifiable;
+    prevYearNonVer = prevYear.nonVerifiable;
+    prevYearEthics = prevYear.ethics;
+    prevYearCPD = prevYearVer + prevYearNonVer;
+  }
+
+  if (twoYearsAgo) {
+    twoYearsAgoVer = twoYearsAgo.verifiable;
+    twoYearsAgoNonVer = twoYearsAgo.nonVerifiable;
+    twoYearsAgoEthics = twoYearsAgo.ethics;
+    twoYearsAgoCPD = twoYearsAgoVer + twoYearsAgoNonVer;
+  }
 
   //S3 create array of currentYear, prevYear and twoYearsAgo Certs objs
   const currentYearCerts = user.cert.filter((cert) => cert.year === year);
@@ -269,7 +276,6 @@ const buildPDF = async (
     .moveDown(0.5);
 
   //Chosen year verifiable courses and certs
-
   if (currentYearCerts.length === 0) {
     doc
       .fontSize(textSize)

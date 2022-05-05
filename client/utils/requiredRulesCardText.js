@@ -68,20 +68,25 @@ From the previous 2 years, you have earned a total of ${totalEarnedHours} CPD ho
   }
 };
 
-const rollingVerRules = (pastVerHours, setCardText) => {
-  const remainingVerHours = 60 - pastVerHours;
-
-  if (remainingVerHours > 0) {
-    setCardText(
-      `The annual Verifiable and total CPD hours requirements are calculated based on your hours for the previous 2 years, if the 3-year rolling requirement is applicable for ${showYear}.
-  
-From the previous 2 years, you have earned a total of ${pastVerHours} verifiable hours, which means you will need to earn ${remainingVerHours} verifiable hours in ${showYear} to satisfy your 3-year rolling Verifiable hours requirement.`
-    );
-  } else {
-    setCardText(
-      `The annual Verifiable hours requirements are calculated based on your hours earned for the previous 2 years, if the 3-year rolling requirement is applicable for ${showYear}. You have satisfied your 3-year rolling Verifiable requirements for ${showYear}.`
-    );
-  }
+const rollingVerRules = (province, totalRollingVerRequired, setCardText) => {
+  setCardText(
+    `According to ${province}'s CPD rules, your current 3 year-rolling Verifiable Hours requirement is ${totalRollingVerRequired} hours.`
+  );
 };
 
-export { requiredVerRules, requiredTotalCPDRules };
+const rollingTotalCPDRules = (
+  province,
+  totalRollingCPDHoursRequired,
+  setCardText
+) => {
+  setCardText(
+    `According to ${province}'s CPD rules, your current 3 year-rolling Total CPD Hours requirement is ${totalRollingCPDHoursRequired} hours.`
+  );
+};
+
+export {
+  requiredVerRules,
+  requiredTotalCPDRules,
+  rollingVerRules,
+  rollingTotalCPDRules,
+};
