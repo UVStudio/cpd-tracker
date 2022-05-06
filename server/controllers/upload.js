@@ -1,18 +1,13 @@
 const fs = require('fs');
-const path = require('path');
 const User = require('../models/User');
 const Cert = require('../models/Cert');
-const { fromPath } = require('pdf2pic');
-const Jimp = require('jimp');
 const ErrorResponse = require('../utils/errorResponse');
 const asyncHandler = require('../middleware/async');
 const mongoose = require('mongoose');
-const { GridFsStorage } = require('multer-gridfs-storage');
 const ObjectId = require('mongodb').ObjectId;
 const { certUploadHelper } = require('../utils/certUpload');
 
 const aws = require('aws-sdk');
-const { PutObjectCommand, S3Client } = require('@aws-sdk/client-s3');
 
 const conn = mongoose.createConnection(process.env.MONGO_URI, {
   useNewUrlParser: true,
@@ -42,30 +37,14 @@ exports.uploadCert = asyncHandler(async (req, res, next) => {
     );
   }
 
-  const certData = await certUploadHelper(
-    userId,
-    year,
-    courseName,
-    hours,
-    ethicsHours,
-    file
-  );
+  const certData = await certUploadHelper(userId, year, file);
   const uploadFile = certData.uploadFile;
-  const storage = certData.storage;
   const newFileName = certData.newFileName;
-
-  //Jimp object does not have path. Must pass path string directly
-  const stream = fs.createReadStream(
-    uploadFile.path ? uploadFile.path : `./uploads/${newFileName}.jpg`
-  );
 
   //Need to make a separate object for streaming to S3
   const streamS3 = fs.createReadStream(
     uploadFile.path ? uploadFile.path : `./uploads/${newFileName}.jpg`
   );
-
-  //upload file to MongoDB, uploadFile is the file object to upload
-  const response = await storage.fromStream(stream, req, uploadFile);
 
   const uploadParams = {
     Bucket: process.env.BUCKET_NAME,
@@ -93,7 +72,6 @@ exports.uploadCert = asyncHandler(async (req, res, next) => {
     hours,
     ethicsHours,
     courseName,
-    img: response.id,
     s3Img: `${bucket}${newFileName}`,
   });
 

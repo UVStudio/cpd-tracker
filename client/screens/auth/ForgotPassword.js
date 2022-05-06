@@ -8,6 +8,7 @@ import CustomFormCard from '../../components/CustomFormCard';
 import CustomButton from '../../components/CustomButton';
 import CustomText from '../../components/CustomText';
 import CustomInput from '../../components/CustomInput';
+import CustomSpinner from '../../components/CustomSpinner';
 import CustomErrorCard from '../../components/CustomErrorCard';
 
 import * as authActions from '../../store/actions/auth';

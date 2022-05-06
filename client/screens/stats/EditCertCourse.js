@@ -14,7 +14,6 @@ import CustomGreyLine from '../../components/CustomGreyLine';
 import CustomScreenContainer from '../../components/CustomScreenContainer';
 import CustomOperationalContainer from '../../components/CustomOperationalContainer';
 
-// import * as DocumentPicker from 'expo-document-picker';
 import * as DocumentPicker from 'react-native-document-picker';
 import * as authActions from '../../store/actions/auth';
 import * as certActions from '../../store/actions/cert';

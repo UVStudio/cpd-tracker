@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 const User = require('../models/User');
-const fs = require('fs');
 const aws = require('aws-sdk');
 const asyncHandler = require('../middleware/async');
 const { buildPDF } = require('../utils/pdfBuilderS3');
@@ -17,39 +16,6 @@ const conn = mongoose.createConnection(process.env.MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
-
-let gfsCerts;
-//let gfsReports;
-
-conn.once('open', (req, res) => {
-  //Init stream
-  //"mongoose": "^5.13.7",
-  gfsCerts = new mongoose.mongo.GridFSBucket(conn.db, {
-    bucketName: 'uploads',
-  });
-});
-
-const downloadFile = (file_id, gfs) => {
-  return new Promise((resolve, reject) => {
-    const read_stream = gfs.openDownloadStream(file_id);
-    let file = [];
-    read_stream.on('data', (chunk) => {
-      file.push(chunk);
-    });
-    read_stream.on('error', (e) => {
-      console.log(e);
-      reject(e);
-    });
-    return read_stream.on('end', () => {
-      file = Buffer.concat(file);
-      const img = `data:image/jpg;base64,${Buffer.from(file).toString(
-        'base64'
-      )}`;
-      //img is type string
-      resolve(img);
-    });
-  });
-};
 
 //downloadFileS3
 const downloadFileS3 = async (s3Img) => {

@@ -2,7 +2,6 @@ import React, { useState, useReducer, useCallback, useEffect } from 'react';
 import { Platform, StyleSheet } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 
-//import * as DocumentPicker from 'expo-document-picker';
 import * as DocumentPicker from 'react-native-document-picker';
 import * as certActions from '../../store/actions/cert';
 import * as authActions from '../../store/actions/auth';
@@ -28,7 +27,6 @@ import { FORM_INPUT_UPDATE } from '../../store/types';
 import { hoursRequiredLogic } from '../../utils/hoursRequiredLogic';
 
 const Records = () => {
-  const [showYear, setShowYear] = useState(currentYear);
   const [cert, setCert] = useState(null); //if true, app uploads a cert. if not, app uploads default no-cert.jpg from S3
   const [cardText, setCardText] = useState('');
   const [pieCardText, setPieCardText] = useState('');
@@ -78,6 +76,7 @@ const Records = () => {
   const hours = Number(formState.inputValues.hours);
   const ethicsHours = Number(formState.inputValues.ethicsHours);
   const { courseName } = formState.inputValues;
+  const courseNameCap = courseName.toUpperCase();
 
   const yearObj = userHours.filter((hours) => hours.year === year);
 
@@ -96,10 +95,7 @@ const Records = () => {
 
   const hoursRequired = hoursRequiredLogic(user, currentYear);
 
-  const {
-    currentYearNeedVerHours,
-    // currentYearNeedEthicsHours,
-  } = hoursRequired;
+  const { currentYearNeedVerHours } = hoursRequired;
 
   const addCertHandler = async () => {
     try {
@@ -144,9 +140,14 @@ const Records = () => {
 
     try {
       if (cert) {
-        console.log('cert: ', cert);
         await dispatch(
-          certActions.saveVerCourse(year, hours, ethicsHours, courseName, cert)
+          certActions.saveVerCourse(
+            year,
+            hours,
+            ethicsHours,
+            courseNameCap,
+            cert
+          )
         );
       } else {
         const noCert = {
@@ -159,7 +160,7 @@ const Records = () => {
             year,
             hours,
             ethicsHours,
-            courseName,
+            courseNameCap,
             noCert
           )
         );

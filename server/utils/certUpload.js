@@ -1,17 +1,7 @@
-const fs = require('fs');
 const path = require('path');
-const { GridFsStorage } = require('multer-gridfs-storage');
 const { fromPath } = require('pdf2pic');
-const Jimp = require('jimp');
 
-const certUploadHelper = async (
-  userId,
-  year,
-  courseName,
-  hours,
-  ethicsHours,
-  file
-) => {
+const certUploadHelper = async (userId, year, file) => {
   let uploadFile;
 
   //clean file name
@@ -26,24 +16,6 @@ const certUploadHelper = async (
     '-' +
     Date.now() +
     path.extname(cleanFileName);
-
-  //setup GFS storage function for certificate
-  const storage = new GridFsStorage({
-    url: process.env.MONGO_URI,
-    file: () => {
-      return {
-        filename: userId + '-' + year + '.jpg',
-        metadata: {
-          userId,
-          courseName,
-          hours,
-          ethicsHours,
-          year,
-        },
-        bucketName: 'uploads',
-      };
-    },
-  });
 
   const ext = path.extname(newFileName);
 
@@ -74,21 +46,22 @@ const certUploadHelper = async (
     );
   }
 
-  //if png, jpeg or jpg, convert to jpg and compress
-  // if (ext === '.png' || ext === '.jpeg' || ext === '.jpg') {
-  //   console.log('certUpload jpg hit');
-  //   await Jimp.read(file.path)
-  //     .then((image) => {
-  //       image
-  //         .resize(Jimp.AUTO, 512)
-  //         .quality(60)
-  //         .write(`./uploads/${newFileName}.jpg`);
-  //       uploadFile = image;
-  //     })
-  //     .catch((err) => console.log('jimp error: ', err));
-  // }
-
-  return { uploadFile, storage, newFileName };
+  return { uploadFile, newFileName };
 };
 
 module.exports = { certUploadHelper };
+
+//Jimp code to compress non pdf's but looks like pdf2pic is doing the job
+//if png, jpeg or jpg, convert to jpg and compress
+// if (ext === '.png' || ext === '.jpeg' || ext === '.jpg') {
+//   console.log('certUpload jpg hit');
+//   await Jimp.read(file.path)
+//     .then((image) => {
+//       image
+//         .resize(Jimp.AUTO, 512)
+//         .quality(60)
+//         .write(`./uploads/${newFileName}.jpg`);
+//       uploadFile = image;
+//     })
+//     .catch((err) => console.log('jimp error: ', err));
+// }

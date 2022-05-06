@@ -162,32 +162,12 @@ const Stats = ({ navigation }) => {
   }, [navigation, showYear]);
 
   //Session details navigations
-  const verifiableHoursDetails = () => {
+  const detailsNavigation = (dest) => {
     if (!historicOrNot()) {
-      navigation.navigate('Verifiable Details', { year: showYear });
+      navigation.navigate(dest, { year: showYear });
     }
     if (historicOrNot() && retroOrNot()) {
-      navigation.navigate('Verifiable Details', { year: showYear });
-    }
-    return;
-  };
-
-  const totalCPDHoursDetails = () => {
-    if (!historicOrNot()) {
-      navigation.navigate('Total CPD Details', { year: showYear });
-    }
-    if (historicOrNot() && retroOrNot()) {
-      navigation.navigate('Total CPD Details', { year: showYear });
-    }
-    return;
-  };
-
-  const nonVerHoursDetails = () => {
-    if (!historicOrNot()) {
-      navigation.navigate('Non-Verifiable Details', { year: showYear });
-    }
-    if (historicOrNot() && retroOrNot()) {
-      navigation.navigate('Non-Verifiable Details', { year: showYear });
+      navigation.navigate(dest, { year: showYear });
     }
     return;
   };
@@ -436,7 +416,11 @@ Otherwise, this is going to be a lot of work for nothing.`);
                           </View>
                         )}
                         <CustomRowLeft>
-                          <Pressable onPress={() => verifiableHoursDetails()}>
+                          <Pressable
+                            onPress={() =>
+                              detailsNavigation('Verifiable Details')
+                            }
+                          >
                             <CustomTextStats>
                               Verifiable Hours:{'  '}
                               {!elem.historic ? (
@@ -489,12 +473,18 @@ Otherwise, this is going to be a lot of work for nothing.`);
                           <CustomAnimatedPie
                             required={currentYearNeedVerHours}
                             progress={elem.verifiable}
-                            CPDdetails={verifiableHoursDetails}
+                            CPDdetails={() =>
+                              detailsNavigation('Verifiable Details')
+                            }
                           />
                         ) : null}
                       </CustomStatsDivider>
                       <CustomStatsDivider>
-                        <Pressable onPress={() => nonVerHoursDetails()}>
+                        <Pressable
+                          onPress={() =>
+                            detailsNavigation('Non-Verifiable Details')
+                          }
+                        >
                           <CustomTextStats>
                             Non-Verifiable Hours:{'  '}
                             {!elem.historic ? (
@@ -511,7 +501,11 @@ Otherwise, this is going to be a lot of work for nothing.`);
                       </CustomStatsDivider>
                       <CustomStatsDivider>
                         <CustomRowLeft>
-                          <Pressable onPress={() => totalCPDHoursDetails()}>
+                          <Pressable
+                            onPress={() =>
+                              detailsNavigation('Total CPD Details')
+                            }
+                          >
                             <CustomTextStats>
                               Total CPD Hours:{'  '}
                               {!elem.historic ? (
@@ -566,7 +560,9 @@ Otherwise, this is going to be a lot of work for nothing.`);
                           <CustomAnimatedPie
                             required={currentYearNeedCPDHours}
                             progress={elem.nonVerifiable + elem.verifiable}
-                            CPDdetails={totalCPDHoursDetails}
+                            CPDdetails={() =>
+                              detailsNavigation('Total CPD Details')
+                            }
                           />
                         ) : null}
                       </CustomStatsDivider>

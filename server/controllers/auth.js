@@ -353,21 +353,6 @@ exports.logOut = asyncHandler(async (req, res, next) => {
 exports.deleteCurrentUser = asyncHandler(async (req, res, next) => {
   const userId = req.user.id;
 
-  const filesToDelete = await conn.db
-    .collection('uploads.files')
-    .find({ 'metadata.userId': userId })
-    .toArray();
-
-  const filesToDeleteIds = filesToDelete.map((file) => file._id);
-
-  const filesResult = await conn.db
-    .collection('uploads.files')
-    .deleteMany({ 'metadata.userId': userId });
-
-  const chunksResult = await conn.db
-    .collection('uploads.chunks')
-    .deleteMany({ files_id: { $in: filesToDeleteIds } });
-
   const certsToDelete = await Cert.deleteMany({ user: userId });
   const nonVersToDelete = await NonVer.deleteMany({ user: userId });
 

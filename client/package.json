@@ -20,7 +20,6 @@
     "axios": "^0.22.0",
     "expo": "^44.0.0",
     "expo-app-loading": "~1.3.0",
-    "expo-document-picker": "~10.1.0",
     "expo-font": "~10.0.4",
     "expo-keep-awake": "~10.0.1",
     "expo-media-library": "~14.0.0",

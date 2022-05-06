@@ -1,9 +1,7 @@
 const User = require('../models/User');
-const fs = require('fs');
 const mongoose = require('mongoose');
 const ErrorResponse = require('../utils/errorResponse');
 const asyncHandler = require('../middleware/async');
-const { buildPDF } = require('../utils/pdfBuilder');
 const aws = require('aws-sdk');
 
 const s3 = new aws.S3({
@@ -104,20 +102,6 @@ exports.deleteUserById = asyncHandler(async (req, res, next) => {
   if (!user) {
     return new ErrorResponse('This User does not exist');
   }
-
-  const filesToDelete = await conn.db
-    .collection('uploads.files')
-    .find({ 'metadata.userId': userId })
-    .toArray();
-  const filesToDeleteIds = filesToDelete.map((file) => file._id);
-
-  const filesResult = await conn.db
-    .collection('uploads.files')
-    .deleteMany({ 'metadata.userId': userId });
-
-  const chunksResult = await conn.db
-    .collection('uploads.chunks')
-    .deleteMany({ files_id: { $in: filesToDeleteIds } });
 
   const certsToDelete = await Cert.deleteMany({ user: userId });
   const nonVersToDelete = await NonVer.deleteMany({ user: userId });
