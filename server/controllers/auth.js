@@ -179,17 +179,6 @@ exports.updateUser = asyncHandler(async (req, res, next) => {
 
   const userUpdated = await User.findById(req.user.id);
 
-  console.log('bucket:', process.env.BUCKET_NAME);
-
-  var params = {
-    Bucket: process.env.BUCKET_NAME,
-    Key: 'users/Ned-626c356aea90aa47c510ee53/626c356aea90aa47c510ee53-2022-garth-cert-1651266646810.pdf.jpg',
-  };
-  s3.getObject(params, (err, data) => {
-    if (err) console.log(err, err.stack); // an error occurred
-    else console.log(data); // successful response
-  });
-
   res.status(200).json({ success: true, data: userUpdated });
 });
 
@@ -231,7 +220,6 @@ exports.updatePassword = asyncHandler(async (req, res, next) => {
 //route   POST /api/auth/forgotPassword
 //access  public
 exports.forgotPassword = asyncHandler(async (req, res, next) => {
-  console.log('email: ', req.body);
   const user = await User.findOne({ email: req.body.email });
 
   if (!user) {

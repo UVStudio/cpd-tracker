@@ -27,6 +27,8 @@ const CertHoursDetails = (props) => {
 
   const certsYearState = useSelector((state) => state.cert.certs);
 
+  //console.log('certsYearState: ', certsYearState);
+
   const loadCerts = async () => {
     setLoading(true);
     try {
@@ -61,10 +63,10 @@ const CertHoursDetails = (props) => {
 
   const deleteSessionHandler = async () => {
     setDeletingSession(true);
-    const imageId = verObjToDelete.img;
+    const certId = verObjToDelete._id;
     try {
-      await dispatch(certsActions.deleteCertObjById(verObjToDelete._id));
-      await dispatch(certsActions.deleteUploadByCertImgId(imageId));
+      await dispatch(certsActions.deleteUploadByCertImgId(certId));
+      await dispatch(certsActions.deleteCertObjById(certId));
       //await dispatch(certsActions.getAllCertObjsByYear(year));
       await dispatch(authActions.getUser());
       setVerObjToDelete(null);

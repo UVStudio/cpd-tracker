@@ -99,9 +99,9 @@ const TotalCPDHoursDetails = (props) => {
         setNonVerToDeleteID('');
       }
       if (verOrNonVer === 'ver') {
-        const imageId = verObjToDelete.img;
-        await dispatch(certsActions.deleteCertObjById(verObjToDelete._id));
-        await dispatch(certsActions.deleteUploadByCertImgId(imageId));
+        const certId = verObjToDelete._id;
+        await dispatch(certsActions.deleteCertObjById(certId));
+        await dispatch(certsActions.deleteUploadByCertImgId(certId));
         //await dispatch(certsActions.getAllCertObjsByYear(year));
         setVerObjToDelete(null);
       }

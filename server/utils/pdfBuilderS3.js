@@ -272,7 +272,12 @@ const buildPDF = async (
   doc
     .fontSize(subTitleSize)
     .font(avenirMedium)
-    .text(`Total Verifiable Hours: ${chosenYearVer} hours earned`)
+    .text(`Total Verifiable Hours: ${chosenYearVer} hours earned`);
+
+  doc
+    .fontSize(subTitleSize)
+    .font(avenirMedium)
+    .text(`Total Ethics Hours: ${chosenYearEthics} hours earned`)
     .moveDown(0.5);
 
   //Chosen year verifiable courses and certs
@@ -394,7 +399,12 @@ const buildPDF = async (
         doc
           .fontSize(subTitleSize)
           .font(avenirMedium)
-          .text(`Total Verifiable Hours: ${prevYearVer} hours earned`)
+          .text(`Total Verifiable Hours: ${prevYearVer} hours earned`);
+
+        doc
+          .fontSize(subTitleSize)
+          .font(avenirMedium)
+          .text(`Total Ethics Hours: ${prevYearEthics} hours earned`)
           .moveDown(0.5);
 
         //Previous year verifiable courses and certs
@@ -516,7 +526,12 @@ const buildPDF = async (
               doc
                 .fontSize(subTitleSize)
                 .font(avenirMedium)
-                .text(`Total Verifiable Hours: ${twoYearsAgoVer} hours earned`)
+                .text(`Total Verifiable Hours: ${twoYearsAgoVer} hours earned`);
+
+              doc
+                .fontSize(subTitleSize)
+                .font(avenirMedium)
+                .text(`Total Ethics Hours: ${twoYearsAgoEthics} hours earned`)
                 .moveDown(0.5);
 
               //Two years ago verifiable courses and certs

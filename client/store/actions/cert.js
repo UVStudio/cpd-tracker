@@ -176,6 +176,7 @@ export const deleteAllCertsByUserYear = (year) => {
   };
 };
 
+//id is Cert ID
 export const deleteUploadByCertImgId = (id) => {
   return async () => {
     try {

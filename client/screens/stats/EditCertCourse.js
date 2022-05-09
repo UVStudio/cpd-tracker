@@ -67,7 +67,8 @@ const EditCertCourse = (props) => {
       console.log('err: ', err.message);
       if (
         err.message ===
-        'RNCPromiseWrapper: user canceled the document picker, Error Domain=NSCocoaErrorDomain Code=3072 "The operation was cancelled."'
+          'RNCPromiseWrapper: user canceled the document picker, Error Domain=NSCocoaErrorDomain Code=3072 "The operation was cancelled."' ||
+        err.message === 'User canceled document picker'
       )
         return;
       setError(
@@ -88,7 +89,6 @@ const EditCertCourse = (props) => {
     [dispatchFormState]
   );
 
-  //also need to update uploads.files metadata
   const editCourse = async (id) => {
     setUpdatingCourse(true);
     const courseName = formState.inputValues.courseName;

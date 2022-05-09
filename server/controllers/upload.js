@@ -3,26 +3,19 @@ const User = require('../models/User');
 const Cert = require('../models/Cert');
 const ErrorResponse = require('../utils/errorResponse');
 const asyncHandler = require('../middleware/async');
-const mongoose = require('mongoose');
-const ObjectId = require('mongodb').ObjectId;
 const { certUploadHelper } = require('../utils/certUpload');
 
 const aws = require('aws-sdk');
 
-const conn = mongoose.createConnection(process.env.MONGO_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
-
 const s3 = new aws.S3({
-  accessKeyId: process.env.ACCESSKEYID,
-  secretAccessKey: process.env.SECRETACCESSKEY,
+  // accessKeyId: process.env.ACCESSKEYID,
+  // secretAccessKey: process.env.SECRETACCESSKEY,
   Bucket: process.env.BUCKET_NAME,
   region: process.env.REGION,
 });
 
 //@route   POST /api/upload
-//@desc    Uploads Cert to DB
+//@desc    Uploads Cert to S3
 //@access  Private
 exports.uploadCert = asyncHandler(async (req, res, next) => {
   const file = req.file;
@@ -106,16 +99,17 @@ exports.uploadCert = asyncHandler(async (req, res, next) => {
   });
 });
 
-//@route   UPDATE /api/upload/:id
-//@desc    UPDATE Update courseName and FILE and CHUNKS by Cert Obj ID, Replace existing img ObjectID
+//@route   PUT /api/upload/:id
+//@desc    PUT Update courseName and FILE and CHUNKS by Cert Obj ID, Replace existing img ObjectID
 //@access  Private
 exports.updateCertByObjId = asyncHandler(async (req, res, next) => {
   const newFile = req.file;
   const certId = req.params.id;
   const userId = req.user.id;
-  const { hours, ethicsHours, courseName } = req.body;
+  const bucket = req.user.bucket;
+  const { hours } = req.body;
   let cert = await Cert.findById(certId);
-  const existingCertImgId = cert.img;
+  const existingCertImgId = cert.s3Img;
   const prevHours = cert.hours;
   const certYear = cert.year;
 
@@ -129,25 +123,41 @@ exports.updateCertByObjId = asyncHandler(async (req, res, next) => {
     );
   }
 
-  const certData = await certUploadHelper(
-    userId,
-    certYear,
-    courseName,
-    hours,
-    ethicsHours,
-    newFile
-  );
+  const certData = await certUploadHelper(userId, certYear, newFile);
   const uploadFile = certData.uploadFile;
-  const storage = certData.storage;
   const newFileName = certData.newFileName;
 
   //Jimp object does not have path. Must pass path string directly
-  const stream = fs.createReadStream(
+  const streamS3 = fs.createReadStream(
     uploadFile.path ? uploadFile.path : `./uploads/${newFileName}.jpg`
   );
 
-  //upload file to MongoDB, uploadFile is the file object to upload
-  const response = await storage.fromStream(stream, req, uploadFile);
+  //Upload new cert to S3
+  const uploadParams = {
+    Bucket: process.env.BUCKET_NAME,
+    Key: `${bucket}${newFileName}.jpg`,
+    Body: streamS3,
+  };
+
+  await s3
+    .upload(uploadParams, (err, data) => {
+      if (err) console.error('upload err: ', err);
+      if (data) console.log('upload success');
+    })
+    .promise();
+
+  //delete old cert from S3
+  const deleteParam = {
+    Bucket: process.env.BUCKET_NAME,
+    Key: `${existingCertImgId}.jpg`,
+  };
+
+  await s3
+    .deleteObject(deleteParam, (err, data) => {
+      if (err) console.error('err: ', err);
+      if (data) console.log('delete success: ', data);
+    })
+    .promise();
 
   fs.unlinkSync(newFile.path);
   fs.unlinkSync(
@@ -171,37 +181,11 @@ exports.updateCertByObjId = asyncHandler(async (req, res, next) => {
 
   cert = await Cert.findOneAndUpdate(
     { _id: certId },
-    { img: response.id, courseName, hours, ethicsHours },
+    { s3Img: `${bucket}${newFileName}` },
     { new: true }
   );
 
-  //delete existing FILE and CHUNKS by FILE mongo ID
-  const file = await conn.db
-    .collection('uploads.files')
-    .findOne({ _id: ObjectId(existingCertImgId) });
-  const chunks = await conn.db
-    .collection('uploads.chunks')
-    .find({ files_id: ObjectId(existingCertImgId) })
-    .toArray();
-
-  if (!file || chunks.length == 0) {
-    return next(new ErrorResponse('File not found', 400));
-  }
-
-  const fileResult = await conn.db
-    .collection('uploads.files')
-    .deleteOne({ _id: ObjectId(existingCertImgId) });
-
-  const chunksResult = await conn.db
-    .collection('uploads.chunks')
-    .deleteMany({ files_id: ObjectId(existingCertImgId) });
-
-  if (fileResult.deletedCount === 0 || chunksResult.deletedCount === 0) {
-    return next(new ErrorResponse('File did not get deleted', 400));
-  }
-
   const user = await User.findById(req.user.id).populate('cert');
-
   const certs = user.cert;
   const certsYear = certs.filter((cert) => cert.year === certYear);
 
@@ -210,47 +194,80 @@ exports.updateCertByObjId = asyncHandler(async (req, res, next) => {
     data: certsYear,
     delete: {
       existingCertImgId,
-      file: fileResult.deletedCount,
-      chunks: chunksResult.deletedCount,
     },
   });
 });
 
 //@route   DELETE /api/upload/:id
-//@desc    DELETE Upload FILE and CHUNKS by FILE mongo ID
+//@desc    DELETE S3 Object By S3 Key via Cert ID
 //@access  Private
 exports.deleteUploadById = asyncHandler(async (req, res, next) => {
-  const fileId = req.params.id;
+  const certId = req.params.id;
+  const cert = await Cert.findById(certId);
+  const s3Key = cert.s3Img;
 
-  const file = await conn.db
-    .collection('uploads.files')
-    .findOne({ _id: ObjectId(fileId) });
-  const chunks = await conn.db
-    .collection('uploads.chunks')
-    .find({ files_id: ObjectId(fileId) })
-    .toArray();
+  const deleteParam = {
+    Bucket: process.env.BUCKET_NAME,
+    Key: `${s3Key}.jpg`,
+  };
 
-  if (!file || chunks.length == 0) {
-    return next(new ErrorResponse('File not found', 400));
-  }
-
-  const fileResult = await conn.db
-    .collection('uploads.files')
-    .deleteOne({ _id: ObjectId(fileId) });
-
-  const chunksResult = await conn.db
-    .collection('uploads.chunks')
-    .deleteMany({ files_id: ObjectId(fileId) });
-
-  if (fileResult.deletedCount === 0 || chunksResult.deletedCount === 0) {
-    return next(new ErrorResponse('File did not get deleted', 400));
-  }
+  await s3
+    .deleteObject(deleteParam, (err, data) => {
+      if (err) console.error('err: ', err);
+      if (data) console.log('delete success: ', data);
+    })
+    .promise();
 
   res.status(200).json({
     success: 'true',
-    data: {
-      file: fileResult.deletedCount,
-      chunks: chunksResult.deletedCount,
-    },
   });
 });
+
+// const file = await conn.db
+//     .collection('uploads.files')
+//     .findOne({ _id: ObjectId(fileId) });
+//   const chunks = await conn.db
+//     .collection('uploads.chunks')
+//     .find({ files_id: ObjectId(fileId) })
+//     .toArray();
+
+//   if (!file || chunks.length == 0) {
+//     return next(new ErrorResponse('File not found', 400));
+//   }
+
+//   const fileResult = await conn.db
+//     .collection('uploads.files')
+//     .deleteOne({ _id: ObjectId(fileId) });
+
+//   const chunksResult = await conn.db
+//     .collection('uploads.chunks')
+//     .deleteMany({ files_id: ObjectId(fileId) });
+
+//   if (fileResult.deletedCount === 0 || chunksResult.deletedCount === 0) {
+//     return next(new ErrorResponse('File did not get deleted', 400));
+//   }
+
+//delete existing FILE and CHUNKS by FILE mongo ID
+// const file = await conn.db
+//   .collection('uploads.files')
+//   .findOne({ _id: ObjectId(existingCertImgId) });
+// const chunks = await conn.db
+//   .collection('uploads.chunks')
+//   .find({ files_id: ObjectId(existingCertImgId) })
+//   .toArray();
+
+// if (!file || chunks.length == 0) {
+//   return next(new ErrorResponse('File not found', 400));
+// }
+
+// const fileResult = await conn.db
+//   .collection('uploads.files')
+//   .deleteOne({ _id: ObjectId(existingCertImgId) });
+
+// const chunksResult = await conn.db
+//   .collection('uploads.chunks')
+//   .deleteMany({ files_id: ObjectId(existingCertImgId) });
+
+// if (fileResult.deletedCount === 0 || chunksResult.deletedCount === 0) {
+//   return next(new ErrorResponse('File did not get deleted', 400));
+// }
