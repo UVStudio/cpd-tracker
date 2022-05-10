@@ -669,6 +669,7 @@ const buildPDF = async (
     };
     s3.upload(params, async (err, data) => {
       if (err) {
+        console.log('err: ', err);
         res.json({ msg: err });
       }
 
@@ -679,6 +680,7 @@ const buildPDF = async (
         );
 
         fs.unlinkSync(`./uploads/${CPDFileName}`);
+
         res.status(200).send({ success: true });
       }
     });

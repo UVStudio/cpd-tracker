@@ -56,17 +56,10 @@ exports.deletePDF = asyncHandler(async (req, res, next) => {
     Key: pdfUrl,
   };
 
-  const s3 = new aws.S3({
-    accessKeyId: process.env.ACCESSKEYID,
-    secretAccessKey: process.env.SECRETACCESSKEY,
-    Bucket: process.env.BUCKET_NAME,
-    region: process.env.REGION,
-  });
-
   await s3
     .deleteObject(deleteParam, (err, data) => {
       if (err) console.error('err: ', err);
-      if (data) console.log('delete success');
+      if (data) console.log('report delete success');
     })
     .promise();
 

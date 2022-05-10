@@ -8,8 +8,8 @@ const { certUploadHelper } = require('../utils/certUpload');
 const aws = require('aws-sdk');
 
 const s3 = new aws.S3({
-  // accessKeyId: process.env.ACCESSKEYID,
-  // secretAccessKey: process.env.SECRETACCESSKEY,
+  accessKeyId: process.env.ACCESSKEYID,
+  secretAccessKey: process.env.SECRETACCESSKEY,
   Bucket: process.env.BUCKET_NAME,
   region: process.env.REGION,
 });

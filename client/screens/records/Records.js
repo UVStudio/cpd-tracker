@@ -152,7 +152,7 @@ const Records = () => {
       } else {
         const noCert = {
           name: 'no-cert.jpg',
-          uri: 'https://cpdtracker.s3.us-east-2.amazonaws.com/cert/no-cert.jpg',
+          uri: 'https://cpdtracker-dev.s3.ca-central-1.amazonaws.com/cert/no-cert.jpg',
         };
 
         await dispatch(

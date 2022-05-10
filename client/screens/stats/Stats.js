@@ -225,7 +225,7 @@ const Stats = ({ navigation }) => {
   //Download PDF Report
   //set vars of names and paths
   const userFirstName = user.name.split(' ')[0];
-  const pdfUri = `https://cpdtracker.s3.us-east-2.amazonaws.com/reports/${
+  const pdfUri = `https://cpdtracker-dev.s3.ca-central-1.amazonaws.com/reports/${
     user._id
   }-${showYear.toString()}-CPD-report.pdf`;
   const fileName = `${userFirstName}-${showYear.toString()}-CPD-${Date.now()}.pdf`;

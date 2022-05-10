@@ -8,14 +8,9 @@ const certUploadHelper = async (userId, year, file) => {
   const cleanFileName = file.originalname.replace(/ /g, '-');
   const midName = cleanFileName.split('.').shift();
   const newFileName =
-    userId +
-    '-' +
-    year +
-    '-' +
-    midName +
-    '-' +
-    Date.now() +
-    path.extname(cleanFileName);
+    // userId +
+    // '-' +
+    year + '-' + midName + '-' + Date.now() + path.extname(cleanFileName);
 
   const ext = path.extname(newFileName);
 

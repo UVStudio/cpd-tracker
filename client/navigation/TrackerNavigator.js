@@ -43,7 +43,7 @@ export const AuthNavigator = () => {
         component={Auth}
         options={{ headerTitle: 'Login / Register' }}
       />
-      <AuthStackNavigator.Screen name="Profile" component={Profile} />
+      {/* <AuthStackNavigator.Screen name="Profile" component={Profile} /> */}
       <AuthStackNavigator.Screen
         name="Forgot Password"
         component={ForgotPassword}
