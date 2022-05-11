@@ -9,6 +9,7 @@ const {
   deleteUserById,
   getUsersCount,
   getReportByUserIdYear,
+  removeCertElementFromUserByCertId,
 } = require('../controllers/admin');
 
 const router = express.Router();
@@ -38,6 +39,12 @@ router.get(
   protect,
   authorize('admin'),
   getReportByUserIdYear
+);
+router.delete(
+  '/user/remove/:id/:cert',
+  protect,
+  authorize('admin'),
+  removeCertElementFromUserByCertId
 );
 
 module.exports = router;

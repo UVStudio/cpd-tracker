@@ -39,9 +39,11 @@ exports.uploadCert = asyncHandler(async (req, res, next) => {
     uploadFile.path ? uploadFile.path : `./uploads/${newFileName}.jpg`
   );
 
+  const s3BucketPath = `${bucket}${year}/${newFileName}`;
+
   const uploadParams = {
     Bucket: process.env.BUCKET_NAME,
-    Key: `${bucket}${newFileName}.jpg`,
+    Key: `${s3BucketPath}.jpg`,
     Body: streamS3,
   };
 
@@ -65,7 +67,7 @@ exports.uploadCert = asyncHandler(async (req, res, next) => {
     hours,
     ethicsHours,
     courseName,
-    s3Img: `${bucket}${newFileName}`,
+    s3Img: `${s3BucketPath}`,
   });
 
   //push cert Obj's ID to user's cert array
@@ -132,10 +134,12 @@ exports.updateCertByObjId = asyncHandler(async (req, res, next) => {
     uploadFile.path ? uploadFile.path : `./uploads/${newFileName}.jpg`
   );
 
+  const s3BucketPath = `${bucket}${certYear}/${newFileName}`;
+
   //Upload new cert to S3
   const uploadParams = {
     Bucket: process.env.BUCKET_NAME,
-    Key: `${bucket}${newFileName}.jpg`,
+    Key: `${s3BucketPath}.jpg`,
     Body: streamS3,
   };
 
@@ -181,7 +185,7 @@ exports.updateCertByObjId = asyncHandler(async (req, res, next) => {
 
   cert = await Cert.findOneAndUpdate(
     { _id: certId },
-    { s3Img: `${bucket}${newFileName}` },
+    { s3Img: `${s3BucketPath}` },
     { new: true }
   );
 

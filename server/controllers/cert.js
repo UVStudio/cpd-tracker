@@ -4,10 +4,25 @@ const ErrorResponse = require('../utils/errorResponse');
 const asyncHandler = require('../middleware/async');
 const mongoose = require('mongoose');
 const ObjectId = require('mongodb').ObjectId;
+const aws = require('aws-sdk');
+const { S3Client, ListObjectsCommand } = require('@aws-sdk/client-s3');
 
 const conn = mongoose.createConnection(process.env.MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
+});
+
+// const s3Client = new S3Client({
+//   accessKeyId: process.env.ACCESSKEYID,
+//   secretAccessKey: process.env.SECRETACCESSKEY,
+//   region: process.env.REGION,
+// });
+
+const s3 = new aws.S3({
+  accessKeyId: process.env.ACCESSKEYID,
+  secretAccessKey: process.env.SECRETACCESSKEY,
+  Bucket: process.env.BUCKET_NAME,
+  region: process.env.REGION,
 });
 
 //desc    GET Cert by ID
@@ -180,30 +195,65 @@ exports.deleteAllCertsByUserYear = asyncHandler(async (req, res, next) => {
   const year = req.params.year;
   const yearNumber = Number(year);
 
-  const filesToDelete = await conn.db
-    .collection('uploads.files')
-    .find({ 'metadata.userId': userId, 'metadata.year': year })
-    .toArray();
+  let user = await User.findById(userId);
+  const s3Path = user.bucket;
 
-  const filesToDeleteIds = filesToDelete.map((file) => file._id);
+  const bucketParams = {
+    Bucket: process.env.BUCKET_NAME,
+    Prefix: `${s3Path}${year}`,
+  };
 
-  await conn.db
-    .collection('uploads.files')
-    .deleteMany({ 'metadata.userId': userId, 'metadata.year': year });
+  const listedObjects = await s3.listObjectsV2(bucketParams).promise();
 
-  await conn.db
-    .collection('uploads.chunks')
-    .deleteMany({ files_id: { $in: filesToDeleteIds } });
+  const deleteParams = {
+    Bucket: process.env.BUCKET_NAME,
+    Delete: {
+      Objects: [],
+    },
+  };
+
+  for (const obj in listedObjects.Contents) {
+    deleteParams.Delete.Objects.push({ Key: listedObjects.Contents[obj].Key });
+  }
+
+  await s3
+    .deleteObjects(deleteParams, (err, data) => {
+      if (err) console.error('upload err: ', err);
+      if (data) console.log('delete success');
+    })
+    .promise();
+
+  const certsToDelete = await Cert.find({ user: userId, year: yearNumber });
+  const certsToDeleteIds = certsToDelete.map(({ _id }) => _id.toString());
 
   await Cert.deleteMany({ user: userId, year: yearNumber });
+  await User.updateOne(
+    { _id: userId },
+    { $pull: { cert: { $in: certsToDeleteIds } } }
+  );
 
-  const user = await User.findById(req.user.id).populate('cert');
+  user = await User.findById(req.user.id).populate('cert');
 
   const certs = user.cert;
   const certsYear = certs.filter((cert) => cert.year === yearNumber);
 
   res.status(200).json({
     success: true,
-    data: certsYear,
+    certsYear,
   });
 });
+
+// const filesToDelete = await conn.db
+//   .collection('uploads.files')
+//   .find({ 'metadata.userId': userId, 'metadata.year': year })
+//   .toArray();
+
+// const filesToDeleteIds = filesToDelete.map((file) => file._id);
+
+// await conn.db
+//   .collection('uploads.files')
+//   .deleteMany({ 'metadata.userId': userId, 'metadata.year': year });
+
+// await conn.db
+//   .collection('uploads.chunks')
+//   .deleteMany({ files_id: { $in: filesToDeleteIds } });

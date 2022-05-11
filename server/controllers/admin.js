@@ -197,6 +197,20 @@ exports.removeUserField = asyncHandler(async (req, res, next) => {
   res.status(200).json({ success: true, data: user });
 });
 
+//desc    DELETE Element from User Cert array
+//route   DELETE /api/admin/user/remove/user:Id/:cert
+//access  admin
+exports.removeCertElementFromUserByCertId = asyncHandler(
+  async (req, res, next) => {
+    const userId = req.params.id;
+    const certId = req.params.cert;
+
+    await User.updateOne({ _id: userId }, { $pull: { cert: certId } });
+
+    res.status(200).json({ success: true });
+  }
+);
+
 //desc    Download individual S3 object
 //route   GET /api/admin/downloadobject
 //access  admin
