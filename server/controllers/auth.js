@@ -340,21 +340,43 @@ exports.logOut = asyncHandler(async (req, res, next) => {
 //access  private
 exports.deleteCurrentUser = asyncHandler(async (req, res, next) => {
   const userId = req.user.id;
+  let user = await User.findById(userId);
+  const s3Path = user.bucket;
 
-  const certsToDelete = await Cert.deleteMany({ user: userId });
-  const nonVersToDelete = await NonVer.deleteMany({ user: userId });
+  const bucketParams = {
+    Bucket: process.env.BUCKET_NAME,
+    Prefix: `${s3Path}`,
+  };
+
+  const listedObjects = await s3.listObjectsV2(bucketParams).promise();
+
+  const deleteParams = {
+    Bucket: process.env.BUCKET_NAME,
+    Delete: {
+      Objects: [],
+    },
+  };
+
+  for (const obj in listedObjects.Contents) {
+    deleteParams.Delete.Objects.push({ Key: listedObjects.Contents[obj].Key });
+  }
+
+  //console.dir(deleteParams, { depth: null });
+
+  await s3
+    .deleteObjects(deleteParams, (err, data) => {
+      if (err) console.error('upload err: ', err);
+      if (data) console.log('delete success');
+    })
+    .promise();
+
+  await Cert.deleteMany({ user: userId });
+  await NonVer.deleteMany({ user: userId });
 
   await User.findByIdAndDelete(userId);
 
   res.status(200).json({
     success: true,
-    data: {
-      filesResult,
-      chunksResult,
-      certsToDelete,
-      nonVersToDelete,
-      userDeleted: userId,
-    },
   });
 });
 
