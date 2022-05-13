@@ -7,6 +7,8 @@ import {
   CODE_VERIFIED,
   SET_NEW_PASSWORD,
   SET_DID_TRY_AL,
+  DATA_REFRESH,
+  CLEAR_DATA_REFRESH,
   CLEAR_USER_STATE,
 } from '../types';
 
@@ -18,23 +20,21 @@ const initialState = {
   veriCode: null,
   verified: false,
   newPassword: false,
+  dataRefresh: false,
 };
 
 export default (state = initialState, action) => {
   switch (action.type) {
     case AUTHENTICATE:
       return {
-        //...state,
         token: action.token,
         userId: action.userId,
         didTryAutoLogin: true,
-        //user: action.user,
       };
     case SET_DID_TRY_AL:
       return {
         ...state,
         didTryAutoLogin: true,
-        //user: action.user,
       };
     case SET_USER:
       return {
@@ -61,10 +61,19 @@ export default (state = initialState, action) => {
         ...state,
         newPassword: action.newPassword,
       };
+    case DATA_REFRESH:
+      return {
+        ...state,
+        dataRefresh: true,
+      };
+    case CLEAR_DATA_REFRESH:
+      return {
+        ...state,
+        dataRefresh: false,
+      };
     case CLEAR_USER_STATE:
       return {
         ...initialState,
-        //didTryAutoLogin: false,
       };
     case LOGOUT:
       return {

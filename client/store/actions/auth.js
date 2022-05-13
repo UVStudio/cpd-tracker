@@ -9,6 +9,8 @@ import {
   CODE_VERIFIED,
   SET_NEW_PASSWORD,
   GET_USER,
+  DATA_REFRESH,
+  CLEAR_DATA_REFRESH,
   CLEAR_USER_STATE,
 } from '../types';
 import { CURRENT_IP } from '../../serverConfig';
@@ -25,6 +27,14 @@ export const authenticate = (token, userId, expiryTime) => {
 
 export const setDidTryAL = () => {
   return { type: SET_DID_TRY_AL };
+};
+
+export const dataRefresh = () => {
+  return { type: DATA_REFRESH };
+};
+
+export const clearDataRefresh = () => {
+  return { type: CLEAR_DATA_REFRESH };
 };
 
 export const register = (

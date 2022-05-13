@@ -93,6 +93,7 @@ const TotalCPDHoursDetails = (props) => {
   const deleteSessionHandler = async () => {
     setDeletingSession(true);
     try {
+      dispatch(authActions.dataRefresh());
       if (verOrNonVer === 'nonVer') {
         await dispatch(nonVerActions.deleteNonVerSession(nonVerToDeleteID));
         //await dispatch(nonVerActions.getAllNonVerObjsByYear(year));

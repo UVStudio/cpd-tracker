@@ -97,6 +97,7 @@ const EditCertCourse = (props) => {
 
     //console.log('formState: ', formState);
     try {
+      dispatch(authActions.dataRefresh());
       if (certUpload) {
         await dispatch(
           certActions.certUpdateById(

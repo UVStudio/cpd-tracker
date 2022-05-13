@@ -65,6 +65,7 @@ const CertHoursDetails = (props) => {
     setDeletingSession(true);
     const certId = verObjToDelete._id;
     try {
+      dispatch(authActions.dataRefresh());
       await dispatch(certsActions.deleteUploadByCertImgId(certId));
       await dispatch(certsActions.deleteCertObjById(certId));
       //await dispatch(certsActions.getAllCertObjsByYear(year));

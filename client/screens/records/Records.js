@@ -139,6 +139,7 @@ const Records = () => {
     }
 
     try {
+      dispatch(authActions.dataRefresh());
       if (cert) {
         await dispatch(
           certActions.saveVerCourse(
@@ -154,7 +155,6 @@ const Records = () => {
           name: 'no-cert.jpg',
           uri: 'https://cpdtracker-dev.s3.ca-central-1.amazonaws.com/cert/no-cert.jpg',
         };
-
         await dispatch(
           certActions.saveVerCourse(
             year,

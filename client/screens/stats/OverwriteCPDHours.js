@@ -73,6 +73,7 @@ const OverwriteCPDHours = (props) => {
   const saveDataHandler = async () => {
     setSavingCPD(true);
     try {
+      dispatch(authActions.dataRefresh());
       await dispatch(
         authActions.overrideHours(
           showYear,

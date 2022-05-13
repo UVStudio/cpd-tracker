@@ -111,6 +111,7 @@ const Timer = () => {
     const sessionName = formState.inputValues.sessionName;
 
     try {
+      dispatch(authActions.dataRefresh());
       await dispatch(
         nonVerActions.addNonVerSession(currentYear, today, hours, sessionName)
       );
@@ -210,6 +211,7 @@ const Timer = () => {
     const sessionName = formState.inputValues.sessionName;
 
     try {
+      dispatch(authActions.dataRefresh());
       await dispatch(
         nonVerActions.addNonVerSession(
           year,

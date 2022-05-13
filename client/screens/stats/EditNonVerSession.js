@@ -61,6 +61,7 @@ const EditNonVerSession = (props) => {
     const sessionName = formState.inputValues.sessionName;
     const hours = formState.inputValues.hours;
     try {
+      dispatch(authActions.dataRefresh());
       await dispatch(nonVerActions.editNonVerSession(sessionName, hours, id));
       await dispatch(authActions.getUser());
       setCardText('Non-Verifiable session successfully updated');

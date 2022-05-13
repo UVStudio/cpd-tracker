@@ -82,6 +82,7 @@ const Stats = ({ navigation }) => {
 
   const authState = useSelector((state) => state.auth.user);
   const reportReady = useSelector((state) => state.report.report);
+  const refreshState = useSelector((state) => state.auth.dataRefresh);
 
   const dispatch = useDispatch();
   const ref = useRef();
@@ -93,6 +94,7 @@ const Stats = ({ navigation }) => {
   const loadUser = async () => {
     setLoading(true);
     try {
+      dispatch(authActions.clearDataRefresh());
       await dispatch(authActions.getUser());
     } catch (err) {
       console.log(err.message);
@@ -153,13 +155,14 @@ const Stats = ({ navigation }) => {
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
       // The screen is focused
-      if (!historicOrNot()) {
+      if (!historicOrNot() && refreshState) {
         refreshData();
+        dispatch(authActions.clearDataRefresh());
       }
     });
     // Return the function to unsubscribe from the event so it gets removed on unmount
     return unsubscribe;
-  }, [navigation, showYear]);
+  }, [navigation, showYear, refreshState]);
 
   //Session details navigations
   const detailsNavigation = (dest) => {

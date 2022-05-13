@@ -59,6 +59,7 @@ const NonVerHoursDetails = (props) => {
   const deleteSessionHandler = async () => {
     setDeletingSession(true);
     try {
+      dispatch(authActions.dataRefresh());
       await dispatch(nonVerActions.deleteNonVerSession(nonVerToDeleteID));
       await dispatch(authActions.getUser());
       setDeletingSession(false);
