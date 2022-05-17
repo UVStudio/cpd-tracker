@@ -7,6 +7,7 @@ import Auth from '../screens/auth/Auth';
 import Profile from '../screens/auth/Profile';
 import Privacy from '../screens/auth/Privacy';
 import ForgotPassword from '../screens/auth/ForgotPassword';
+import Activation from '../screens/activation/Activation';
 import Verification from '../screens/auth/Verification';
 import ResetPassword from '../screens/auth/ResetPassword';
 import Stats from '../screens/stats/Stats';
@@ -60,8 +61,20 @@ export const AuthNavigator = () => {
   );
 };
 
+const ActivateStackNavigator = createNativeStackNavigator();
+export const ActivateNavigator = () => {
+  return (
+    <ActivateStackNavigator.Navigator screenOptions={defaultNavOptions}>
+      <ActivateStackNavigator.Screen
+        name="Activation Screen"
+        component={Activation}
+      />
+    </ActivateStackNavigator.Navigator>
+  );
+};
+
 const CPDStackNavigator = createNativeStackNavigator();
-const CPDNavigator = () => {
+export const CPDNavigator = () => {
   return (
     <CPDStackNavigator.Navigator screenOptions={defaultNavOptions}>
       <CPDStackNavigator.Screen name="Your CPD Statistics" component={Stats} />

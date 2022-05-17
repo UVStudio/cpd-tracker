@@ -23,11 +23,11 @@ const UserSchema = new mongoose.Schema({
     minlength: 6,
     select: false,
   },
-  //Field to add
-  // Obj: {
-  //   type: String,
-  //   required: false,
-  // },
+  active: {
+    type: Boolean,
+    // required: true,
+    default: false,
+  },
   role: {
     type: String,
     default: 'user',
@@ -60,6 +60,9 @@ const UserSchema = new mongoose.Schema({
       required: true,
     },
   ],
+  bucket: {
+    type: String,
+  },
   hours: [
     {
       year: {
@@ -98,9 +101,6 @@ const UserSchema = new mongoose.Schema({
       },
     },
   ],
-  bucket: {
-    type: String,
-  },
   createdAt: {
     type: Date,
     default: Date.now,
