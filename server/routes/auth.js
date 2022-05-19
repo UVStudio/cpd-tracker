@@ -7,9 +7,10 @@ const {
   login,
   logOut,
   deleteCurrentUser,
-  forgotPassword,
+  generateVeriCode,
   verificationCode,
   resetPassword,
+  activateAccount,
 } = require('../controllers/auth');
 
 const router = express.Router();
@@ -19,9 +20,10 @@ const { protect } = require('../middleware/auth');
 router.post('/', createUser);
 router.put('/', protect, updateUser);
 router.get('/', protect, getCurrentUser);
-router.post('/forgotpassword', forgotPassword);
-router.post('/forgotpassword/:vericode', verificationCode);
-router.put('/forgotpassword/:vericode', resetPassword);
+router.post('/generateVeriCode', generateVeriCode);
+router.post('/generateVeriCode/:vericode', verificationCode);
+router.put('/generateVeriCode/:vericode', resetPassword);
+router.post('/generateVeriCode/activate/:vericode', activateAccount);
 router.put('/password', protect, updatePassword);
 router.post('/login', login);
 router.post('/logout', logOut);

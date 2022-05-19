@@ -9,18 +9,21 @@ import CustomButton from '../../components/CustomButton';
 import CustomText from '../../components/CustomText';
 import CustomInput from '../../components/CustomInput';
 import CustomErrorCard from '../../components/CustomErrorCard';
+import CustomSpinner from '../../components/CustomSpinner';
+import CustomIndicator from '../../components/CustomIndicator';
 
 import * as authActions from '../../store/actions/auth';
 import { formReducer } from '../../utils/formReducer';
 import { FORM_INPUT_UPDATE } from '../../store/types';
-import CustomSpinner from '../../components/CustomSpinner';
 
 const Activation = () => {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const authState = useSelector((state) => state.auth.user);
-  const active = authState.active;
+  const user = useSelector((state) => state.auth.user);
+  const activate = useSelector((state) => state.auth.activate);
+  console.log('user: ', user.email);
+  console.log('activate: ', activate);
 
   const navigation = useNavigation();
   const dispatch = useDispatch();
@@ -35,17 +38,32 @@ const Activation = () => {
     formIsValid: false,
   });
 
-  // useEffect(() => {
-  //   if (active) navigation.navigate('Statistics');
-  // }, [active]);
+  const genActCodeHandler = async () => {
+    try {
+      await dispatch(authActions.generateVeriCode(user.email));
+    } catch (error) {
+      console.log(err.message);
+      setError(err.message);
+    }
+  };
+
+  const logoutHandler = () => {
+    try {
+      dispatch(authActions.logout());
+    } catch (err) {
+      console.log(err.message);
+    }
+  };
 
   const activationCodeHandler = async (code) => {
     setError('');
     setIsLoading(true);
     try {
-      await dispatch(authActions.verifyCode(code));
+      await dispatch(authActions.activateAccount(code));
+      await dispatch(authActions.getUser());
     } catch (err) {
-      setError(err.messsage);
+      console.log(err.message);
+      setError('Account cannot be activated');
     }
     setIsLoading(false);
   };
@@ -61,6 +79,10 @@ const Activation = () => {
     },
     [dispatchFormState]
   );
+
+  if (isLoading) {
+    return <CustomIndicator />;
+  }
 
   return (
     <CustomImageBackground>
@@ -94,6 +116,10 @@ const Activation = () => {
             Confirm Activation Code
           </CustomButton>
         )}
+        <CustomButton onSelect={logoutHandler}>Logout</CustomButton>
+        <CustomButton onSelect={genActCodeHandler}>
+          Resend Activation Code
+        </CustomButton>
       </CustomFormCard>
       {error !== '' ? (
         <CustomErrorCard error={error} toShow={setError} />

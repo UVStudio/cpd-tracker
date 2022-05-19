@@ -87,7 +87,7 @@ const Auth = () => {
       setIsRegistering(true);
       action = authActions.register(
         formState.inputValues.name,
-        formState.inputValues.email,
+        formState.inputValues.email.toLowerCase(),
         formState.inputValues.province,
         formState.inputValues.cpdMonth,
         formState.inputValues.cpdYear,
@@ -96,13 +96,24 @@ const Auth = () => {
     } else {
       setIsLogging(true);
       action = authActions.login(
-        formState.inputValues.email,
+        formState.inputValues.email.toLowerCase(),
         formState.inputValues.password
       );
     }
     setError('');
     try {
       await dispatch(action);
+      if (isSignup) {
+        await dispatch(
+          authActions.generateVeriCode(
+            formState.inputValues.email.toLowerCase()
+          )
+        );
+        setIsLogging(false);
+        setIsRegistering(false);
+      }
+      setIsLogging(false);
+      setIsRegistering(false);
     } catch (err) {
       setError(err.message);
       setIsLogging(false);

@@ -7,6 +7,7 @@ import {
   SET_USER,
   GET_VERIFICATION_CODE,
   CODE_VERIFIED,
+  ACTIVATE,
   SET_NEW_PASSWORD,
   GET_USER,
   DATA_REFRESH,
@@ -253,7 +254,7 @@ export const updatePassword = (passwordFormState) => {
   };
 };
 
-export const forgotPassword = (email) => {
+export const generateVeriCode = (email) => {
   return async (dispatch) => {
     const body = JSON.stringify({ email });
 
@@ -265,7 +266,7 @@ export const forgotPassword = (email) => {
 
     try {
       const response = await axios.post(
-        `${CURRENT_IP}/api/auth/forgotpassword`,
+        `${CURRENT_IP}/api/auth/generateVeriCode`,
         body,
         config
       );
@@ -294,7 +295,7 @@ export const verifyCode = (code) => {
 
     try {
       const response = await axios.post(
-        `${CURRENT_IP}/api/auth/forgotpassword/${code}`,
+        `${CURRENT_IP}/api/auth/generateVeriCode/${code}`,
         body,
         config
       );
@@ -304,6 +305,35 @@ export const verifyCode = (code) => {
       dispatch({
         type: CODE_VERIFIED,
         verified: verified,
+      });
+    } catch (err) {
+      throw new Error(err.response.data.error);
+    }
+  };
+};
+
+export const activateAccount = (code) => {
+  return async (dispatch) => {
+    const body = JSON.stringify({ code });
+
+    const config = {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    };
+
+    try {
+      const response = await axios.post(
+        `${CURRENT_IP}/api/auth/generateVeriCode/activate/${code}`,
+        body,
+        config
+      );
+
+      const activate = response.data.success;
+
+      dispatch({
+        type: ACTIVATE,
+        activate: activate,
       });
     } catch (err) {
       throw new Error(err.response.data.error);
@@ -329,7 +359,7 @@ export const setNewPassword = (password, passwordConfirm, veriCode) => {
 
     try {
       const response = await axios.put(
-        `${CURRENT_IP}/api/auth/forgotpassword/${veriCode}`,
+        `${CURRENT_IP}/api/auth/generateVeriCode/${veriCode}`,
         body,
         config
       );

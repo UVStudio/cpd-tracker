@@ -217,14 +217,17 @@ exports.updatePassword = asyncHandler(async (req, res, next) => {
 });
 
 //desc    GENERATE Verification code
-//route   POST /api/auth/forgotPassword
+//route   POST /api/auth/generateVeriCode
 //access  public
-exports.forgotPassword = asyncHandler(async (req, res, next) => {
+exports.generateVeriCode = asyncHandler(async (req, res, next) => {
   const user = await User.findOne({ email: req.body.email });
 
   if (!user) {
     return next(new ErrorResponse('This user does not exist.', 404));
   }
+
+  let mailText;
+  let mailSubject;
 
   //get reset token
   const veriCode = user.getVerificationCode();
@@ -233,14 +236,19 @@ exports.forgotPassword = asyncHandler(async (req, res, next) => {
 
   sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
-  const mailText = `You have requested to reset your password for the CPD Tracker. Here is your 6 digit verification code: <strong>${veriCode}</strong>. If you did not request a reset, please contact developer@sheriffconsulting.com immediately.`;
-  console.log('veriCode: ', veriCode);
+  if (user.active) {
+    mailSubject = `CPD Tracker Password Reset`;
+    mailText = `You have requested to reset your password for the CPD Tracker. Here is your 6 digit verification code: <strong>${veriCode}</strong>. If you did not request a reset, please contact developer@sheriffconsulting.com immediately.`;
+  }
+
+  mailSubject = `CPD Tracker Activation Request`;
+  mailText = `Here is your 6 digit activation code for your CPD Tracker App. Here is your 6 digit activation code: <strong>${veriCode}</strong>. If you did not try to activate your account, please contact developer@sheriffconsulting.com immediately. Thank you for using our app.`;
 
   try {
     await sgMail.send({
       to: user.email,
       from: 'developer@sheriffconsulting.com',
-      subject: 'CPD Tracker Password Reset',
+      subject: `${mailSubject}`,
       html: `<p>Hello ${user.name}, <br><br>
         ${mailText}<br>
         <br>
@@ -265,7 +273,7 @@ exports.forgotPassword = asyncHandler(async (req, res, next) => {
 });
 
 //desc    POST Verification code
-//route   POST /api/auth/forgotpassword/:vericode
+//route   POST /api/auth/generateVeriCode/:vericode
 //access  public
 exports.verificationCode = asyncHandler(async (req, res, next) => {
   const verificationCode = crypto
@@ -289,7 +297,7 @@ exports.verificationCode = asyncHandler(async (req, res, next) => {
 });
 
 //desc    RESET password
-//route   PUT /api/auth/forgotpassword/:vericode/
+//route   PUT /api/auth/generateVeriCode/:vericode
 //access  public
 exports.resetPassword = asyncHandler(async (req, res, next) => {
   const verificationCode = crypto
@@ -303,13 +311,43 @@ exports.resetPassword = asyncHandler(async (req, res, next) => {
   });
 
   if (!user) {
-    return next(new ErrorResponse('Invalid verification code', 400));
+    return next(new ErrorResponse('Invalid verification code', 403));
   }
   //mongoose syntax has an User.pre function to encrypt password before saving to DB
   //so no need to bcrypt password here
   const password = req.body.password;
 
   user.password = password;
+  user.lastModifiedAt = Date.now();
+  user.verificationCode = undefined;
+  user.verificationCodeExpire = undefined;
+
+  await user.save();
+
+  res.status(200).json({
+    success: true,
+  });
+});
+
+//desc    ACTIVATE account
+//route   PUT /api/auth/generateVeriCode/activate/:vericode
+//access  public
+exports.activateAccount = asyncHandler(async (req, res, next) => {
+  const verificationCode = crypto
+    .createHash('sha256')
+    .update(req.params.vericode)
+    .digest('hex');
+
+  const user = await User.findOne({
+    verificationCode,
+    verificationCodeExpire: { $gt: Date.now() },
+  });
+
+  if (!user) {
+    return next(new ErrorResponse('Invalid activation code', 403));
+  }
+
+  user.active = true;
   user.lastModifiedAt = Date.now();
   user.verificationCode = undefined;
   user.verificationCodeExpire = undefined;

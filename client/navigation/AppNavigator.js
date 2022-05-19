@@ -22,10 +22,7 @@ const AppNavigator = () => {
     if (authState) {
       setIsActive(authState.active);
     }
-    // console.log('authState: ', isActive);
   }, [authState]);
-
-  console.log('isActive: ', isActive);
 
   return (
     <NavigationContainer>

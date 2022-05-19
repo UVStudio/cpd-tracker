@@ -5,6 +5,7 @@ import {
   GET_USER,
   GET_VERIFICATION_CODE,
   CODE_VERIFIED,
+  ACTIVATE,
   SET_NEW_PASSWORD,
   SET_DID_TRY_AL,
   DATA_REFRESH,
@@ -19,6 +20,7 @@ const initialState = {
   user: null,
   veriCode: null,
   verified: false,
+  activate: false,
   newPassword: false,
   dataRefresh: false,
 };
@@ -55,6 +57,11 @@ export default (state = initialState, action) => {
       return {
         ...state,
         verified: action.verified,
+      };
+    case ACTIVATE:
+      return {
+        ...state,
+        activate: action.activate,
       };
     case SET_NEW_PASSWORD:
       return {

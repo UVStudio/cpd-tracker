@@ -54,7 +54,7 @@ const ForgotPassword = () => {
     setError('');
     setIsLoading(true);
     try {
-      await dispatch(authActions.forgotPassword(email));
+      await dispatch(authActions.generateVeriCode(email));
     } catch (err) {
       setError(err.message);
     }
