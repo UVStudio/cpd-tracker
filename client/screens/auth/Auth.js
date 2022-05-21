@@ -103,17 +103,15 @@ const Auth = () => {
     setError('');
     try {
       await dispatch(action);
-      if (isSignup) {
-        await dispatch(
-          authActions.generateVeriCode(
-            formState.inputValues.email.toLowerCase()
-          )
-        );
-        setIsLogging(false);
-        setIsRegistering(false);
-      }
-      setIsLogging(false);
-      setIsRegistering(false);
+      // if (isSignup) {
+      //   await dispatch(
+      //     authActions.generateVeriCode(
+      //       formState.inputValues.email.toLowerCase()
+      //     )
+      //   );
+      //   setIsLogging(false);
+      //   setIsRegistering(false);
+      // }
     } catch (err) {
       setError(err.message);
       setIsLogging(false);
@@ -147,7 +145,7 @@ const Auth = () => {
   }, [province]);
 
   if (isLoading) {
-    return <CustomIndicator />;
+    return <CustomIndicator text="Loading your account..." />;
   }
 
   return (

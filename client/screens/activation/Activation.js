@@ -18,12 +18,15 @@ import { FORM_INPUT_UPDATE } from '../../store/types';
 
 const Activation = () => {
   const [error, setError] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isAuthSuccess, setIsAuthSuccess] = useState(false);
+  const [isConfirming, setIsConfirming] = useState(false);
+  const [isResending, setIsResending] = useState(false);
 
   const user = useSelector((state) => state.auth.user);
-  const activate = useSelector((state) => state.auth.activate);
-  console.log('user: ', user.email);
-  console.log('activate: ', activate);
+
+  //activate state slice not used in any way
+  //const activate = useSelector((state) => state.auth.activate);
 
   const navigation = useNavigation();
   const dispatch = useDispatch();
@@ -38,6 +41,18 @@ const Activation = () => {
     formIsValid: false,
   });
 
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      // The screen is focused
+      if (!user.active) {
+        setIsLoading(false);
+        genActCodeHandler();
+      }
+    });
+    // Return the function to unsubscribe from the event so it gets removed on unmount
+    return unsubscribe;
+  }, [user]);
+
   const genActCodeHandler = async () => {
     try {
       await dispatch(authActions.generateVeriCode(user.email));
@@ -45,6 +60,17 @@ const Activation = () => {
       console.log(err.message);
       setError(err.message);
     }
+  };
+
+  const resendActCodeHandler = async () => {
+    try {
+      setIsResending(true);
+      await dispatch(authActions.generateVeriCode(user.email));
+    } catch (error) {
+      console.log(err.message);
+      setError(err.message);
+    }
+    setIsResending(false);
   };
 
   const logoutHandler = () => {
@@ -57,15 +83,19 @@ const Activation = () => {
 
   const activationCodeHandler = async (code) => {
     setError('');
+    setIsConfirming(true);
     setIsLoading(true);
     try {
       await dispatch(authActions.activateAccount(code));
+      setIsLoading(false);
+      setIsAuthSuccess(true);
       await dispatch(authActions.getUser());
     } catch (err) {
       console.log(err.message);
       setError('Account cannot be activated');
     }
-    setIsLoading(false);
+    setIsAuthSuccess(false);
+    setIsConfirming(false);
   };
 
   const inputChangeHandler = useCallback(
@@ -81,7 +111,11 @@ const Activation = () => {
   );
 
   if (isLoading) {
-    return <CustomIndicator />;
+    return <CustomIndicator text="Loading..." />;
+  }
+
+  if (isAuthSuccess) {
+    return <CustomIndicator text="Authentication Success!" />;
   }
 
   return (
@@ -102,7 +136,7 @@ const Activation = () => {
           required
           style={styles.textInput}
         />
-        {isLoading ? (
+        {isConfirming ? (
           <CustomButton style={{ marginVertical: 20 }}>
             Confirming {'  '} <CustomSpinner />
           </CustomButton>
@@ -117,9 +151,15 @@ const Activation = () => {
           </CustomButton>
         )}
         <CustomButton onSelect={logoutHandler}>Logout</CustomButton>
-        <CustomButton onSelect={genActCodeHandler}>
-          Resend Activation Code
-        </CustomButton>
+        {isResending ? (
+          <CustomButton>
+            Resending {'  '} <CustomSpinner />
+          </CustomButton>
+        ) : (
+          <CustomButton onSelect={resendActCodeHandler}>
+            Resend Activation Code
+          </CustomButton>
+        )}
       </CustomFormCard>
       {error !== '' ? (
         <CustomErrorCard error={error} toShow={setError} />
