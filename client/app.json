@@ -24,7 +24,7 @@
     },
     "android": {
       "package": "com.sheriffconsulting.cpdtracker",
-      "versionCode": 15,
+      "versionCode": 16,
       "icon": "./assets/adaptive-icon.png",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
