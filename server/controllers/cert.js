@@ -5,7 +5,6 @@ const asyncHandler = require('../middleware/async');
 const mongoose = require('mongoose');
 const ObjectId = require('mongodb').ObjectId;
 const aws = require('aws-sdk');
-const { S3Client, ListObjectsCommand } = require('@aws-sdk/client-s3');
 
 const conn = mongoose.createConnection(process.env.MONGO_URI, {
   useNewUrlParser: true,
