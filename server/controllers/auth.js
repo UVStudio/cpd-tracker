@@ -75,9 +75,11 @@ exports.createUser = asyncHandler(async (req, res, next) => {
     role,
   });
 
+  const userNameS3 = user.name.replace(' ', '-');
+
   const bucketParam = {
     Bucket: process.env.BUCKET_NAME,
-    Key: `users/${user.name}-${user._id.toString()}/`,
+    Key: `users/${userNameS3}-${user._id.toString()}/`,
   };
 
   await s3
