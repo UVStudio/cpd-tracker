@@ -655,7 +655,12 @@ Otherwise, this is going to be a lot of work for nothing.`);
                                     <CustomTextStats
                                       style={{
                                         ...styles.required,
-                                        transform: [{ translateY: 1 }],
+                                        transform: [
+                                          {
+                                            translateY:
+                                              Platform.OS === 'android' ? 4 : 1,
+                                          },
+                                        ],
                                       }}
                                     >
                                       {' '}
@@ -667,7 +672,12 @@ Otherwise, this is going to be a lot of work for nothing.`);
                                       color={Colors.darkOrange}
                                       style={{
                                         ...styles.quotation,
-                                        transform: [{ translateY: 1 }],
+                                        transform: [
+                                          {
+                                            translateY:
+                                              Platform.OS === 'android' ? 4 : 1,
+                                          },
+                                        ],
                                       }}
                                     />
                                   </Pressable>
@@ -731,7 +741,12 @@ Otherwise, this is going to be a lot of work for nothing.`);
                                     <CustomTextStats
                                       style={{
                                         ...styles.required,
-                                        transform: [{ translateY: 1 }],
+                                        transform: [
+                                          {
+                                            translateY:
+                                              Platform.OS === 'android' ? 4 : 1,
+                                          },
+                                        ],
                                       }}
                                     >
                                       {' '}
@@ -743,7 +758,12 @@ Otherwise, this is going to be a lot of work for nothing.`);
                                       color={Colors.darkOrange}
                                       style={{
                                         ...styles.quotation,
-                                        transform: [{ translateY: 1 }],
+                                        transform: [
+                                          {
+                                            translateY:
+                                              Platform.OS === 'android' ? 4 : 1,
+                                          },
+                                        ],
                                       }}
                                     />
                                   </Pressable>
