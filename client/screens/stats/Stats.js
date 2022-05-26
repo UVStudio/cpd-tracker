@@ -301,14 +301,14 @@ const Stats = ({ navigation }) => {
       // 4) iPhone 13 - 15
 
       //this conditional is only for iOS 15 (and perhaps beyond)
-      const majorVersionIOS = parseInt(Platform.Version, 10);
-      if (
-        Platform.OS === 'ios' &&
-        majorVersionIOS > 14 &&
-        (await Sharing.isAvailableAsync())
-      ) {
-        await Sharing.shareAsync('file://' + filePath);
-      }
+      // const majorVersionIOS = parseInt(Platform.Version, 10);
+      // if (
+      //   Platform.OS === 'ios' &&
+      //   majorVersionIOS > 14 &&
+      //   (await Sharing.isAvailableAsync())
+      // ) {
+      //   await Sharing.shareAsync('file://' + filePath);
+      // }
       //end of iOS 15 conditional requirement
 
       await dispatch(reportActions.deleteReport(AWSFileName));
@@ -317,9 +317,7 @@ const Stats = ({ navigation }) => {
         
 For Android users, the PDF is located in the CPD folder.
 
-For iOS 14 and older users, the report is in the File > CPD Tracker folder.
-
-For iOS 15 and beyond, the PDF is where you have chosen to save it.`
+For iOS users, the report is in the Files > CPD Tracker folder.`
       );
     } catch (err) {
       console.log(err.message);
