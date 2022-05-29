@@ -94,6 +94,62 @@ exports.uploadCert = asyncHandler(async (req, res, next) => {
   const certs = user.cert;
   const certsYear = certs.filter((cert) => cert.year === Number(year));
 
+  //Email test
+  // Set the region
+  aws.config.update({ region: process.env.REGION });
+
+  // Create sendEmail params
+  const params = {
+    Destination: {
+      /* required */
+      ToAddresses: [
+        'uvstudio2199@gmail.com',
+        /* more items */
+      ],
+    },
+    Message: {
+      /* required */
+      Body: {
+        /* required */
+        Html: {
+          Charset: 'UTF-8',
+          Data: `Hello ${user.name}, you have just uploaded a certificate`,
+        },
+        Text: {
+          Charset: 'UTF-8',
+          Data: 'TEXT_FORMAT_BODY - testing email on cert upload',
+        },
+      },
+      Subject: {
+        Charset: 'UTF-8',
+        Data: 'Test email',
+      },
+    },
+    Source: 'developer@sheriffconsulting.com' /* required */,
+    ReplyToAddresses: [
+      'developer@sheriffconsulting.com',
+      /* more items */
+    ],
+  };
+
+  // Create the promise and SES service object
+  const sendPromise = new aws.SES({
+    accessKeyId: process.env.ACCESSKEYID,
+    secretAccessKey: process.env.SECRETACCESSKEY,
+    apiVersion: '2010-12-01',
+  })
+    .sendEmail(params)
+    .promise();
+
+  // Handle promise's fulfilled/rejected states
+  sendPromise
+    .then((data) => {
+      console.log(data.MessageId);
+    })
+    .catch((err) => {
+      console.error(err, err.stack);
+    });
+
   res.status(200).json({
     success: 'true',
     info: { file, cert: certObj, user },
