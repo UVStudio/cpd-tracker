@@ -47,6 +47,7 @@ const Profile = () => {
     inputValues: {
       name: user.name,
       email: user.email,
+      backupEmail: user.backupEmail,
       province: user.province,
       cpdMonth: user.cpdMonth.toString(),
       cpdYear: user.cpdYear.toString(),
@@ -54,6 +55,7 @@ const Profile = () => {
     inputValidities: {
       name: false,
       email: false,
+      backupEmail: false,
       province: false,
       cpdMonth: false,
       cpdYear: false,
@@ -230,6 +232,16 @@ All data and certificates will be erased permanently. The app does not keep any 
             autoCapitalize="none"
             onInputChange={inputChangeHandler}
             initialValue={user.email}
+            initiallyValid="true"
+            required
+          />
+          <CustomInput
+            id="backupEmail"
+            label="Backup Email"
+            keyboardType="default"
+            autoCapitalize="none"
+            onInputChange={inputChangeHandler}
+            initialValue={user.backupEmail}
             initiallyValid="true"
             required
           />

@@ -163,7 +163,7 @@ exports.getCurrentUser = asyncHandler(async (req, res, next) => {
 //route   PUT /api/auth/
 //access  private
 exports.updateUser = asyncHandler(async (req, res, next) => {
-  const { name, email, province, cpdYear, cpdMonth } = req.body;
+  const { name, email, backupEmail, province, cpdYear, cpdMonth } = req.body;
 
   await User.updateOne(
     { _id: req.user.id },
@@ -171,6 +171,7 @@ exports.updateUser = asyncHandler(async (req, res, next) => {
       $set: {
         name,
         email,
+        backupEmail,
         province,
         cpdYear,
         cpdMonth,

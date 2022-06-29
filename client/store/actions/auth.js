@@ -197,7 +197,8 @@ export const getUser = () => {
 
 export const updateUser = (formState) => {
   return async (dispatch) => {
-    const { name, email, province, cpdYear, cpdMonth } = formState.inputValues;
+    const { name, email, backupEmail, province, cpdYear, cpdMonth } =
+      formState.inputValues;
 
     try {
       const config = {
@@ -209,6 +210,7 @@ export const updateUser = (formState) => {
       const body = JSON.stringify({
         name,
         email,
+        backupEmail,
         province,
         cpdMonth,
         cpdYear,
