@@ -38,13 +38,17 @@ const CustomInput = (props) => {
   }, [inputState, onInputChange, id]);
 
   const textChangeHandler = (text) => {
+    const nameRegex = /[a-z\s]+$/gi;
     const emailRegex =
       /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     let isValid = true;
     if (props.required && text.trim().length === 0) {
       isValid = false;
     }
-    if (props.email && !emailRegex.test(text.toLowerCase())) {
+    if (props.id === 'email' && !emailRegex.test(text)) {
+      isValid = false;
+    }
+    if (props.id === 'name' && !nameRegex.test(text)) {
       isValid = false;
     }
     if (props.min != null && +text < props.min) {

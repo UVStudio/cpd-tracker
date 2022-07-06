@@ -104,8 +104,6 @@ const Profile = () => {
     [dispatchPasswordFormState]
   );
 
-  //console.log('pw formState: ', passwordFormState);
-
   useEffect(() => {
     dispatchFormState({
       type: FORM_INPUT_UPDATE,
@@ -115,8 +113,16 @@ const Profile = () => {
     });
   }, [province]);
 
+  const nameRegex = /[a-z\s]+$/gi;
+
   const updateProfileHandler = async () => {
     setUpdatingProfile(true);
+    if (!nameRegex.test(formState.inputValues.name)) {
+      setUpdatingProfile(false);
+      setCardText(`For your name, please use letters and/or hyphens only.`);
+      return;
+    }
+
     const { cpdMonth, cpdYear } = formState.inputValues;
     try {
       if (

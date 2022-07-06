@@ -60,6 +60,8 @@ const Auth = () => {
     formIsValid: false,
   });
 
+  console.log('formState: ', formState);
+
   //regex for min 8, max 15, 1 lower, 1 upper, 1 num
   const pwRegex = new RegExp(/^((?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,16})$/);
 
