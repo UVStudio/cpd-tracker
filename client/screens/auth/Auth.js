@@ -60,10 +60,9 @@ const Auth = () => {
     formIsValid: false,
   });
 
-  console.log('formState: ', formState);
-
   //regex for min 8, max 15, 1 lower, 1 upper, 1 num
   const pwRegex = new RegExp(/^((?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,16})$/);
+  const nameRegex = /[a-z\s]+$/gi;
 
   const authHandler = async () => {
     let action;
@@ -83,6 +82,11 @@ const Auth = () => {
 1 lowercase letter,
 1 number.`
         );
+        return;
+      }
+
+      if (!nameRegex.test(formState.inputValues.name)) {
+        setError(`For your name, please use letters and/or hyphens only.`);
         return;
       }
 
