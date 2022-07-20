@@ -3,6 +3,11 @@ const mongoose = require('mongoose');
 const ErrorResponse = require('../utils/errorResponse');
 const asyncHandler = require('../middleware/async');
 const aws = require('aws-sdk');
+const {
+  hoursRequiredLogic,
+  showThreeYearRolling,
+} = require('../utils/hoursRequiredLogic');
+const { currentYear } = require('../utils/currentYear');
 
 const s3 = new aws.S3({
   accessKeyId: process.env.ACCESSKEYID,
@@ -226,12 +231,104 @@ exports.downloadObjectByKey = asyncHandler(async (req, res, next) => {
   //   console.log('success');
   // });
 
-  console.log('Body: ', Body);
-  //console.log('Type of Body: ', typeof Body);
-
   //converting from Buffer to string, PDFKit only accepts string as input for .image()
   const img = `data:image/jpg;base64,${Buffer.from(Body).toString('base64')}`;
-  console.log('typeof img: ', typeof img);
+  //console.log('typeof img: ', typeof img);
 
   res.status(200).json({ success: true });
+});
+
+//desc    ALPHA - Send mass emails
+//route   POST /api/admin/massemail
+//access  admin
+exports.sendMassEmails = asyncHandler(async (req, res, next) => {
+  const Leonard = await User.find({ email: 'leonard.shen@gmail.com' });
+  const Ned = await User.find({ email: 'uvstudio2199@gmail.com' });
+
+  const users = [Leonard, Ned];
+
+  //Email test
+  //Set the region
+  aws.config.update({ region: process.env.REGION });
+
+  for (const user of users) {
+    const currentUser = user[0];
+    const hoursRequired = hoursRequiredLogic(currentUser, currentYear);
+
+    const currentYearCPDAccomplished =
+      currentUser.hours[0].verifiable + currentUser.hours[0].nonVerifiable;
+
+    const {
+      currentYearNeedCPDHours,
+      currentYearNeedVerHours,
+      currentYearNeedEthicsHours,
+      totalRollingVerRequired,
+      totalRollingCPDHoursRequired,
+      totalRollingEthicsRequired,
+      pastVerHours,
+      pastNonVerHours,
+      pastEthicsHours,
+    } = hoursRequired;
+
+    const CPDAccomplishedThreeYears =
+      pastVerHours + pastNonVerHours + currentYearCPDAccomplished;
+
+    //Create sendEmail params
+    const params = {
+      Destination: {
+        /* required */
+        ToAddresses: [currentUser.email],
+      },
+      Message: {
+        /* required */
+        Body: {
+          /* required */
+          Html: {
+            Charset: 'UTF-8',
+            Data: `Hello ${
+              currentUser.name
+            }, for testing purposes, your email address is ${currentUser.email}.
+            You currently need ${
+              totalRollingCPDHoursRequired - CPDAccomplishedThreeYears
+            } hours for this year of ${currentYear}.
+            `,
+          },
+          Text: {
+            Charset: 'UTF-8',
+            Data: 'TEXT_FORMAT_BODY - testing email on cert upload',
+          },
+        },
+        Subject: {
+          Charset: 'UTF-8',
+          Data: 'Test email',
+        },
+      },
+      Source: 'developer@sheriffconsulting.com' /* required */,
+      ReplyToAddresses: [
+        'developer@sheriffconsulting.com',
+        /* more items */
+      ],
+    };
+
+    const sendPromise = new aws.SES({
+      accessKeyId: process.env.ACCESSKEYID,
+      secretAccessKey: process.env.SECRETACCESSKEY,
+      apiVersion: '2010-12-01',
+    })
+      .sendEmail(params)
+      .promise();
+
+    // Handle promise's fulfilled/rejected states
+    await sendPromise
+      .then((data) => {
+        console.log(data.MessageId);
+      })
+      .catch((err) => {
+        console.error(err, err.stack);
+      });
+  }
+
+  res.status(200).json({
+    success: 'true',
+  });
 });

@@ -10,6 +10,7 @@ const {
   getUsersCount,
   getReportByUserIdYear,
   removeCertElementFromUserByCertId,
+  sendMassEmails,
 } = require('../controllers/admin');
 
 const router = express.Router();
@@ -46,5 +47,6 @@ router.delete(
   authorize('admin'),
   removeCertElementFromUserByCertId
 );
+router.post('/massemails', protect, authorize('admin'), sendMassEmails);
 
 module.exports = router;
