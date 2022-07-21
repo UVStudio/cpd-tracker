@@ -8,6 +8,7 @@ const {
   showThreeYearRolling,
 } = require('../utils/hoursRequiredLogic');
 const { currentYear } = require('../utils/currentYear');
+const { recordsEmailsParams } = require('../templates/hoursReport');
 
 const s3 = new aws.S3({
   accessKeyId: process.env.ACCESSKEYID,
@@ -273,63 +274,20 @@ exports.sendMassEmails = asyncHandler(async (req, res, next) => {
     const CPDAccomplishedThreeYears =
       pastVerHours + pastNonVerHours + currentYearCPDAccomplished;
 
-    //Create sendEmail params
-    const params = {
-      Destination: {
-        /* required */
-        ToAddresses: [currentUser.email],
-      },
-      Message: {
-        /* required */
-        Body: {
-          /* required */
-          Html: {
-            Charset: 'UTF-8',
-            Data: `<h3>Hello ${currentUser.name}:</h3>
-            <p>For testing purposes, your email address is ${
-              currentUser.email
-            }.</p>
-            <p>You currently need <b>${
-              totalRollingCPDHoursRequired - CPDAccomplishedThreeYears
-            }</b> total CPD hours for the year ${currentYear} to fulfill all your CPD requirements for the province of ${
-              currentUser.province
-            }. Of which, <b>${
-              currentYearNeedVerHours - currentUser.hours[0].verifiable
-            }</b> hour(s) will need to be verifiable.</p>
-            <p>If you do not wish to receive similar emails from us in the future, please reply to this email requesting to be removed from our email notification list. A human will manually remove your email address from this list.</p>
-
-            <p>Thank you for using CPD Tracker by Sheriff Consulting.</p>
-            <p><b>
-            Leonard Shen, Application Developer<br>
-            Sheriff Consulting</b><br>
-            <br>
-            </p>
-
-            `,
-          },
-          Text: {
-            Charset: 'UTF-8',
-            Data: 'TEXT_FORMAT_BODY - testing email on cert upload',
-          },
-        },
-        Subject: {
-          Charset: 'UTF-8',
-          Data: 'Test email',
-        },
-      },
-      Source: 'developer@sheriffconsulting.com' /* required */,
-      ReplyToAddresses: [
-        'developer@sheriffconsulting.com',
-        /* more items */
-      ],
-    };
-
     const sendPromise = new aws.SES({
       accessKeyId: process.env.ACCESSKEYID,
       secretAccessKey: process.env.SECRETACCESSKEY,
       apiVersion: '2010-12-01',
     })
-      .sendEmail(params)
+      .sendEmail(
+        recordsEmailsParams(
+          currentUser,
+          totalRollingCPDHoursRequired,
+          CPDAccomplishedThreeYears,
+          currentYear,
+          currentYearNeedVerHours
+        )
+      )
       .promise();
 
     // Handle promise's fulfilled/rejected states
