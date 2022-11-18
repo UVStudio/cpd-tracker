@@ -94,7 +94,6 @@ export const login = (email, password) => {
         body,
         config
       );
-
       const resData = await response.data;
       dispatch(authenticate(resData.token, resData.user._id, oneMonth));
       dispatch(setUser(resData.user));
@@ -380,7 +379,6 @@ export const setNewPassword = (password, passwordConfirm, veriCode) => {
 
 export const deleteCurrentUser = () => {
   return async (dispatch) => {
-    //await dispatch(clearUserState());
     dispatch(logout());
     try {
       await axios.delete(`${CURRENT_IP}/api/auth/`);
