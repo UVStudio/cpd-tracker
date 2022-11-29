@@ -32,7 +32,10 @@ const rootReducer = combineReducers({
 const store = createStore(rootReducer, applyMiddleware(ReduxThunk));
 
 const App = () => {
-  LogBox.ignoreLogs(['Setting a timer']);
+  LogBox.ignoreLogs([
+    'Setting a timer',
+    'Overwriting fontFamily style attribute preprocessor',
+  ]);
 
   const [fontLoaded, setFontLoaded] = useState(false);
 
