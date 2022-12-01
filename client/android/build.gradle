@@ -32,8 +32,8 @@ allprojects {
                }
            }
         }
-        mavenCentral()
-        mavenLocal()
+        // mavenCentral()
+        // mavenLocal()
         maven {
             // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
             url(new File(["node", "--print", "require.resolve('react-native/package.json')"].execute(null, rootDir).text.trim(), "../android"))
@@ -42,9 +42,16 @@ allprojects {
             // Android JSC is installed from npm
             url(new File(["node", "--print", "require.resolve('jsc-android/package.json')"].execute(null, rootDir).text.trim(), "../dist"))
         }
+        mavenCentral {
+            // We don't want to fetch react-native from Maven Central as there are
+            // older versions over there.
+            content {
+                excludeGroup "com.facebook.react"
+            }
+        }
 
         google()
-        mavenCentral()
+        // mavenCentral()
         maven { url 'https://www.jitpack.io' }
     }
 }
