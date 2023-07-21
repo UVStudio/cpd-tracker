@@ -1,6 +1,4 @@
-# Welcome to CPD Tracker by <a href="http://sheriffconsulting.com" target="_blank">Sheriff Consulting</a>
-
-
+# Welcome to CPD Tracker by [Sheriff Consulting](http://sheriffconsulting.com) 
 
 The project is current in hiatus. This codebase is a working prototype React-Native app. 
 The purpose of this app is to help CPA's in Canada keep track of their verifiable and non-verifiable CPD hours.
